@@ -1,0 +1,129 @@
+import 'package:equatable/equatable.dart';
+
+enum InternRegistrationType {
+  registerWish('registerWish'),
+  yourself('yourself'),
+  facultyAssign('facultyAssign');
+
+  const InternRegistrationType(this.value);
+
+  final String value;
+}
+
+abstract class InternRegistrationRequestModel extends Equatable {
+  const InternRegistrationRequestModel({
+    required this.type,
+    required this.academicYearId,
+    required this.cpa,
+    required this.cvFileKey,
+    required this.cvFileName,
+  });
+
+  final InternRegistrationType type;
+  final String academicYearId;
+  final double cpa;
+  final String cvFileKey;
+  final String cvFileName;
+
+  Map<String, dynamic> toJson();
+
+  Map<String, dynamic> commonToJson() {
+    return {
+      'type': type.value,
+      'academicYearId': academicYearId,
+      'cpa': cpa,
+      'cvFileKey': cvFileKey,
+      'cvFileName': cvFileName,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+        type,
+        academicYearId,
+        cpa,
+        cvFileKey,
+        cvFileName,
+      ];
+}
+
+class RegisterWishInternRequestModel extends InternRegistrationRequestModel {
+  const RegisterWishInternRequestModel({
+    required super.academicYearId,
+    required super.cpa,
+    required super.cvFileKey,
+    required super.cvFileName,
+    required this.preferredCompanies,
+  }) : super(type: InternRegistrationType.registerWish);
+
+  final List<String> preferredCompanies;
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      ...commonToJson(),
+      'preferredCompanies': preferredCompanies,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+        ...super.props,
+        preferredCompanies,
+      ];
+}
+
+class RegisterYourselfInternRequestModel
+    extends InternRegistrationRequestModel {
+  const RegisterYourselfInternRequestModel({
+    required super.academicYearId,
+    required super.cpa,
+    required super.cvFileKey,
+    required super.cvFileName,
+    required this.companyName,
+    required this.companyField,
+    required this.companyAddress,
+    required this.representativeName,
+    required this.representativePhoneNumber,
+    required this.representativeJob,
+    required this.expectedStartTime,
+    required this.expectedEndTime,
+  }) : super(type: InternRegistrationType.yourself);
+
+  final String companyName;
+  final String companyField;
+  final String companyAddress;
+  final String representativeName;
+  final String representativePhoneNumber;
+  final String representativeJob;
+  final DateTime expectedStartTime;
+  final DateTime expectedEndTime;
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      ...commonToJson(),
+      'companyName': companyName,
+      'companyField': companyField,
+      'companyAddress': companyAddress,
+      'representativeName': representativeName,
+      'representativePhoneNumber': representativePhoneNumber,
+      'representativeJob': representativeJob,
+      'expectedStartTime': expectedStartTime.toUtc().toIso8601String(),
+      'expectedEndTime': expectedEndTime.toUtc().toIso8601String(),
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+        ...super.props,
+        companyName,
+        companyField,
+        companyAddress,
+        representativeName,
+        representativePhoneNumber,
+        representativeJob,
+        expectedStartTime,
+        expectedEndTime,
+      ];
+}
