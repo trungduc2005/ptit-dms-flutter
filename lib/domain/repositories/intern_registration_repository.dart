@@ -13,13 +13,13 @@ abstract class InternRegistrationRepository {
     required InternRegistrationRequestModel request,
   });
 
-  Future<CurrentInternRegistrationModel> getCurrentRegistration({
+  Future<CurrentInternRegistrationModel?> getCurrentRegistration({
     required String academicYearId,
   });
 
   Future<InternRegistrationCheckModel> checkInternRegistration({
-    required String studentId, 
-    required String academicYearId, 
+    required String studentId,
+    required String academicYearId,
   });
 
   Future<InternRegistrationCvDownloadModel> downloadRegistrationCv({

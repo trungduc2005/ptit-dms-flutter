@@ -2,11 +2,11 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:ptit_dms_flutter/core/network/bearer_auth_interceptor.dart';
+import 'package:ptit_dms_flutter/data/models/current_intern_registration_model.dart';
 import 'package:ptit_dms_flutter/data/models/intern_registration_check_model.dart';
 import 'package:ptit_dms_flutter/data/models/intern_registration_cv_download_model.dart';
 import 'package:ptit_dms_flutter/data/models/intern_registration_model.dart';
 import 'package:ptit_dms_flutter/data/models/intern_registration_request_model.dart';
-import 'package:ptit_dms_flutter/data/models/current_intern_registration_model.dart';
 
 class InternRegistrationRemoteDataSource {
   InternRegistrationRemoteDataSource(this._dio);
@@ -37,7 +37,7 @@ class InternRegistrationRemoteDataSource {
     return InternRegistrationModel.fromJson(_asJsonMap(response.data));
   }
 
-  Future<CurrentInternRegistrationModel> getCurrentRegistration({
+  Future<CurrentInternRegistrationModel?> getCurrentRegistration({
     required String academicYearId,
   }) async {
     final response = await _dio.get(
@@ -46,7 +46,12 @@ class InternRegistrationRemoteDataSource {
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    return CurrentInternRegistrationModel.fromJson(_asJsonMap(response.data));
+    final json = _asNullableJsonMap(response.data);
+    if (json == null || !_looksLikeCurrentRegistrationPayload(json)) {
+      return null;
+    }
+
+    return CurrentInternRegistrationModel.fromJson(json);
   }
 
   Future<InternRegistrationCheckModel> checkInternRegistration({
@@ -75,14 +80,19 @@ class InternRegistrationRemoteDataSource {
       ),
     );
 
+    final bytes = _asBytes(response.data);
+    if (bytes == null || bytes.isEmpty) {
+      throw StateError('Khong nhan duoc du lieu file CV hop le.');
+    }
+
     return InternRegistrationCvDownloadModel(
-      bytes: _asBytes(response.data),
+      bytes: bytes,
       fileName: _extractFileName(response.headers) ?? '$studentId-cv.pdf',
       contentType: response.headers.value(Headers.contentTypeHeader),
     );
   }
 
-  Uint8List _asBytes(Object? data) {
+  Uint8List? _asBytes(Object? data) {
     if (data is Uint8List) {
       return data;
     }
@@ -97,7 +107,7 @@ class InternRegistrationRemoteDataSource {
       );
     }
 
-    return Uint8List(0);
+    return null;
   }
 
   String? _extractFileName(Headers headers) {
@@ -118,6 +128,40 @@ class InternRegistrationRemoteDataSource {
       r'filename="?([^"]+)"?',
     ).firstMatch(contentDisposition);
     return basicMatch?.group(1);
+  }
+
+  bool _looksLikeCurrentRegistrationPayload(Map<String, dynamic> json) {
+    return json.containsKey('_id') ||
+        json.containsKey('internId') ||
+        json.containsKey('studentId') ||
+        json.containsKey('type');
+  }
+
+  Map<String, dynamic>? _asNullableJsonMap(Object? data) {
+    if (data == null) {
+      return null;
+    }
+
+    Object? source = data;
+
+    if (data is Map) {
+      source = data.containsKey('data') ? data['data'] : data;
+    }
+
+    if (source == null) {
+      return null;
+    }
+
+    if (source is Map<String, dynamic>) {
+      return source.isEmpty ? null : source;
+    }
+
+    if (source is Map) {
+      final map = Map<String, dynamic>.from(source);
+      return map.isEmpty ? null : map;
+    }
+
+    return null;
   }
 
   Map<String, dynamic> _asJsonMap(Object? data) {

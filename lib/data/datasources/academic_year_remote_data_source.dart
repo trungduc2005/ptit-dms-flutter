@@ -9,7 +9,7 @@ class AcademicYearRemoteDataSource {
 
   Future<List<AcademicYearOptionModel>> getInternAcademicYears() async {
     final response = await _dio.get(
-      '/academic-years-options/interns',
+      '/academic-years/options/interns',
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 

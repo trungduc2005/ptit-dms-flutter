@@ -47,7 +47,7 @@ class CurrentInternRegistrationModel extends Equatable {
   final List<CurrentInternPreferredCompanyModel> preferredCompanies;
   final String? cvFileName;
   final String? cvFileKey;
-  final List<String> rejectReasons;
+  final List<CurrentInternRejectReasonModel> rejectReasons;
   final String? status;
   final double? cpa;
   final DateTime? expectedStartTime;
@@ -64,7 +64,7 @@ class CurrentInternRegistrationModel extends Equatable {
       id: asString(json['_id']) ?? '',
       internId: asString(json['internId']) ?? '',
       studentId: asString(json['studentId']) ?? '',
-      studentRef: asString(json['studentRef']),
+      studentRef: _asIdValue(json['studentRef']),
       type: asString(json['type']) ?? '',
       cohort: asString(json['cohort']),
       academicYearRef: academicYearRefJson is Map
@@ -91,7 +91,7 @@ class CurrentInternRegistrationModel extends Equatable {
           : const [],
       cvFileName: asString(json['cvFileName']),
       cvFileKey: asString(json['cvFileKey']),
-      rejectReasons: _asStringList(json['rejectReasons']),
+      rejectReasons: _asRejectReasonList(json['rejectReasons']),
       status: asString(json['status']),
       cpa: asDouble(json['cpa']),
       expectedStartTime: asDateTime(json['expectedStartTime']),
@@ -123,7 +123,9 @@ class CurrentInternRegistrationModel extends Equatable {
           .toList(growable: false),
       'cvFileName': cvFileName,
       'cvFileKey': cvFileKey,
-      'rejectReasons': rejectReasons,
+      'rejectReasons': rejectReasons
+          .map((item) => item.toJson())
+          .toList(growable: false),
       'status': status,
       'cpa': cpa,
       'expectedStartTime': expectedStartTime?.toIso8601String(),
@@ -134,15 +136,40 @@ class CurrentInternRegistrationModel extends Equatable {
     };
   }
 
-  static List<String> _asStringList(Object? value) {
+  static String? _asIdValue(Object? value) {
+    if (value is Map) {
+      return asString(value['_id']) ?? asString(value['id']);
+    }
+
+    return asString(value);
+  }
+
+  static List<CurrentInternRejectReasonModel> _asRejectReasonList(
+    Object? value,
+  ) {
     if (value is! List) {
       return const [];
     }
 
-    return value
-        .map((item) => item?.toString().trim() ?? '')
-        .where((item) => item.isNotEmpty)
-        .toList(growable: false);
+    final results = <CurrentInternRejectReasonModel>[];
+
+    for (final item in value) {
+      if (item is Map) {
+        results.add(
+          CurrentInternRejectReasonModel.fromJson(
+            Map<String, dynamic>.from(item),
+          ),
+        );
+        continue;
+      }
+
+      final text = item?.toString().trim() ?? '';
+      if (text.isNotEmpty) {
+        results.add(CurrentInternRejectReasonModel(reason: text));
+      }
+    }
+
+    return List.unmodifiable(results);
   }
 
   @override
@@ -235,4 +262,37 @@ class CurrentInternPreferredCompanyModel extends Equatable {
 
   @override
   List<Object?> get props => [order, companyId, companyName];
+}
+
+class CurrentInternRejectReasonModel extends Equatable {
+  const CurrentInternRejectReasonModel({
+    required this.reason,
+    this.rejectedAt,
+    this.rejectedBy,
+  });
+  
+  final String reason;
+  final DateTime? rejectedAt;
+  final String? rejectedBy;
+
+  factory CurrentInternRejectReasonModel.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return CurrentInternRejectReasonModel(
+      reason: asString(json['reason']) ?? '',
+      rejectedAt: asDateTime(json['rejectedAt']),
+      rejectedBy: asString(json['rejectedBy']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'reason': reason,
+      'rejectedAt': rejectedAt?.toIso8601String(),
+      'rejectedBy': rejectedBy,
+    };
+  }
+
+  @override
+  List<Object?> get props => [reason, rejectedAt, rejectedBy];
 }

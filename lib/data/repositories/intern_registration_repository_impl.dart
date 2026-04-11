@@ -26,7 +26,7 @@ class InternRegistrationRepositoryImpl implements InternRegistrationRepository {
   }
 
   @override
-  Future<CurrentInternRegistrationModel> getCurrentRegistration({
+  Future<CurrentInternRegistrationModel?> getCurrentRegistration({
     required String academicYearId,
   }) {
     return _remoteDataSource.getCurrentRegistration(
