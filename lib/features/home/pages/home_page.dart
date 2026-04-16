@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:ptit_dms_flutter/core/network/dio_client.dart';
 import 'package:ptit_dms_flutter/data/datasources/academic_year_remote_data_source.dart';
@@ -20,6 +21,7 @@ import 'package:ptit_dms_flutter/domain/repositories/academic_year_repository.da
 import 'package:ptit_dms_flutter/domain/repositories/eligibility_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_cv_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/timeline_repository.dart';
+import 'package:ptit_dms_flutter/features/auth/bloc/auth_bloc.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -84,6 +86,10 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     _cvFilePathController.dispose();
     super.dispose();
+  }
+
+  void _logout() {
+    context.read<AuthBloc>().add(const AuthLogoutRequested());
   }
 
   Future<void> _loadAcademicYears() async {
@@ -286,12 +292,8 @@ class _HomePageState extends State<HomePage> {
             Text('type: ${timeline.type ?? '-'}'),
             Text('role: ${timeline.role ?? '-'}'),
             Text('academicYear: ${timeline.academicYear ?? '-'}'),
-            Text(
-              'startTime: ${timeline.startTime?.toIso8601String() ?? '-'}',
-            ),
-            Text(
-              'endTime: ${timeline.endTime?.toIso8601String() ?? '-'}',
-            ),
+            Text('startTime: ${timeline.startTime?.toIso8601String() ?? '-'}'),
+            Text('endTime: ${timeline.endTime?.toIso8601String() ?? '-'}'),
             Text(
               'preferredCompanyCount: '
               '${timeline.preferredCompanyCount?.toString() ?? '-'}',
@@ -396,6 +398,13 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Test Intern APIs'),
+        actions: [
+          IconButton(
+            tooltip: 'Dang xuat',
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(

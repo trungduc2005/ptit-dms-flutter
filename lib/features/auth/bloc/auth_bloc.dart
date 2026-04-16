@@ -34,12 +34,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       if (emit.isDone || isClosed) return;
 
+      if (!data.valid) {
+        emit(
+          state.copyWith(
+            status: AuthStatus.unauthenticated,
+            message: null,
+            userId: null,
+            role: null,
+          ),
+        );
+        return;
+      }
+
       emit(
         state.copyWith(
           status: AuthStatus.authenticated,
           message: null,
-          userId: _readUserId(data),
-          role: _readRole(data),
+          userId: data.user?.userId,
+          role: data.user?.role,
         ),
       );
     } on DioException catch (e) {
@@ -64,7 +76,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(
         state.copyWith(
           status: AuthStatus.unauthenticated,
-          message: "Không thể kiểm tra phiên đăng nhập",
+          message: 'Không thể kiểm tra phiên đăng nhập',
           userId: null,
           role: null,
         ),
@@ -93,11 +105,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       if (emit.isDone || isClosed) return;
 
-      if (data['success'] == false) {
+      if (!data.success) {
         emit(
           state.copyWith(
             status: AuthStatus.failure,
-            message: data['message']?.toString() ?? 'Đăng nhập thất bại',
+            message: data.message ?? 'Đăng nhập thất bại',
           ),
         );
         return;
@@ -107,8 +119,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         state.copyWith(
           status: AuthStatus.authenticated,
           message: null,
-          userId: _readUserId(data),
-          role: _readRole(data),
+          userId: data.userId,
+          role: data.role,
         ),
       );
     } on DioException catch (e) {
@@ -150,21 +162,5 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         role: null,
       ),
     );
-  }
-
-  String? _readUserId(Map<String, dynamic> data) {
-    final user = data['user'];
-    if (user is Map && user['id'] != null) {
-      return user['id'].toString();
-    }
-    return data['userId']?.toString();
-  }
-
-  String? _readRole(Map<String, dynamic> data) {
-    final user = data['user'];
-    if (user is Map && user['role'] != null) {
-      return user['role'].toString();
-    }
-    return data['role']?.toString();
   }
 }
