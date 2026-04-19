@@ -39,7 +39,7 @@ class _ProfilePageViewState extends State<_ProfilePageView> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => const MainTabChildPage(
-          title: 'Thong tin tai khoan',
+          title: 'Thông tin tài khoản',
         ),
       ),
     );

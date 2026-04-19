@@ -95,7 +95,7 @@ class ProfileViewBody extends StatelessWidget {
                         children: [
                           ProfileActionTile(
                             icon: Icons.person_outline_rounded,
-                            label: 'Thong tin tai khoan',
+                            label: 'Thông tin tài khoản',
                             onTap: onAccountInfoTap,
                           ),
                           const SizedBox(height: 28),
