@@ -3,6 +3,8 @@ import 'package:ptit_dms_flutter/core/network/bearer_auth_interceptor.dart';
 import 'package:ptit_dms_flutter/data/models/student_profile_avatar_upload_model.dart';
 import 'package:ptit_dms_flutter/data/models/student_profile_model.dart';
 import 'package:ptit_dms_flutter/data/models/student_profile_update_request_model.dart';
+import 'package:ptit_dms_flutter/data/models/required_profile_check_model.dart';
+import 'package:ptit_dms_flutter/data/models/required_profile_update_request_model.dart';
 
 class StudentProfileRemoteDataSource {
   StudentProfileRemoteDataSource(this._dio);
@@ -50,6 +52,25 @@ class StudentProfileRemoteDataSource {
     );
 
     return StudentProfileAvatarUploadModel.fromJson(_asJsonMap(response.data));
+  }
+
+  Future<RequiredProfileCheckModel> checkRequiredProfile() async {
+    final response = await _dio.get(
+      '/users/check-profile',
+      options: Options(extra: const {requiresBearerAuthKey: true}),
+    );
+
+    return RequiredProfileCheckModel.fromJson(_asJsonMap(response.data));
+  }
+
+  Future<void> updateRequiredProfile({
+    required RequiredProfileUpdateRequestModel request,
+  }) async {
+    await _dio.put(
+      '/users/update-profile-required',
+      data: request.toJson(),
+      options: Options(extra: const {requiresBearerAuthKey: true}),
+    );
   }
 
   Map<String, dynamic> _asJsonMap(Object? data) {

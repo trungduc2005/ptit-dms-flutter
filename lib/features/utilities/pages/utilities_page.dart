@@ -18,11 +18,11 @@ class UtilitiesPage extends StatelessWidget {
       iconAsset: 'assets/icons/register.svg',
       routeName: UtilitiesRoutes.internshipRegistration,
     ),
-    UtilityShortcutData(
-      title: 'Kết quả\nđăng ký',
-      iconAsset: 'assets/icons/result.svg',
-      routeName: UtilitiesRoutes.registrationResult,
-    ),
+    // UtilityShortcutData(
+    //   title: 'Kết quả\nđăng ký',
+    //   iconAsset: 'assets/icons/result.svg',
+    //   routeName: UtilitiesRoutes.registrationResult,
+    // ),
   ];
 
   @override

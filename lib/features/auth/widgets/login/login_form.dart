@@ -27,7 +27,7 @@ class LoginForm extends StatelessWidget {
         children: [
           LoginTextField(
             label: 'Tên đăng nhập',
-            hintText: 'NHập tên đăng nhập',
+            hintText: 'Nhập tên đăng nhập',
             controller: usernameController,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,

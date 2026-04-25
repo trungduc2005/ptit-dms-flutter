@@ -3,6 +3,8 @@ import 'package:ptit_dms_flutter/data/models/student_profile_avatar_upload_model
 import 'package:ptit_dms_flutter/data/models/student_profile_model.dart';
 import 'package:ptit_dms_flutter/data/models/student_profile_update_request_model.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
+import 'package:ptit_dms_flutter/data/models/required_profile_check_model.dart';
+import 'package:ptit_dms_flutter/data/models/required_profile_update_request_model.dart';
 
 class StudentProfileRepositoryImpl implements StudentProfileRepository {
   StudentProfileRepositoryImpl(this._remoteDataSource);
@@ -26,5 +28,17 @@ class StudentProfileRepositoryImpl implements StudentProfileRepository {
     required String filePath,
   }) {
     return _remoteDataSource.uploadAvatar(filePath: filePath);
+  }
+
+  @override
+  Future<RequiredProfileCheckModel> checkRequiredProfile() {
+    return _remoteDataSource.checkRequiredProfile();
+  }
+
+  @override
+  Future<void> updateRequiredProfile({
+    required RequiredProfileUpdateRequestModel request,
+  }) {
+    return _remoteDataSource.updateRequiredProfile(request: request);
   }
 }
