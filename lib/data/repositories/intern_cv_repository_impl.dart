@@ -11,10 +11,12 @@ class InternCvRepositoryImpl implements InternCvRepository {
   Future<InternCvUploadResultModel> uploadCv({
     required String academicYearId,
     required String filePath,
+    String? studentId,
   }) {
     return _remoteDataSource.uploadCv(
       academicYearId: academicYearId,
       filePath: filePath,
+      studentId: studentId,
     );
   }
 }

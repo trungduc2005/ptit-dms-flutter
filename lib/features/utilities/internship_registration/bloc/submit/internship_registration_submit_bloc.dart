@@ -45,6 +45,7 @@ class InternshipRegistrationSubmitBloc extends Bloc<
       final uploadedCv = await _internCvRepository.uploadCv(
         academicYearId: event.academicYearId,
         filePath: event.filePath,
+        studentId: event.studentId,
       );
 
       if (emit.isDone || isClosed) return;

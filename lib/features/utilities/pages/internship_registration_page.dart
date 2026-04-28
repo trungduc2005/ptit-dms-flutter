@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:file_picker/file_picker.dart';
@@ -18,10 +19,14 @@ import 'package:ptit_dms_flutter/domain/repositories/timeline_repository.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/bloc/context/internship_registration_context_bloc.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/bloc/submit/internship_registration_submit_bloc.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/models/internship_registration_form_type.dart';
+import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_picker_field.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_sections.dart';
+import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_self_contact_group_section.dart';
 import 'package:ptit_dms_flutter/features/utilities/widgets/utilities_header.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_calendar_dialog.dart';
 import 'package:ptit_dms_flutter/core/widgets/app_popup_dialog.dart';
+import 'package:ptit_dms_flutter/data/models/student_search_result_model.dart';
+import 'package:ptit_dms_flutter/domain/repositories/student_search_repository.dart';
 
 class InternshipRegistrationPage extends StatelessWidget {
   const InternshipRegistrationPage({super.key});
@@ -74,6 +79,15 @@ class _InternshipRegistrationViewState
       TextEditingController();
   final TextEditingController _representativeJobController =
       TextEditingController();
+  final TextEditingController _memberSearchController = TextEditingController();
+  Timer? _memberSearchDebounce;
+
+  List<SelfContactMemberForm> _selfContactMembers = const [];
+  List<StudentSearchResultModel> _memberSearchResults = const [];
+  bool _isAddingSelfContactMember = false;
+  bool _isSearchingMembers = false;
+  String? _memberSearchError;
+  String? _uploadingMemberStudentId;
 
   bool _isPopupOpen = false;
 
@@ -102,6 +116,8 @@ class _InternshipRegistrationViewState
     _representativeNameController.dispose();
     _representativePhoneController.dispose();
     _representativeJobController.dispose();
+    _memberSearchDebounce?.cancel();
+    _memberSearchController.dispose();
     super.dispose();
   }
 
@@ -133,6 +149,257 @@ class _InternshipRegistrationViewState
         _isBootstrapping = false;
         _bootstrapError = 'Không thể tải thông tin sinh viên.';
       });
+    }
+  }
+
+  String _representativeStudentIdForState(
+    InternshipRegistrationContextState state,
+  ) {
+    final profileStudentId = _profile?.studentId.trim() ?? '';
+    return profileStudentId.isNotEmpty
+        ? profileStudentId
+        : state.studentId.trim();
+  }
+
+  String _studentSearchLabel(StudentSearchResultModel student) {
+    final label = student.label.trim();
+    if (label.isNotEmpty) return label;
+
+    final name = student.studentName.trim();
+    final id = student.studentId.trim();
+
+    if (name.isNotEmpty && id.isNotEmpty) return '$name ($id)';
+    return name.isNotEmpty ? name : id;
+  }
+
+  String _representativeLabelForState(
+    InternshipRegistrationContextState state,
+  ) {
+    final studentId = _representativeStudentIdForState(state);
+    final fullName = _profile?.user?.fullName.trim() ?? '';
+
+    if (fullName.isNotEmpty && studentId.isNotEmpty) {
+      return '$fullName - $studentId';
+    }
+
+    return fullName.isNotEmpty ? fullName : studentId;
+  }
+
+  String _representativeNameForState(InternshipRegistrationContextState state) {
+    final fullName = _profile?.user?.fullName.trim() ?? '';
+    if (fullName.isNotEmpty) {
+      return fullName;
+    }
+
+    return _representativeStudentIdForState(state);
+  }
+
+  void _startAddingSelfContactMember() {
+    _memberSearchDebounce?.cancel();
+
+    setState(() {
+      _isAddingSelfContactMember = true;
+      _memberSearchController.clear();
+      _memberSearchResults = const [];
+      _memberSearchError = null;
+      _isSearchingMembers = false;
+    });
+  }
+
+  void _cancelAddingSelfContactMember() {
+    _memberSearchDebounce?.cancel();
+
+    setState(() {
+      _isAddingSelfContactMember = false;
+      _memberSearchController.clear();
+      _memberSearchResults = const [];
+      _memberSearchError = null;
+      _isSearchingMembers = false;
+    });
+  }
+
+  void _onSelfContactSearchChanged(
+    InternshipRegistrationContextState contextState,
+    String value,
+  ) {
+    _memberSearchDebounce?.cancel();
+
+    final query = value.trim();
+
+    if (query.isEmpty) {
+      setState(() {
+        _memberSearchResults = const [];
+        _memberSearchError = null;
+        _isSearchingMembers = false;
+      });
+      return;
+    }
+
+    if (query.length < 3) {
+      setState(() {
+        _memberSearchResults = const [];
+        _memberSearchError = 'Nhập ít nhất 3 ký tự để tìm sinh viên.';
+        _isSearchingMembers = false;
+      });
+      return;
+    }
+
+    _memberSearchDebounce = Timer(const Duration(milliseconds: 350), () {
+      _searchSelfContactMembers(contextState, query);
+    });
+  }
+
+  Future<void> _searchSelfContactMembers(
+    InternshipRegistrationContextState contextState,
+    String query,
+  ) async {
+    final studentSearchRepository = context.read<StudentSearchRepository>();
+    final academicYearId = contextState.selectedAcademicYearId?.trim() ?? '';
+
+    if (academicYearId.isEmpty) {
+      setState(() {
+        _memberSearchResults = const [];
+        _memberSearchError = 'Bạn phải chọn năm học trước khi tìm sinh viên.';
+        _isSearchingMembers = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isSearchingMembers = true;
+      _memberSearchError = null;
+      _memberSearchResults = const [];
+    });
+
+    try {
+      final results = await studentSearchRepository
+          .searchInternEligibleStudents(
+            query: query,
+            academicYearId: academicYearId,
+          );
+
+      if (!mounted || _memberSearchController.text.trim() != query) return;
+
+      final currentStudentId = _representativeStudentIdForState(contextState);
+      final selectedIds = {
+        currentStudentId,
+        ..._selfContactMembers.map((item) => item.studentId),
+      };
+
+      setState(() {
+        _memberSearchResults = results
+            .where((item) {
+              final studentId = item.studentId.trim();
+              return studentId.isNotEmpty && !selectedIds.contains(studentId);
+            })
+            .toList(growable: false);
+        _memberSearchError = _memberSearchResults.isEmpty
+            ? 'Không tìm thấy sinh viên phù hợp.'
+            : null;
+      });
+    } catch (_) {
+      if (!mounted || _memberSearchController.text.trim() != query) return;
+
+      setState(() {
+        _memberSearchError = 'Không thể tìm sinh viên.';
+      });
+    } finally {
+      if (mounted && _memberSearchController.text.trim() == query) {
+        setState(() {
+          _isSearchingMembers = false;
+        });
+      }
+    }
+  }
+
+  void _addSelfContactMember(StudentSearchResultModel student) {
+    final studentId = student.studentId.trim();
+    if (studentId.isEmpty) return;
+
+    if (_selfContactMembers.any((item) => item.studentId == studentId)) {
+      _showSnack('Sinh viên này đã có trong nhóm.', isError: true);
+      return;
+    }
+
+    setState(() {
+      _selfContactMembers = [
+        ..._selfContactMembers,
+        SelfContactMemberForm(
+          studentId: studentId,
+          label: _studentSearchLabel(student),
+          studentName: student.studentName.trim(),
+        ),
+      ];
+      _isAddingSelfContactMember = false;
+      _isSearchingMembers = false;
+      _memberSearchController.clear();
+      _memberSearchResults = const [];
+      _memberSearchError = null;
+    });
+  }
+
+  void _removeSelfContactMember(SelfContactMemberForm member) {
+    setState(() {
+      _selfContactMembers = _selfContactMembers
+          .where((item) => item.studentId != member.studentId)
+          .toList(growable: false);
+    });
+  }
+
+  Future<void> _pickAndUploadMemberCv(
+    InternshipRegistrationContextState contextState,
+    SelfContactMemberForm member,
+  ) async {
+    final internCvRepository = context.read<InternCvRepository>();
+    final academicYearId = contextState.selectedAcademicYearId?.trim() ?? '';
+    if (academicYearId.isEmpty) {
+      _showSnack('Bạn phải chọn năm học trước khi upload CV.', isError: true);
+      return;
+    }
+
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+      allowMultiple: false,
+    );
+
+    if (result == null || result.files.isEmpty) return;
+
+    final file = result.files.single;
+    final filePath = file.path?.trim() ?? '';
+    if (filePath.isEmpty) {
+      _showSnack('Không lấy được đường dẫn tệp PDF.', isError: true);
+      return;
+    }
+
+    setState(() {
+      _uploadingMemberStudentId = member.studentId;
+    });
+
+    try {
+      final uploadedCv = await internCvRepository.uploadCv(
+        academicYearId: academicYearId,
+        filePath: filePath,
+        studentId: member.studentId,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        member.cvFileKey = uploadedCv.cvFileKey.trim();
+        member.cvFileName = uploadedCv.cvFileName.trim();
+      });
+
+      _showSnack('Upload CV cho ${member.label} thành công.');
+    } catch (_) {
+      if (!mounted) return;
+      _showSnack('Upload CV cho ${member.label} thất bại.', isError: true);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _uploadingMemberStudentId = null;
+        });
+      }
     }
   }
 
@@ -237,7 +504,7 @@ class _InternshipRegistrationViewState
       _pickedFileName = null;
 
       if (registration == null) {
-        _selectedType ??= InternshipRegistrationFormType.yourself;
+        _selectedType ??= InternshipRegistrationFormType.wish;
         _cpaController.clear();
         _clearSelfContactFields();
         _expectedStartTime = defaultStart;
@@ -314,12 +581,21 @@ class _InternshipRegistrationViewState
   }
 
   void _clearSelfContactFields() {
+    _memberSearchDebounce?.cancel();
     _companyNameController.clear();
     _companyFieldController.clear();
     _companyAddressController.clear();
     _representativeNameController.clear();
     _representativePhoneController.clear();
     _representativeJobController.clear();
+
+    _memberSearchController.clear();
+    _selfContactMembers = const [];
+    _memberSearchResults = const [];
+    _isAddingSelfContactMember = false;
+    _memberSearchError = null;
+    _isSearchingMembers = false;
+    _uploadingMemberStudentId = null;
   }
 
   int _slotCountForState(InternshipRegistrationContextState state) {
@@ -434,6 +710,7 @@ class _InternshipRegistrationViewState
   Future<void> _pickAndUploadCv(
     InternshipRegistrationContextState contextState,
   ) async {
+    final submitBloc = context.read<InternshipRegistrationSubmitBloc>();
     final academicYearId = contextState.selectedAcademicYearId?.trim() ?? '';
     if (academicYearId.isEmpty) {
       _showSnack('Bạn phải chọn năm học trước khi upload CV.', isError: true);
@@ -462,10 +739,13 @@ class _InternshipRegistrationViewState
       _pickedFileName = file.name;
     });
 
-    context.read<InternshipRegistrationSubmitBloc>().add(
+    submitBloc.add(
       InternshipCvUploadRequested(
         academicYearId: academicYearId,
         filePath: filePath,
+        studentId: (_profile?.studentId.trim().isNotEmpty ?? false)
+            ? _profile!.studentId.trim()
+            : null,
       ),
     );
   }
@@ -570,6 +850,68 @@ class _InternshipRegistrationViewState
         return;
       }
 
+      final representativeStudentId = _representativeStudentIdForState(
+        contextState,
+      );
+
+      final selfContactGroupMembers = [
+        SelfContactGroupMemberRequestModel(
+          studentId: representativeStudentId,
+          cpa: cpa,
+          cvFileKey: cvFileKey,
+          cvFileName: cvFileName,
+        ),
+        ..._selfContactMembers.map(
+          (member) => SelfContactGroupMemberRequestModel(
+            studentId: member.studentId,
+            cpa: member.cpa,
+            cvFileKey: member.cvFileKey,
+            cvFileName: member.cvFileName,
+          ),
+        ),
+      ];
+
+      if (selfContactGroupMembers.length < 4) {
+        _showSnack(
+          'Nhóm tự liên hệ phải có ít nhất 4 sinh viên.',
+          isError: true,
+        );
+        return;
+      }
+
+      final memberIds = selfContactGroupMembers
+          .map((item) => item.studentId.trim())
+          .where((item) => item.isNotEmpty)
+          .toList(growable: false);
+
+      if (memberIds.length != selfContactGroupMembers.length ||
+          memberIds.toSet().length != memberIds.length) {
+        _showSnack(
+          'Danh sách sinh viên trong nhóm không hợp lệ.',
+          isError: true,
+        );
+        return;
+      }
+
+      if (selfContactGroupMembers.any((item) => item.cpa < 0 || item.cpa > 4)) {
+        _showSnack(
+          'CPA của sinh viên trong nhóm phải nằm trong khoảng 0 - 4.',
+          isError: true,
+        );
+        return;
+      }
+
+      if (selfContactGroupMembers.any(
+        (item) =>
+            item.cvFileKey.trim().isEmpty || item.cvFileName.trim().isEmpty,
+      )) {
+        _showSnack(
+          'Mỗi sinh viên trong nhóm tự liên hệ phải có CV.',
+          isError: true,
+        );
+        return;
+      }
+
       request = RegisterYourselfInternRequestModel(
         academicYearId: academicYearId,
         cpa: cpa,
@@ -583,6 +925,7 @@ class _InternshipRegistrationViewState
         representativeJob: _representativeJobController.text.trim(),
         expectedStartTime: _expectedStartTime!,
         expectedEndTime: _expectedEndTime!,
+        selfContactGroupMembers: selfContactGroupMembers,
       );
     }
 
@@ -635,7 +978,7 @@ class _InternshipRegistrationViewState
     return null;
   }
 
-  List<DropdownMenuItem<String>> _buildCompanyItems(
+  List<InternshipRegistrationPickerOption<String>> _buildCompanyItems(
     InternshipRegistrationContextState state, {
     String? currentValue,
   }) {
@@ -670,9 +1013,9 @@ class _InternshipRegistrationViewState
 
     return options.entries
         .map(
-          (entry) => DropdownMenuItem<String>(
+          (entry) => InternshipRegistrationPickerOption<String>(
             value: entry.key,
-            child: Text(entry.value),
+            label: entry.value,
           ),
         )
         .toList(growable: false);
@@ -754,6 +1097,9 @@ class _InternshipRegistrationViewState
                 final useActiveBanner = _useActiveRegistrationBanner(
                   contextState,
                 );
+                final isSelfContactForm =
+                    !_isFacultyAssign(contextState) &&
+                    _selectedType != InternshipRegistrationFormType.wish;
 
                 return RefreshIndicator(
                   onRefresh: () async {
@@ -808,6 +1154,7 @@ class _InternshipRegistrationViewState
                         cpaController: _cpaController,
                         canEditForm: canEditForm,
                         isFacultyAssign: _isFacultyAssign(contextState),
+                        showCpaField: !isSelfContactForm,
                         selectedType: _selectedType,
                         onTypeChanged: (value) {
                           if (value == null) return;
@@ -816,6 +1163,29 @@ class _InternshipRegistrationViewState
                           });
                         },
                       ),
+                      if (isSelfContactForm)
+                        InternshipRegistrationSelfContactGroupSection(
+                          canEditForm: canEditForm,
+                          representativeLabel: _representativeLabelForState(
+                            contextState,
+                          ),
+                          representativeName: _representativeNameForState(
+                            contextState,
+                          ),
+                          representativeCpaController: _cpaController,
+                          isAddingMember: _isAddingSelfContactMember,
+                          members: _selfContactMembers,
+                          searchController: _memberSearchController,
+                          searchResults: _memberSearchResults,
+                          isSearching: _isSearchingMembers,
+                          searchError: _memberSearchError,
+                          onStartAdd: _startAddingSelfContactMember,
+                          onCancelAdd: _cancelAddingSelfContactMember,
+                          onSearchChanged: (value) =>
+                              _onSelfContactSearchChanged(contextState, value),
+                          onAdd: _addSelfContactMember,
+                          onRemove: _removeSelfContactMember,
+                        ),
                       if (_isFacultyAssign(contextState))
                         InternshipRegistrationAssignedSummarySection(
                           status: registration?.status ?? '',
@@ -848,7 +1218,7 @@ class _InternshipRegistrationViewState
                             });
                           },
                         )
-                      else
+                      else ...[
                         InternshipRegistrationSelfContactSection(
                           canEditForm: canEditForm,
                           companyNameController: _companyNameController,
@@ -872,18 +1242,41 @@ class _InternshipRegistrationViewState
                           ),
                           formatDate: _formatDate,
                         ),
-                      InternshipRegistrationCvSection(
-                        canEditForm: canEditForm,
-                        hasEffectiveCv: hasEffectiveCv,
-                        hasExistingCv: _hasExistingCv(contextState),
-                        hasUploadedCv: submitState.hasUploadedCv,
-                        effectiveCvName: _effectiveCvName(
-                          contextState,
-                          submitState,
+                        InternshipRegistrationSelfContactGroupCvSection(
+                          canEditForm: canEditForm,
+                          representativeName: _representativeNameForState(
+                            contextState,
+                          ),
+                          hasRepresentativeCv: hasEffectiveCv,
+                          representativeCvName: _effectiveCvName(
+                            contextState,
+                            submitState,
+                          ),
+                          pickedRepresentativeCvName: _pickedFileName,
+                          isUploadingRepresentativeCv:
+                              submitState.uploadStatus ==
+                              InternshipCvUploadStatus.loading,
+                          members: _selfContactMembers,
+                          uploadingMemberStudentId: _uploadingMemberStudentId,
+                          onPickCv: (member) =>
+                              _pickAndUploadMemberCv(contextState, member),
+                          onPickRepresentativeCv: () =>
+                              _pickAndUploadCv(contextState),
                         ),
-                        pickedFileName: _pickedFileName,
-                        onPickCv: () => _pickAndUploadCv(contextState),
-                      ),
+                      ],
+                      if (!isSelfContactForm)
+                        InternshipRegistrationCvSection(
+                          canEditForm: canEditForm,
+                          hasEffectiveCv: hasEffectiveCv,
+                          hasExistingCv: _hasExistingCv(contextState),
+                          hasUploadedCv: submitState.hasUploadedCv,
+                          effectiveCvName: _effectiveCvName(
+                            contextState,
+                            submitState,
+                          ),
+                          pickedFileName: _pickedFileName,
+                          onPickCv: () => _pickAndUploadCv(contextState),
+                        ),
                       InternshipRegistrationRejectReasonsSection(
                         reasons: (registration?.rejectReasons ?? const [])
                             .map((item) => item.reason)

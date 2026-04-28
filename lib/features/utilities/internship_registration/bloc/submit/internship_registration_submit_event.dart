@@ -13,13 +13,15 @@ final class InternshipCvUploadRequested
   const InternshipCvUploadRequested({
     required this.academicYearId,
     required this.filePath,
+    this.studentId, 
   });
 
   final String academicYearId;
   final String filePath;
+  final String? studentId;
 
   @override
-  List<Object?> get props => [academicYearId, filePath];
+  List<Object?> get props => [academicYearId, filePath, studentId];
 }
 
 final class InternshipRegistrationSubmitted

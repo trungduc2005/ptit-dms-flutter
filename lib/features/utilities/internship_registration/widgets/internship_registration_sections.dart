@@ -5,6 +5,7 @@ import 'package:ptit_dms_flutter/features/utilities/internship_registration/mode
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_date_field.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_dropdown_field.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_field_shell.dart';
+import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_picker_field.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_read_only_field.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_section_card.dart';
 
@@ -133,6 +134,7 @@ class InternshipRegistrationGeneralSection extends StatelessWidget {
     required this.isFacultyAssign,
     required this.selectedType,
     required this.onTypeChanged,
+    this.showCpaField = true,
     super.key,
   });
 
@@ -140,6 +142,7 @@ class InternshipRegistrationGeneralSection extends StatelessWidget {
   final TextEditingController cpaController;
   final bool canEditForm;
   final bool isFacultyAssign;
+  final bool showCpaField;
   final InternshipRegistrationFormType? selectedType;
   final ValueChanged<InternshipRegistrationFormType?> onTypeChanged;
 
@@ -150,14 +153,18 @@ class InternshipRegistrationGeneralSection extends StatelessWidget {
       child: Column(
         children: [
           InternshipRegistrationReadOnlyField(label: 'Ngành', value: majorText),
-          const SizedBox(height: 12),
-          InternshipRegistrationTextInput(
-            label: 'CPA (thang 4)',
-            controller: cpaController,
-            enabled: canEditForm,
-            hintText: 'Nhập CPA tính đến hiện tại',
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          ),
+          if (showCpaField) ...[
+            const SizedBox(height: 12),
+            InternshipRegistrationTextInput(
+              label: 'CPA (thang 4)',
+              controller: cpaController,
+              enabled: canEditForm,
+              hintText: 'Nhập CPA tính đến hiện tại',
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           if (isFacultyAssign)
             const InternshipRegistrationReadOnlyField(
@@ -201,7 +208,9 @@ class InternshipRegistrationWishSection extends StatelessWidget {
   final int slotCount;
   final bool canEditForm;
   final List<String?> preferredCompanyIds;
-  final List<DropdownMenuItem<String>> Function(String? currentValue)
+  final List<InternshipRegistrationPickerOption<String>> Function(
+    String? currentValue,
+  )
   companyItemsBuilder;
   final void Function(int index, String? value) onChanged;
 
@@ -226,12 +235,12 @@ class InternshipRegistrationWishSection extends StatelessWidget {
 
           return Padding(
             padding: EdgeInsets.only(bottom: index == slotCount - 1 ? 0 : 12),
-            child: InternshipRegistrationDropdownField<String>(
+            child: InternshipRegistrationPickerField<String>(
               label: 'Nguyện vọng ${index + 1}',
               value: currentValue?.trim().isEmpty ?? true ? null : currentValue,
               hintText: 'Chọn công ty',
               enabled: canEditForm,
-              items: companyItemsBuilder(currentValue),
+              options: companyItemsBuilder(currentValue),
               onChanged: (value) => onChanged(index, value),
             ),
           );
@@ -432,7 +441,7 @@ class InternshipRegistrationCvSection extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: hasEffectiveCv
-                ? AppTheme.brandColor.withOpacity(0.35)
+                ? AppTheme.brandColor.withValues(alpha: 0.35)
                 : const Color(0xFFE7EAF0),
           ),
         ),

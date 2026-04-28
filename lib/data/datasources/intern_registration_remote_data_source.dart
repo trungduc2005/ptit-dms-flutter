@@ -17,7 +17,7 @@ class InternRegistrationRemoteDataSource {
     required InternRegistrationRequestModel request,
   }) async {
     final response = await _dio.post(
-      '/interns/registrations/register',
+      '/interns/registrations',
       data: request.toJson(),
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
@@ -29,7 +29,7 @@ class InternRegistrationRemoteDataSource {
     required InternRegistrationRequestModel request,
   }) async {
     final response = await _dio.put(
-      '/interns/registrations/update',
+      '/interns/registrations',
       data: request.toJson(),
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );

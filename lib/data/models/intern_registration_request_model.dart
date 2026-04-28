@@ -38,13 +38,7 @@ abstract class InternRegistrationRequestModel extends Equatable {
   }
 
   @override
-  List<Object?> get props => [
-        type,
-        academicYearId,
-        cpa,
-        cvFileKey,
-        cvFileName,
-      ];
+  List<Object?> get props => [type, academicYearId, cpa, cvFileKey, cvFileName];
 }
 
 class RegisterWishInternRequestModel extends InternRegistrationRequestModel {
@@ -60,17 +54,11 @@ class RegisterWishInternRequestModel extends InternRegistrationRequestModel {
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      ...commonToJson(),
-      'preferredCompanies': preferredCompanies,
-    };
+    return {...commonToJson(), 'preferredCompanies': preferredCompanies};
   }
 
   @override
-  List<Object?> get props => [
-        ...super.props,
-        preferredCompanies,
-      ];
+  List<Object?> get props => [...super.props, preferredCompanies];
 }
 
 class RegisterYourselfInternRequestModel
@@ -88,6 +76,7 @@ class RegisterYourselfInternRequestModel
     required this.representativeJob,
     required this.expectedStartTime,
     required this.expectedEndTime,
+    required this.selfContactGroupMembers,
   }) : super(type: InternRegistrationType.yourself);
 
   final String companyName;
@@ -98,6 +87,7 @@ class RegisterYourselfInternRequestModel
   final String representativeJob;
   final DateTime expectedStartTime;
   final DateTime expectedEndTime;
+  final List<SelfContactGroupMemberRequestModel> selfContactGroupMembers;
 
   @override
   Map<String, dynamic> toJson() {
@@ -111,19 +101,49 @@ class RegisterYourselfInternRequestModel
       'representativeJob': representativeJob,
       'expectedStartTime': expectedStartTime.toUtc().toIso8601String(),
       'expectedEndTime': expectedEndTime.toUtc().toIso8601String(),
+      'selfContactGroupMembers': selfContactGroupMembers
+          .map((item) => item.toJson())
+          .toList(growable: false),
     };
   }
 
   @override
   List<Object?> get props => [
-        ...super.props,
-        companyName,
-        companyField,
-        companyAddress,
-        representativeName,
-        representativePhoneNumber,
-        representativeJob,
-        expectedStartTime,
-        expectedEndTime,
-      ];
+    ...super.props,
+    companyName,
+    companyField,
+    companyAddress,
+    representativeName,
+    representativePhoneNumber,
+    representativeJob,
+    expectedStartTime,
+    expectedEndTime,
+    selfContactGroupMembers,
+  ];
+}
+
+class SelfContactGroupMemberRequestModel extends Equatable {
+  const SelfContactGroupMemberRequestModel({
+    required this.studentId,
+    required this.cpa,
+    required this.cvFileKey,
+    required this.cvFileName,
+  });
+
+  final String studentId;
+  final double cpa;
+  final String cvFileKey;
+  final String cvFileName;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'studentId': studentId,
+      'cpa': cpa,
+      'cvFileKey': cvFileKey,
+      'cvFileName': cvFileName,
+    };
+  }
+
+  @override
+  List<Object?> get props => [studentId, cpa, cvFileKey, cvFileName];
 }

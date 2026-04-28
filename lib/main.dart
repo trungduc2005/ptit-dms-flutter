@@ -20,6 +20,8 @@ import 'data/repositories/intern_cv_repository_impl.dart';
 import 'data/repositories/intern_registration_repository_impl.dart';
 import 'data/repositories/student_profile_repository_impl.dart';
 import 'data/repositories/timeline_repository_impl.dart';
+import 'data/datasources/student_search_remote_data_source.dart';
+import 'data/repositories/student_search_repository_impl.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +40,10 @@ Future<void> main() async {
     cookieJar,
   );
 
+  final studentSearchRepository = StudentSearchRepositoryImpl(
+    StudentSearchRemoteDataSource(dio),
+  );
+
   final studentProfileRepository = StudentProfileRepositoryImpl(
     StudentProfileRemoteDataSource(dio),
   );
@@ -54,9 +60,7 @@ Future<void> main() async {
     TimelineRemoteDataSource(dio),
   );
 
-  final companyRepository = CompanyRepositoryImpl(
-    CompanyRemoteDataSource(dio),
-  );
+  final companyRepository = CompanyRepositoryImpl(CompanyRemoteDataSource(dio));
 
   final internCvRepository = InternCvRepositoryImpl(
     InternCvRemoteDataSource(dio),
@@ -76,6 +80,7 @@ Future<void> main() async {
       companyRepository: companyRepository,
       internCvRepository: internCvRepository,
       internRegistrationRepository: internRegistrationRepository,
+      studentSearchRepository: studentSearchRepository,
     ),
   );
 }

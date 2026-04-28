@@ -28,6 +28,9 @@ class CurrentInternRegistrationModel extends Equatable {
     this.createdAt,
     this.updatedAt,
     this.version,
+    this.selfContactGroupId,
+    this.representativeStudentId,
+    this.selfContactGroupMembers = const [],
   });
 
   final String id;
@@ -55,10 +58,14 @@ class CurrentInternRegistrationModel extends Equatable {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final int? version;
+  final String? selfContactGroupId;
+  final String? representativeStudentId;
+  final List<CurrentInternSelfContactGroupMemberModel> selfContactGroupMembers;
 
   factory CurrentInternRegistrationModel.fromJson(Map<String, dynamic> json) {
     final academicYearRefJson = json['academicYearRef'];
     final preferredCompaniesJson = json['preferredCompanies'];
+    final selfContactGroupMembersJson = json['selfContactGroupMembers'];
 
     return CurrentInternRegistrationModel(
       id: asString(json['_id']) ?? '',
@@ -81,13 +88,13 @@ class CurrentInternRegistrationModel extends Equatable {
       representativeJob: asString(json['representativeJob']),
       preferredCompanies: preferredCompaniesJson is List
           ? preferredCompaniesJson
-              .whereType<Map>()
-              .map(
-                (item) => CurrentInternPreferredCompanyModel.fromJson(
-                  Map<String, dynamic>.from(item),
-                ),
-              )
-              .toList(growable: false)
+                .whereType<Map>()
+                .map(
+                  (item) => CurrentInternPreferredCompanyModel.fromJson(
+                    Map<String, dynamic>.from(item),
+                  ),
+                )
+                .toList(growable: false)
           : const [],
       cvFileName: asString(json['cvFileName']),
       cvFileKey: asString(json['cvFileKey']),
@@ -99,6 +106,18 @@ class CurrentInternRegistrationModel extends Equatable {
       createdAt: asDateTime(json['createdAt']),
       updatedAt: asDateTime(json['updatedAt']),
       version: asInt(json['__v']),
+      selfContactGroupId: asString(json['selfContactGroupId']),
+      representativeStudentId: asString(json['representativeStudentId']),
+      selfContactGroupMembers: selfContactGroupMembersJson is List
+          ? selfContactGroupMembersJson
+                .whereType<Map>()
+                .map(
+                  (item) => CurrentInternSelfContactGroupMemberModel.fromJson(
+                    Map<String, dynamic>.from(item),
+                  ),
+                )
+                .toList(growable: false)
+          : const [],
     );
   }
 
@@ -133,6 +152,11 @@ class CurrentInternRegistrationModel extends Equatable {
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
       '__v': version,
+      'selfContactGroupId': selfContactGroupId,
+      'representativeStudentId': representativeStudentId,
+      'selfContactGroupMembers': selfContactGroupMembers
+          .map((item) => item.toJson())
+          .toList(growable: false),
     };
   }
 
@@ -174,32 +198,35 @@ class CurrentInternRegistrationModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        internId,
-        studentId,
-        studentRef,
-        type,
-        cohort,
-        academicYearRef,
-        companyId,
-        companyName,
-        companyField,
-        companyAddress,
-        representativeName,
-        representativePhoneNumber,
-        representativeJob,
-        preferredCompanies,
-        cvFileName,
-        cvFileKey,
-        rejectReasons,
-        status,
-        cpa,
-        expectedStartTime,
-        expectedEndTime,
-        createdAt,
-        updatedAt,
-        version,
-      ];
+    id,
+    internId,
+    studentId,
+    studentRef,
+    type,
+    cohort,
+    academicYearRef,
+    companyId,
+    companyName,
+    companyField,
+    companyAddress,
+    representativeName,
+    representativePhoneNumber,
+    representativeJob,
+    preferredCompanies,
+    cvFileName,
+    cvFileKey,
+    rejectReasons,
+    status,
+    cpa,
+    expectedStartTime,
+    expectedEndTime,
+    createdAt,
+    updatedAt,
+    version,
+    selfContactGroupId,
+    representativeStudentId,
+    selfContactGroupMembers,
+  ];
 }
 
 class CurrentInternAcademicYearRefModel extends Equatable {
@@ -221,10 +248,7 @@ class CurrentInternAcademicYearRefModel extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      '_id': id,
-      'name': name,
-    };
+    return {'_id': id, 'name': name};
   }
 
   @override
@@ -253,11 +277,7 @@ class CurrentInternPreferredCompanyModel extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'order': order,
-      'companyId': companyId,
-      'companyName': companyName,
-    };
+    return {'order': order, 'companyId': companyId, 'companyName': companyName};
   }
 
   @override
@@ -270,14 +290,12 @@ class CurrentInternRejectReasonModel extends Equatable {
     this.rejectedAt,
     this.rejectedBy,
   });
-  
+
   final String reason;
   final DateTime? rejectedAt;
   final String? rejectedBy;
 
-  factory CurrentInternRejectReasonModel.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory CurrentInternRejectReasonModel.fromJson(Map<String, dynamic> json) {
     return CurrentInternRejectReasonModel(
       reason: asString(json['reason']) ?? '',
       rejectedAt: asDateTime(json['rejectedAt']),
@@ -295,4 +313,56 @@ class CurrentInternRejectReasonModel extends Equatable {
 
   @override
   List<Object?> get props => [reason, rejectedAt, rejectedBy];
+}
+
+class CurrentInternSelfContactGroupMemberModel extends Equatable {
+  const CurrentInternSelfContactGroupMemberModel({
+    required this.studentId,
+    required this.studentName,
+    this.cpa,
+    this.cvFileName,
+    this.cvFileKey,
+    this.isRepresentative = false,
+  });
+
+  final String studentId;
+  final String studentName;
+  final double? cpa;
+  final String? cvFileName;
+  final String? cvFileKey;
+  final bool isRepresentative;
+
+  factory CurrentInternSelfContactGroupMemberModel.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return CurrentInternSelfContactGroupMemberModel(
+      studentId: asString(json['studentId']) ?? '',
+      studentName: asString(json['studentName']) ?? '',
+      cpa: asDouble(json['cpa']),
+      cvFileName: asString(json['cvFileName']),
+      cvFileKey: asString(json['cvFileKey']),
+      isRepresentative: asBool(json['isRepresentative']) ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'studentId': studentId,
+      'studentName': studentName,
+      'cpa': cpa,
+      'cvFileName': cvFileName,
+      'cvFileKey': cvFileKey,
+      'isRepresentative': isRepresentative,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+    studentId,
+    studentName,
+    cpa,
+    cvFileName,
+    cvFileKey,
+    isRepresentative,
+  ];
 }

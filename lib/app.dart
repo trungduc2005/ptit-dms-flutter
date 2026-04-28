@@ -11,6 +11,7 @@ import 'package:ptit_dms_flutter/domain/repositories/intern_registration_reposit
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/timeline_repository.dart';
 import 'package:ptit_dms_flutter/features/auth/bloc/auth_bloc.dart';
+import 'package:ptit_dms_flutter/domain/repositories/student_search_repository.dart';
 
 class App extends StatelessWidget {
   const App({
@@ -22,6 +23,7 @@ class App extends StatelessWidget {
     required this.companyRepository,
     required this.internCvRepository,
     required this.internRegistrationRepository,
+    required this.studentSearchRepository,
     super.key,
   });
 
@@ -33,6 +35,7 @@ class App extends StatelessWidget {
   final CompanyRepository companyRepository;
   final InternCvRepository internCvRepository;
   final InternRegistrationRepository internRegistrationRepository;
+  final StudentSearchRepository studentSearchRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -48,13 +51,14 @@ class App extends StatelessWidget {
         RepositoryProvider<EligibilityRepository>.value(
           value: eligibilityRepository,
         ),
-        RepositoryProvider<TimelineRepository>.value(
-          value: timelineRepository,
-        ),
+        RepositoryProvider<TimelineRepository>.value(value: timelineRepository),
         RepositoryProvider<CompanyRepository>.value(value: companyRepository),
         RepositoryProvider<InternCvRepository>.value(value: internCvRepository),
         RepositoryProvider<InternRegistrationRepository>.value(
           value: internRegistrationRepository,
+        ),
+        RepositoryProvider<StudentSearchRepository>.value(
+          value: studentSearchRepository,
         ),
       ],
       child: BlocProvider(

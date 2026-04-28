@@ -4,5 +4,6 @@ abstract class InternCvRepository {
   Future<InternCvUploadResultModel> uploadCv({
     required String academicYearId,
     required String filePath,
+    String? studentId,
   });
 }

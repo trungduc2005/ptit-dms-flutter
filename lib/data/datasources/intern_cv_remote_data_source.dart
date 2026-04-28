@@ -10,12 +10,16 @@ class InternCvRemoteDataSource {
   Future<InternCvUploadResultModel> uploadCv({
     required String academicYearId,
     required String filePath,
+    String? studentId,
   }) async {
+    final normalizedStudentId = studentId?.trim() ?? '';
+
     final formData = FormData.fromMap({
       'cvFile': await MultipartFile.fromFile(
         filePath,
         filename: _extractFileName(filePath),
       ),
+      if (normalizedStudentId.isNotEmpty) 'studentId': normalizedStudentId,
     });
 
     final response = await _dio.post(
