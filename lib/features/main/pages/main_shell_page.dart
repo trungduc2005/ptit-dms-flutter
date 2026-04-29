@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ptit_dms_flutter/core/router/routes.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 import 'package:ptit_dms_flutter/features/auth/bloc/auth_bloc.dart';
 import 'package:ptit_dms_flutter/features/main/models/main_tab.dart';
@@ -135,7 +136,7 @@ class _MainShellPageState extends State<MainShellPage> {
       Navigator.of(
         context,
         rootNavigator: true,
-      ).pushNamedAndRemoveUntil('/login', (_) => false);
+      ).pushNamedAndRemoveUntil(Routes.login, (_) => false);
     }
   }
 

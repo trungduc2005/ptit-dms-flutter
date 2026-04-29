@@ -1,14 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:ptit_dms_flutter/core/network/bearer_auth_interceptor.dart';
 import 'package:ptit_dms_flutter/core/utils/json_helpers.dart';
-import 'package:ptit_dms_flutter/data/models/timeline_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/timeline.dart';
 
 class TimelineRemoteDataSource {
   TimelineRemoteDataSource(this._dio);
 
   final Dio _dio;
 
-  Future<List<TimelineModel>> getInternTimelines({
+  Future<List<Timeline>> getInternTimelines({
     required String academicYearId,
   }) async {
     final response = await _dio.get(
@@ -19,6 +19,6 @@ class TimelineRemoteDataSource {
 
     final items = asJsonList(response.data);
 
-    return items.map(TimelineModel.fromJson).toList(growable: false);
+    return items.map(Timeline.fromJson).toList(growable: false);
   }
 }

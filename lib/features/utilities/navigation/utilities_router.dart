@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ptit_dms_flutter/data/models/company_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/company.dart';
 import 'package:ptit_dms_flutter/features/utilities/company_list/pages/companies_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/company_list/pages/company_detail_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/navigation/utilities_routes.dart';
@@ -28,7 +28,7 @@ class UtilitiesRouter {
         final company = settings.arguments;
         return MaterialPageRoute(
           builder: (_) {
-            if (company is CompanyModel) {
+            if (company is Company) {
               return CompanyDetailPage(company: company);
             }
 

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ptit_dms_flutter/core/utils/error_helpers.dart';
-import 'package:ptit_dms_flutter/data/models/required_profile_update_request_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/required_profile_update_request.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 
 import 'required_profile_event.dart';
@@ -120,7 +120,7 @@ class RequiredProfileBloc
   }
 
   String? _validateRequest(
-    RequiredProfileUpdateRequestModel request, {
+    RequiredProfileUpdateRequest request, {
     required bool mustChangePassword,
   }) {
     final email = request.email.trim();

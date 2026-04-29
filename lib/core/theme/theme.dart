@@ -7,14 +7,15 @@ class AppTheme {
     useMaterial3: true,
     fontFamily: 'Roboto',
     scaffoldBackgroundColor: Colors.white,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: brandColor,
-      brightness: Brightness.light,
-    ).copyWith(
-      primary: brandColor,
-      secondary: const Color(0xFFD55757),
-      surface: Colors.white,
-    ),
+    colorScheme:
+        ColorScheme.fromSeed(
+          seedColor: brandColor,
+          brightness: Brightness.light,
+        ).copyWith(
+          primary: brandColor,
+          secondary: const Color(0xFFD55757),
+          surface: Colors.white,
+        ),
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.white,
       foregroundColor: Color(0xFF151A2D),
@@ -33,10 +34,7 @@ class AppTheme {
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 16,
-      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       hintStyle: const TextStyle(
         color: Color(0xFF99A1AA),
         fontSize: 14,
@@ -65,9 +63,7 @@ class AppTheme {
           fontFamily: 'Roboto',
           fontWeight: FontWeight.w700,
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     ),
   );

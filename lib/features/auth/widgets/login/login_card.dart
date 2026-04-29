@@ -55,9 +55,7 @@ class LoginCard extends StatelessWidget {
               ],
             ),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.78),
-            ),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.78)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.06),
@@ -69,10 +67,7 @@ class LoginCard extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              LoginHeader(
-                logoSize: logoSize,
-                titleSize: titleSize,
-              ),
+              LoginHeader(logoSize: logoSize, titleSize: titleSize),
               const SizedBox(height: 30),
               LoginForm(
                 usernameController: usernameController,

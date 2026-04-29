@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-class RequiredProfileUpdateRequestModel extends Equatable {
-  const RequiredProfileUpdateRequestModel({
+class RequiredProfileUpdateRequest extends Equatable {
+  const RequiredProfileUpdateRequest({
     required this.email,
     required this.phone,
     required this.citizenId,
@@ -21,10 +21,17 @@ class RequiredProfileUpdateRequestModel extends Equatable {
       'phone': phone.trim(),
       'citizenId': citizenId.trim(),
       if ((newPassword ?? '').isNotEmpty) 'newPassword': newPassword,
-      if ((confirmPassword ?? '').isNotEmpty) 'confirmPassword': confirmPassword,
+      if ((confirmPassword ?? '').isNotEmpty)
+        'confirmPassword': confirmPassword,
     };
   }
 
   @override
-  List<Object?> get props => [email, phone, citizenId, newPassword, confirmPassword];
+  List<Object?> get props => [
+    email,
+    phone,
+    citizenId,
+    newPassword,
+    confirmPassword,
+  ];
 }

@@ -1,20 +1,10 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/intern_cv_upload_result_model.dart';
-import 'package:ptit_dms_flutter/data/models/intern_registration_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_cv_upload_result.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration.dart';
 
-enum InternshipCvUploadStatus {
-  initial,
-  loading,
-  success,
-  failure,
-}
+enum InternshipCvUploadStatus { initial, loading, success, failure }
 
-enum InternshipRegistrationSubmitStatus {
-  initial,
-  loading,
-  success,
-  failure,
-}
+enum InternshipRegistrationSubmitStatus { initial, loading, success, failure }
 
 const _unset = Object();
 
@@ -29,8 +19,8 @@ final class InternshipRegistrationSubmitState extends Equatable {
 
   final InternshipCvUploadStatus uploadStatus;
   final InternshipRegistrationSubmitStatus submitStatus;
-  final InternCvUploadResultModel? uploadedCv;
-  final InternRegistrationModel? submittedRegistration;
+  final InternCvUploadResult? uploadedCv;
+  final InternRegistration? submittedRegistration;
   final String? message;
 
   bool get isBusy =>
@@ -53,20 +43,20 @@ final class InternshipRegistrationSubmitState extends Equatable {
       submitStatus: submitStatus ?? this.submitStatus,
       uploadedCv: identical(uploadedCv, _unset)
           ? this.uploadedCv
-          : uploadedCv as InternCvUploadResultModel?,
+          : uploadedCv as InternCvUploadResult?,
       submittedRegistration: identical(submittedRegistration, _unset)
           ? this.submittedRegistration
-          : submittedRegistration as InternRegistrationModel?,
+          : submittedRegistration as InternRegistration?,
       message: identical(message, _unset) ? this.message : message as String?,
     );
   }
 
   @override
   List<Object?> get props => [
-        uploadStatus,
-        submitStatus,
-        uploadedCv,
-        submittedRegistration,
-        message,
-      ];
+    uploadStatus,
+    submitStatus,
+    uploadedCv,
+    submittedRegistration,
+    message,
+  ];
 }

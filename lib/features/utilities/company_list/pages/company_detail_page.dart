@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:ptit_dms_flutter/data/models/company_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/company.dart';
 import 'package:ptit_dms_flutter/features/utilities/widgets/utilities_header.dart';
 
 class CompanyDetailPage extends StatelessWidget {
-  const CompanyDetailPage({
-    required this.company,
-    super.key,
-  });
+  const CompanyDetailPage({required this.company, super.key});
 
-  final CompanyModel company;
+  final Company company;
 
   @override
   Widget build(BuildContext context) {
@@ -67,10 +64,7 @@ class CompanyDetailPage extends StatelessWidget {
     return text;
   }
 
-  static String _textOrFallback(
-    String? value, {
-    required String fallback,
-  }) {
+  static String _textOrFallback(String? value, {required String fallback}) {
     final text = value?.trim();
     if (text == null || text.isEmpty) return fallback;
     return text;
@@ -83,10 +77,7 @@ class CompanyDetailPage extends StatelessWidget {
 }
 
 class _CompanyDetailRow extends StatelessWidget {
-  const _CompanyDetailRow({
-    required this.label,
-    required this.value,
-  });
+  const _CompanyDetailRow({required this.label, required this.value});
 
   final String label;
   final String value;
@@ -98,20 +89,9 @@ class _CompanyDetailRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 130,
-            child: Text(
-              label,
-              style: _textStyle,
-            ),
-          ),
+          SizedBox(width: 130, child: Text(label, style: _textStyle)),
           const SizedBox(width: 32),
-          Expanded(
-            child: Text(
-              value,
-              style: _textStyle,
-            ),
-          ),
+          Expanded(child: Text(value, style: _textStyle)),
         ],
       ),
     );

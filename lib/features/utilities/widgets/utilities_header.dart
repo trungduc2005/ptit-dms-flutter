@@ -28,10 +28,7 @@ class UtilitiesHeader extends StatelessWidget implements PreferredSizeWidget {
         padding: const EdgeInsets.only(top: 4),
         child: Text(
           title,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
         ),
       ),
     );

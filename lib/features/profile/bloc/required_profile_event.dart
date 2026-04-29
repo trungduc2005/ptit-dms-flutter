@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/required_profile_update_request_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/required_profile_update_request.dart';
 
 sealed class RequiredProfileEvent extends Equatable {
   const RequiredProfileEvent();
@@ -15,7 +15,7 @@ final class RequiredProfileStarted extends RequiredProfileEvent {
 final class RequiredProfileSubmitted extends RequiredProfileEvent {
   const RequiredProfileSubmitted({required this.request});
 
-  final RequiredProfileUpdateRequestModel request;
+  final RequiredProfileUpdateRequest request;
 
   @override
   List<Object?> get props => [request];

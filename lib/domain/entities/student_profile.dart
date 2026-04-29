@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/model_parsers.dart';
+import 'package:ptit_dms_flutter/core/utils/model_parsers.dart';
 
-class StudentProfileModel extends Equatable {
-  const StudentProfileModel({
+class StudentProfile extends Equatable {
+  const StudentProfile({
     required this.id,
     required this.studentId,
     required this.cohort,
@@ -17,15 +17,15 @@ class StudentProfileModel extends Equatable {
   final String cohort;
   final List<String> major;
   final String? subSpecialization;
-  final StudentProfileClassModel? classInfo;
-  final StudentProfileUserModel? user;
+  final StudentProfileClass? classInfo;
+  final StudentProfileUser? user;
 
-  factory StudentProfileModel.fromJson(Map<String, dynamic> json) {
+  factory StudentProfile.fromJson(Map<String, dynamic> json) {
     final classJson = json['classId'];
     final userJson = json['userId'];
     final majorJson = json['major'];
 
-    return StudentProfileModel(
+    return StudentProfile(
       id: asString(json['_id']) ?? '',
       studentId: asString(json['studentId']) ?? '',
       cohort: asString(json['cohort']) ?? '',
@@ -34,14 +34,10 @@ class StudentProfileModel extends Equatable {
           : const [],
       subSpecialization: asString(json['subSpecialization']),
       classInfo: classJson is Map
-          ? StudentProfileClassModel.fromJson(
-              Map<String, dynamic>.from(classJson),
-            )
+          ? StudentProfileClass.fromJson(Map<String, dynamic>.from(classJson))
           : null,
       user: userJson is Map
-          ? StudentProfileUserModel.fromJson(
-              Map<String, dynamic>.from(userJson),
-            )
+          ? StudentProfileUser.fromJson(Map<String, dynamic>.from(userJson))
           : null,
     );
   }
@@ -70,35 +66,29 @@ class StudentProfileModel extends Equatable {
   ];
 }
 
-class StudentProfileClassModel extends Equatable {
-  const StudentProfileClassModel({
-    required this.id,
-    required this.name,
-  });
+class StudentProfileClass extends Equatable {
+  const StudentProfileClass({required this.id, required this.name});
 
   final String id;
   final String name;
 
-  factory StudentProfileClassModel.fromJson(Map<String, dynamic> json) {
-    return StudentProfileClassModel(
+  factory StudentProfileClass.fromJson(Map<String, dynamic> json) {
+    return StudentProfileClass(
       id: asString(json['_id']) ?? '',
       name: asString(json['name']) ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      '_id': id,
-      'name': name,
-    };
+    return {'_id': id, 'name': name};
   }
 
   @override
   List<Object?> get props => [id, name];
 }
 
-class StudentProfileUserModel extends Equatable {
-  const StudentProfileUserModel({
+class StudentProfileUser extends Equatable {
+  const StudentProfileUser({
     required this.id,
     required this.fullName,
     required this.username,
@@ -128,12 +118,12 @@ class StudentProfileUserModel extends Equatable {
   final String? facultyName;
   final String? departmentName;
 
-  factory StudentProfileUserModel.fromJson(Map<String, dynamic> json) {
+  factory StudentProfileUser.fromJson(Map<String, dynamic> json) {
     final roleJson = json['roleId'];
     final facultyJson = json['facultyId'];
     final departmentJson = json['departmentId'];
 
-    return StudentProfileUserModel(
+    return StudentProfileUser(
       id: asString(json['_id']) ?? '',
       fullName: asString(json['fullName']) ?? '',
       username: asString(json['username']) ?? '',

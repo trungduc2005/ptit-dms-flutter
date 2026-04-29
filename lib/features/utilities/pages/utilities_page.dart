@@ -31,15 +31,10 @@ class UtilitiesPage extends StatelessWidget {
       backgroundColor: const Color(0xFFFAF9F6),
       appBar: const UtilitiesHeader(title: 'Tiện ích'),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 20,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
         child: const UtilitiesSectionCard(
           title: 'Thực tập',
-          child: UtilityShortcutGrid(
-            shortcuts: _internshipShortcuts,
-          ),
+          child: UtilityShortcutGrid(shortcuts: _internshipShortcuts),
         ),
       ),
     );

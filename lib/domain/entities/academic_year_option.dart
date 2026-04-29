@@ -1,14 +1,14 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/model_parsers.dart';
+import 'package:ptit_dms_flutter/core/utils/model_parsers.dart';
 
-class AcademicYearOptionModel extends Equatable {
-  const AcademicYearOptionModel({required this.id, required this.name});
+class AcademicYearOption extends Equatable {
+  const AcademicYearOption({required this.id, required this.name});
 
   final String id;
   final String name;
 
-  factory AcademicYearOptionModel.fromJson(Map<String, dynamic> json) {
-    return AcademicYearOptionModel(
+  factory AcademicYearOption.fromJson(Map<String, dynamic> json) {
+    return AcademicYearOption(
       id: asString(json['_id']) ?? '',
       name: asString(json['name']) ?? '',
     );

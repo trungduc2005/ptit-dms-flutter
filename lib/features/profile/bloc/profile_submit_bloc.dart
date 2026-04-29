@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ptit_dms_flutter/core/utils/error_helpers.dart';
-import 'package:ptit_dms_flutter/data/models/student_profile_update_request_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_profile_update_request.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 
 import 'profile_submit_event.dart';
@@ -171,7 +171,7 @@ class ProfileSubmitBloc extends Bloc<ProfileSubmitEvent, ProfileSubmitState> {
     );
   }
 
-  String? _validateRequest(StudentProfileUpdateRequestModel request) {
+  String? _validateRequest(StudentProfileUpdateRequest request) {
     final email = request.email?.trim() ?? '';
     final phone = request.phone?.trim() ?? '';
 

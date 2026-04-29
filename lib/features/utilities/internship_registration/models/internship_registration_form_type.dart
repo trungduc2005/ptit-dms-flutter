@@ -1,4 +1,1 @@
-enum InternshipRegistrationFormType {
-  yourself,
-  wish,
-}
+enum InternshipRegistrationFormType { yourself, wish }

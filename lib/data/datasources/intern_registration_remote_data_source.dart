@@ -3,19 +3,19 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:ptit_dms_flutter/core/network/bearer_auth_interceptor.dart';
 import 'package:ptit_dms_flutter/core/utils/json_helpers.dart';
-import 'package:ptit_dms_flutter/data/models/current_intern_registration_model.dart';
-import 'package:ptit_dms_flutter/data/models/intern_registration_check_model.dart';
-import 'package:ptit_dms_flutter/data/models/intern_registration_cv_download_model.dart';
-import 'package:ptit_dms_flutter/data/models/intern_registration_model.dart';
-import 'package:ptit_dms_flutter/data/models/intern_registration_request_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/current_intern_registration.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_check.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_cv_download.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_request.dart';
 
 class InternRegistrationRemoteDataSource {
   InternRegistrationRemoteDataSource(this._dio);
 
   final Dio _dio;
 
-  Future<InternRegistrationModel> registerInternship({
-    required InternRegistrationRequestModel request,
+  Future<InternRegistration> registerInternship({
+    required InternRegistrationRequest request,
   }) async {
     final response = await _dio.post(
       '/interns/registrations',
@@ -23,13 +23,13 @@ class InternRegistrationRemoteDataSource {
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    return InternRegistrationModel.fromJson(
+    return InternRegistration.fromJson(
       asJsonMap(response.data, unwrapData: true),
     );
   }
 
-  Future<InternRegistrationModel> updateInternship({
-    required InternRegistrationRequestModel request,
+  Future<InternRegistration> updateInternship({
+    required InternRegistrationRequest request,
   }) async {
     final response = await _dio.put(
       '/interns/registrations',
@@ -37,12 +37,12 @@ class InternRegistrationRemoteDataSource {
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    return InternRegistrationModel.fromJson(
+    return InternRegistration.fromJson(
       asJsonMap(response.data, unwrapData: true),
     );
   }
 
-  Future<CurrentInternRegistrationModel?> getCurrentRegistration({
+  Future<CurrentInternRegistration?> getCurrentRegistration({
     required String academicYearId,
   }) async {
     final response = await _dio.get(
@@ -56,10 +56,10 @@ class InternRegistrationRemoteDataSource {
       return null;
     }
 
-    return CurrentInternRegistrationModel.fromJson(json);
+    return CurrentInternRegistration.fromJson(json);
   }
 
-  Future<InternRegistrationCheckModel> checkInternRegistration({
+  Future<InternRegistrationCheck> checkInternRegistration({
     required String studentId,
     required String academicYearId,
   }) async {
@@ -69,12 +69,12 @@ class InternRegistrationRemoteDataSource {
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    return InternRegistrationCheckModel.fromJson(
+    return InternRegistrationCheck.fromJson(
       asJsonMap(response.data, unwrapData: true),
     );
   }
 
-  Future<InternRegistrationCvDownloadModel> downloadRegistrationCv({
+  Future<InternRegistrationCvDownload> downloadRegistrationCv({
     required String studentId,
     required String academicYearId,
   }) async {
@@ -92,7 +92,7 @@ class InternRegistrationRemoteDataSource {
       throw StateError('Không nhận được dữ liệu file CV hợp lệ.');
     }
 
-    return InternRegistrationCvDownloadModel(
+    return InternRegistrationCvDownload(
       bytes: bytes,
       fileName: _extractFileName(response.headers) ?? '$studentId-cv.pdf',
       contentType: response.headers.value(Headers.contentTypeHeader),

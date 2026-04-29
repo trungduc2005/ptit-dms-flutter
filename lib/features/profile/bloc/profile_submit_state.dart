@@ -1,20 +1,10 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/student_profile_avatar_upload_model.dart';
-import 'package:ptit_dms_flutter/data/models/student_profile_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/avatar_upload_result.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_profile.dart';
 
-enum ProfileSubmitStatus {
-  initial,
-  loading,
-  success,
-  failure,
-}
+enum ProfileSubmitStatus { initial, loading, success, failure }
 
-enum ProfileAvatarUploadStatus {
-  initial,
-  loading,
-  success,
-  failure,
-}
+enum ProfileAvatarUploadStatus { initial, loading, success, failure }
 
 const _unset = Object();
 
@@ -29,8 +19,8 @@ final class ProfileSubmitState extends Equatable {
 
   final ProfileSubmitStatus submitStatus;
   final ProfileAvatarUploadStatus uploadStatus;
-  final StudentProfileModel? updatedProfile;
-  final StudentProfileAvatarUploadModel? uploadedAvatar;
+  final StudentProfile? updatedProfile;
+  final AvatarUploadResult? uploadedAvatar;
   final String? message;
 
   bool get isBusy =>
@@ -49,20 +39,20 @@ final class ProfileSubmitState extends Equatable {
       uploadStatus: uploadStatus ?? this.uploadStatus,
       updatedProfile: identical(updatedProfile, _unset)
           ? this.updatedProfile
-          : updatedProfile as StudentProfileModel?,
+          : updatedProfile as StudentProfile?,
       uploadedAvatar: identical(uploadedAvatar, _unset)
           ? this.uploadedAvatar
-          : uploadedAvatar as StudentProfileAvatarUploadModel?,
+          : uploadedAvatar as AvatarUploadResult?,
       message: identical(message, _unset) ? this.message : message as String?,
     );
   }
 
   @override
   List<Object?> get props => [
-        submitStatus,
-        uploadStatus,
-        updatedProfile,
-        uploadedAvatar,
-        message,
-      ];
+    submitStatus,
+    uploadStatus,
+    updatedProfile,
+    uploadedAvatar,
+    message,
+  ];
 }

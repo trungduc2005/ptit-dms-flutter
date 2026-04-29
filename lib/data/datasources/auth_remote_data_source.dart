@@ -1,14 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:ptit_dms_flutter/core/utils/json_helpers.dart';
-import 'package:ptit_dms_flutter/data/models/auth_login_response_model.dart';
-import 'package:ptit_dms_flutter/data/models/auth_verify_response_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/auth_login_result.dart';
+import 'package:ptit_dms_flutter/domain/entities/auth_session.dart';
 
 class AuthRemoteDataSource {
   AuthRemoteDataSource(this._dio);
 
   final Dio _dio;
 
-  Future<AuthLoginResponseModel> login({
+  Future<AuthLoginResult> login({
     required String username,
     required String password,
   }) async {
@@ -18,12 +18,12 @@ class AuthRemoteDataSource {
       options: Options(extra: const {'skipAuthRefresh': true}),
     );
 
-    return AuthLoginResponseModel.fromJson(asJsonMap(response.data));
+    return AuthLoginResult.fromJson(asJsonMap(response.data));
   }
 
-  Future<AuthVerifyResponseModel> verify() async {
+  Future<AuthSession> verify() async {
     final response = await _dio.get('/auth/verify');
-    return AuthVerifyResponseModel.fromJson(asJsonMap(response.data));
+    return AuthSession.fromJson(asJsonMap(response.data));
   }
 
   Future<void> logout() async {

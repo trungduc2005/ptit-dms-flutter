@@ -45,8 +45,9 @@ class RequiredProfileActions extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: LoginStyles.brandColor,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor:
-                    LoginStyles.brandColor.withValues(alpha: 0.72),
+                disabledBackgroundColor: LoginStyles.brandColor.withValues(
+                  alpha: 0.72,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

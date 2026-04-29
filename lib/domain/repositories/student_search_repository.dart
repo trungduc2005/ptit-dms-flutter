@@ -1,7 +1,7 @@
-import 'package:ptit_dms_flutter/data/models/student_search_result_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_search_result.dart';
 
 abstract class StudentSearchRepository {
-  Future<List<StudentSearchResultModel>> searchInternEligibleStudents({
+  Future<List<StudentSearchResult>> searchInternEligibleStudents({
     required String query,
     required String academicYearId,
   });

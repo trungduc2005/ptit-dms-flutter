@@ -45,11 +45,7 @@ class ProfileActionTile extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(
-                icon,
-                color: primaryColor,
-                size: 22,
-              ),
+              Icon(icon, color: primaryColor, size: 22),
               const SizedBox(width: 14),
               Expanded(
                 child: Text(

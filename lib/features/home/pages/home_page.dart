@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ptit_dms_flutter/data/models/academic_year_option_model.dart';
-import 'package:ptit_dms_flutter/data/models/eligibility_model.dart';
-import 'package:ptit_dms_flutter/data/models/intern_cv_upload_result_model.dart';
-import 'package:ptit_dms_flutter/data/models/timeline_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/academic_year_option.dart';
+import 'package:ptit_dms_flutter/domain/entities/eligibility.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_cv_upload_result.dart';
+import 'package:ptit_dms_flutter/domain/entities/timeline.dart';
 import 'package:ptit_dms_flutter/domain/repositories/academic_year_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/eligibility_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_cv_repository.dart';
@@ -28,11 +28,11 @@ class _HomePageState extends State<HomePage> {
 
   final TextEditingController _cvFilePathController = TextEditingController();
 
-  List<AcademicYearOptionModel> _academicYears = const [];
+  List<AcademicYearOption> _academicYears = const [];
   String? _selectedAcademicYearId;
-  EligibilityModel? _eligibility;
-  List<TimelineModel> _timelines = const [];
-  InternCvUploadResultModel? _uploadedCv;
+  Eligibility? _eligibility;
+  List<Timeline> _timelines = const [];
+  InternCvUploadResult? _uploadedCv;
 
   @override
   void dispose() {
@@ -209,7 +209,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Widget _buildAcademicYearCard(AcademicYearOptionModel item) {
+  Widget _buildAcademicYearCard(AcademicYearOption item) {
     final isSelected = item.id == _selectedAcademicYearId;
 
     return Card(
@@ -231,7 +231,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildTimelineCard(TimelineModel timeline) {
+  Widget _buildTimelineCard(Timeline timeline) {
     return Card(
       child: ListTile(
         title: Text(timeline.name),

@@ -5,10 +5,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ptit_dms_flutter/core/theme/theme.dart';
-import 'package:ptit_dms_flutter/data/models/company_model.dart';
-import 'package:ptit_dms_flutter/data/models/current_intern_registration_model.dart';
-import 'package:ptit_dms_flutter/data/models/intern_registration_request_model.dart';
-import 'package:ptit_dms_flutter/data/models/student_profile_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/company.dart';
+import 'package:ptit_dms_flutter/domain/entities/current_intern_registration.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_request.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_profile.dart';
 import 'package:ptit_dms_flutter/domain/repositories/academic_year_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/company_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/eligibility_repository.dart';
@@ -25,7 +25,7 @@ import 'package:ptit_dms_flutter/features/utilities/internship_registration/widg
 import 'package:ptit_dms_flutter/features/utilities/widgets/utilities_header.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_calendar_dialog.dart';
 import 'package:ptit_dms_flutter/core/widgets/app_popup_dialog.dart';
-import 'package:ptit_dms_flutter/data/models/student_search_result_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_search_result.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_search_repository.dart';
 
 class InternshipRegistrationPage extends StatelessWidget {
@@ -83,7 +83,7 @@ class _InternshipRegistrationViewState
   Timer? _memberSearchDebounce;
 
   List<SelfContactMemberForm> _selfContactMembers = const [];
-  List<StudentSearchResultModel> _memberSearchResults = const [];
+  List<StudentSearchResult> _memberSearchResults = const [];
   bool _isAddingSelfContactMember = false;
   bool _isSearchingMembers = false;
   String? _memberSearchError;
@@ -91,7 +91,7 @@ class _InternshipRegistrationViewState
 
   bool _isPopupOpen = false;
 
-  StudentProfileModel? _profile;
+  StudentProfile? _profile;
   bool _isBootstrapping = true;
   String? _bootstrapError;
   InternshipRegistrationFormType? _selectedType;
@@ -161,7 +161,7 @@ class _InternshipRegistrationViewState
         : state.studentId.trim();
   }
 
-  String _studentSearchLabel(StudentSearchResultModel student) {
+  String _studentSearchLabel(StudentSearchResult student) {
     final label = student.label.trim();
     if (label.isNotEmpty) return label;
 
@@ -312,7 +312,7 @@ class _InternshipRegistrationViewState
     }
   }
 
-  void _addSelfContactMember(StudentSearchResultModel student) {
+  void _addSelfContactMember(StudentSearchResult student) {
     final studentId = student.studentId.trim();
     if (studentId.isEmpty) return;
 
@@ -826,7 +826,7 @@ class _InternshipRegistrationViewState
         ? uploadedCv!.cvFileName.trim()
         : existingRegistration?.cvFileName?.trim() ?? '';
 
-    late final InternRegistrationRequestModel request;
+    late final InternRegistrationRequest request;
 
     if (_selectedType == InternshipRegistrationFormType.wish) {
       final slotCount = _slotCountForState(contextState);
@@ -837,7 +837,7 @@ class _InternshipRegistrationViewState
         return _preferredCompanyIds[index]?.trim() ?? '';
       }, growable: false);
 
-      request = RegisterWishInternRequestModel(
+      request = RegisterWishInternRequest(
         academicYearId: academicYearId,
         cpa: cpa,
         cvFileKey: cvFileKey,
@@ -855,14 +855,14 @@ class _InternshipRegistrationViewState
       );
 
       final selfContactGroupMembers = [
-        SelfContactGroupMemberRequestModel(
+        SelfContactGroupMemberRequest(
           studentId: representativeStudentId,
           cpa: cpa,
           cvFileKey: cvFileKey,
           cvFileName: cvFileName,
         ),
         ..._selfContactMembers.map(
-          (member) => SelfContactGroupMemberRequestModel(
+          (member) => SelfContactGroupMemberRequest(
             studentId: member.studentId,
             cpa: member.cpa,
             cvFileKey: member.cvFileKey,
@@ -912,7 +912,7 @@ class _InternshipRegistrationViewState
         return;
       }
 
-      request = RegisterYourselfInternRequestModel(
+      request = RegisterYourselfInternRequest(
         academicYearId: academicYearId,
         cpa: cpa,
         cvFileKey: cvFileKey,
@@ -948,7 +948,7 @@ class _InternshipRegistrationViewState
     );
   }
 
-  String _resolveCompanyValue(CompanyModel company) {
+  String _resolveCompanyValue(Company company) {
     final companyId = company.companyId.trim();
     if (companyId.isNotEmpty) {
       return companyId;
@@ -958,7 +958,7 @@ class _InternshipRegistrationViewState
   }
 
   String? _resolveCurrentCompanyLabel(
-    CurrentInternRegistrationModel? registration,
+    CurrentInternRegistration? registration,
     String value,
   ) {
     if (registration == null) {

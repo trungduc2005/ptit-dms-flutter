@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/model_parsers.dart';
+import 'package:ptit_dms_flutter/core/utils/model_parsers.dart';
 
-class InternRegistrationModel extends Equatable {
-  const InternRegistrationModel({
+class InternRegistration extends Equatable {
+  const InternRegistration({
     required this.id,
     required this.internId,
     required this.studentId,
@@ -28,50 +28,50 @@ class InternRegistrationModel extends Equatable {
   final String studentId;
   final String? studentRef;
   final String type;
-  final InternRegistrationCvFileModel? cvFile;
-  final InternRegistrationCompanyInfoModel? companyInfo;
-  final List<InternRegistrationPreferredCompanyModel> preferredCompanies;
+  final InternRegistrationCvFile? cvFile;
+  final InternRegistrationCompanyInfo? companyInfo;
+  final List<InternRegistrationPreferredCompany> preferredCompanies;
   final String? cohort;
   final String? academicYearRef;
   final String? status;
   final double? cpa;
   final DateTime? expectedStartTime;
   final DateTime? expectedEndTime;
-  final List<InternRegistrationRejectReasonModel> rejectReasons;
+  final List<InternRegistrationRejectReason> rejectReasons;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final int? version;
 
-  factory InternRegistrationModel.fromJson(Map<String, dynamic> json) {
+  factory InternRegistration.fromJson(Map<String, dynamic> json) {
     final cvFileJson = json['cvFile'];
     final companyInfoJson = json['companyInfo'];
     final preferredCompaniesJson = json['preferredCompanies'];
 
-    return InternRegistrationModel(
+    return InternRegistration(
       id: asString(json['_id']) ?? '',
       internId: asString(json['internId']) ?? '',
       studentId: asString(json['studentId']) ?? '',
       studentRef: _asIdValue(json['studentRef']),
       type: asString(json['type']) ?? '',
       cvFile: cvFileJson is Map
-          ? InternRegistrationCvFileModel.fromJson(
+          ? InternRegistrationCvFile.fromJson(
               Map<String, dynamic>.from(cvFileJson),
             )
           : null,
       companyInfo: companyInfoJson is Map
-          ? InternRegistrationCompanyInfoModel.fromJson(
+          ? InternRegistrationCompanyInfo.fromJson(
               Map<String, dynamic>.from(companyInfoJson),
             )
           : null,
       preferredCompanies: preferredCompaniesJson is List
           ? preferredCompaniesJson
-              .whereType<Map>()
-              .map(
-                (item) => InternRegistrationPreferredCompanyModel.fromJson(
-                  Map<String, dynamic>.from(item),
-                ),
-              )
-              .toList(growable: false)
+                .whereType<Map>()
+                .map(
+                  (item) => InternRegistrationPreferredCompany.fromJson(
+                    Map<String, dynamic>.from(item),
+                  ),
+                )
+                .toList(growable: false)
           : const [],
       cohort: asString(json['cohort']),
       academicYearRef: _asIdValue(json['academicYearRef']),
@@ -121,19 +121,19 @@ class InternRegistrationModel extends Equatable {
     return asString(value);
   }
 
-  static List<InternRegistrationRejectReasonModel> _asRejectReasonList(
+  static List<InternRegistrationRejectReason> _asRejectReasonList(
     Object? value,
   ) {
     if (value is! List) {
       return const [];
     }
 
-    final results = <InternRegistrationRejectReasonModel>[];
+    final results = <InternRegistrationRejectReason>[];
 
     for (final item in value) {
       if (item is Map) {
         results.add(
-          InternRegistrationRejectReasonModel.fromJson(
+          InternRegistrationRejectReason.fromJson(
             Map<String, dynamic>.from(item),
           ),
         );
@@ -142,7 +142,7 @@ class InternRegistrationModel extends Equatable {
 
       final text = item?.toString().trim() ?? '';
       if (text.isNotEmpty) {
-        results.add(InternRegistrationRejectReasonModel(reason: text));
+        results.add(InternRegistrationRejectReason(reason: text));
       }
     }
 
@@ -151,29 +151,29 @@ class InternRegistrationModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        internId,
-        studentId,
-        studentRef,
-        type,
-        cvFile,
-        companyInfo,
-        preferredCompanies,
-        cohort,
-        academicYearRef,
-        status,
-        cpa,
-        expectedStartTime,
-        expectedEndTime,
-        rejectReasons,
-        createdAt,
-        updatedAt,
-        version,
-      ];
+    id,
+    internId,
+    studentId,
+    studentRef,
+    type,
+    cvFile,
+    companyInfo,
+    preferredCompanies,
+    cohort,
+    academicYearRef,
+    status,
+    cpa,
+    expectedStartTime,
+    expectedEndTime,
+    rejectReasons,
+    createdAt,
+    updatedAt,
+    version,
+  ];
 }
 
-class InternRegistrationCvFileModel extends Equatable {
-  const InternRegistrationCvFileModel({
+class InternRegistrationCvFile extends Equatable {
+  const InternRegistrationCvFile({
     required this.fileName,
     required this.fileKey,
     this.fileType,
@@ -185,8 +185,8 @@ class InternRegistrationCvFileModel extends Equatable {
   final String? fileType;
   final DateTime? uploadedAt;
 
-  factory InternRegistrationCvFileModel.fromJson(Map<String, dynamic> json) {
-    return InternRegistrationCvFileModel(
+  factory InternRegistrationCvFile.fromJson(Map<String, dynamic> json) {
+    return InternRegistrationCvFile(
       fileName: asString(json['fileName']) ?? '',
       fileKey: asString(json['fileKey']) ?? '',
       fileType: asString(json['fileType']),
@@ -207,8 +207,8 @@ class InternRegistrationCvFileModel extends Equatable {
   List<Object?> get props => [fileName, fileKey, fileType, uploadedAt];
 }
 
-class InternRegistrationCompanyInfoModel extends Equatable {
-  const InternRegistrationCompanyInfoModel({
+class InternRegistrationCompanyInfo extends Equatable {
+  const InternRegistrationCompanyInfo({
     required this.companyName,
     this.companyField,
     this.companyAddress,
@@ -224,10 +224,8 @@ class InternRegistrationCompanyInfoModel extends Equatable {
   final String? representativePhoneNumber;
   final String? representativeJob;
 
-  factory InternRegistrationCompanyInfoModel.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    return InternRegistrationCompanyInfoModel(
+  factory InternRegistrationCompanyInfo.fromJson(Map<String, dynamic> json) {
+    return InternRegistrationCompanyInfo(
       companyName: asString(json['companyName']) ?? '',
       companyField: asString(json['companyField']),
       companyAddress: asString(json['companyAddress']),
@@ -250,17 +248,17 @@ class InternRegistrationCompanyInfoModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        companyName,
-        companyField,
-        companyAddress,
-        representativeName,
-        representativePhoneNumber,
-        representativeJob,
-      ];
+    companyName,
+    companyField,
+    companyAddress,
+    representativeName,
+    representativePhoneNumber,
+    representativeJob,
+  ];
 }
 
-class InternRegistrationPreferredCompanyModel extends Equatable {
-  const InternRegistrationPreferredCompanyModel({
+class InternRegistrationPreferredCompany extends Equatable {
+  const InternRegistrationPreferredCompany({
     required this.id,
     this.order,
     this.companyRef,
@@ -274,13 +272,13 @@ class InternRegistrationPreferredCompanyModel extends Equatable {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  factory InternRegistrationPreferredCompanyModel.fromJson(
+  factory InternRegistrationPreferredCompany.fromJson(
     Map<String, dynamic> json,
   ) {
-    return InternRegistrationPreferredCompanyModel(
+    return InternRegistrationPreferredCompany(
       id: asString(json['_id']) ?? '',
       order: asInt(json['order']),
-      companyRef: InternRegistrationModel._asIdValue(json['companyRef']),
+      companyRef: InternRegistration._asIdValue(json['companyRef']),
       createdAt: asDateTime(json['createdAt']),
       updatedAt: asDateTime(json['updatedAt']),
     );
@@ -300,8 +298,8 @@ class InternRegistrationPreferredCompanyModel extends Equatable {
   List<Object?> get props => [id, order, companyRef, createdAt, updatedAt];
 }
 
-class InternRegistrationRejectReasonModel extends Equatable {
-  const InternRegistrationRejectReasonModel({
+class InternRegistrationRejectReason extends Equatable {
+  const InternRegistrationRejectReason({
     required this.reason,
     this.rejectedAt,
     this.rejectedBy,
@@ -311,10 +309,8 @@ class InternRegistrationRejectReasonModel extends Equatable {
   final DateTime? rejectedAt;
   final String? rejectedBy;
 
-  factory InternRegistrationRejectReasonModel.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    return InternRegistrationRejectReasonModel(
+  factory InternRegistrationRejectReason.fromJson(Map<String, dynamic> json) {
+    return InternRegistrationRejectReason(
       reason: asString(json['reason']) ?? '',
       rejectedAt: asDateTime(json['rejectedAt']),
       rejectedBy: asString(json['rejectedBy']),

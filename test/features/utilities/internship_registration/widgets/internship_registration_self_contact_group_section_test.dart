@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ptit_dms_flutter/data/models/student_search_result_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_search_result.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_self_contact_group_section.dart';
 
 void main() {
@@ -26,7 +26,7 @@ void main() {
                   ),
                 ],
                 searchController: searchController,
-                searchResults: const <StudentSearchResultModel>[],
+                searchResults: const <StudentSearchResult>[],
                 isSearching: false,
                 onStartAdd: () {},
                 onCancelAdd: () {},

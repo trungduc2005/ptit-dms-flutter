@@ -1,12 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/student_profile_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_profile.dart';
 
-enum ProfileContextStatus {
-  initial,
-  loading,
-  success,
-  failure,
-}
+enum ProfileContextStatus { initial, loading, success, failure }
 
 const _unset = Object();
 
@@ -18,7 +13,7 @@ final class ProfileContextState extends Equatable {
   });
 
   final ProfileContextStatus status;
-  final StudentProfileModel? profile;
+  final StudentProfile? profile;
   final String? errorMessage;
 
   bool get hasProfile => profile != null;
@@ -32,7 +27,7 @@ final class ProfileContextState extends Equatable {
       status: status ?? this.status,
       profile: identical(profile, _unset)
           ? this.profile
-          : profile as StudentProfileModel?,
+          : profile as StudentProfile?,
       errorMessage: identical(errorMessage, _unset)
           ? this.errorMessage
           : errorMessage as String?,

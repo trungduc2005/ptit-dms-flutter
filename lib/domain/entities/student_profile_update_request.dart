@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-class StudentProfileUpdateRequestModel extends Equatable {
-  const StudentProfileUpdateRequestModel({
+class StudentProfileUpdateRequest extends Equatable {
+  const StudentProfileUpdateRequest({
     this.email,
     this.phone,
     this.gender,

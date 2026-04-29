@@ -1,28 +1,28 @@
 import 'package:dio/dio.dart';
 import 'package:ptit_dms_flutter/core/network/bearer_auth_interceptor.dart';
 import 'package:ptit_dms_flutter/core/utils/json_helpers.dart';
-import 'package:ptit_dms_flutter/data/models/student_profile_avatar_upload_model.dart';
-import 'package:ptit_dms_flutter/data/models/student_profile_model.dart';
-import 'package:ptit_dms_flutter/data/models/student_profile_update_request_model.dart';
-import 'package:ptit_dms_flutter/data/models/required_profile_check_model.dart';
-import 'package:ptit_dms_flutter/data/models/required_profile_update_request_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/avatar_upload_result.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_profile.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_profile_update_request.dart';
+import 'package:ptit_dms_flutter/domain/entities/required_profile_check.dart';
+import 'package:ptit_dms_flutter/domain/entities/required_profile_update_request.dart';
 
 class StudentProfileRemoteDataSource {
   StudentProfileRemoteDataSource(this._dio);
 
   final Dio _dio;
 
-  Future<StudentProfileModel> getProfile() async {
+  Future<StudentProfile> getProfile() async {
     final response = await _dio.get(
       '/info',
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    return StudentProfileModel.fromJson(asJsonMap(response.data));
+    return StudentProfile.fromJson(asJsonMap(response.data));
   }
 
-  Future<StudentProfileModel> updateProfile({
-    required StudentProfileUpdateRequestModel request,
+  Future<StudentProfile> updateProfile({
+    required StudentProfileUpdateRequest request,
   }) async {
     final response = await _dio.put(
       '/info/update',
@@ -30,12 +30,10 @@ class StudentProfileRemoteDataSource {
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    return StudentProfileModel.fromJson(_asInfoJsonMap(response.data));
+    return StudentProfile.fromJson(_asInfoJsonMap(response.data));
   }
 
-  Future<StudentProfileAvatarUploadModel> uploadAvatar({
-    required String filePath,
-  }) async {
+  Future<AvatarUploadResult> uploadAvatar({required String filePath}) async {
     final formData = FormData.fromMap({
       'avatar': await MultipartFile.fromFile(
         filePath,
@@ -52,20 +50,20 @@ class StudentProfileRemoteDataSource {
       ),
     );
 
-    return StudentProfileAvatarUploadModel.fromJson(asJsonMap(response.data));
+    return AvatarUploadResult.fromJson(asJsonMap(response.data));
   }
 
-  Future<RequiredProfileCheckModel> checkRequiredProfile() async {
+  Future<RequiredProfileCheck> checkRequiredProfile() async {
     final response = await _dio.get(
       '/users/check-profile',
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    return RequiredProfileCheckModel.fromJson(asJsonMap(response.data));
+    return RequiredProfileCheck.fromJson(asJsonMap(response.data));
   }
 
   Future<void> updateRequiredProfile({
-    required RequiredProfileUpdateRequestModel request,
+    required RequiredProfileUpdateRequest request,
   }) async {
     await _dio.put(
       '/users/update-profile-required',

@@ -1,14 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:ptit_dms_flutter/core/network/bearer_auth_interceptor.dart';
 import 'package:ptit_dms_flutter/core/utils/json_helpers.dart';
-import 'package:ptit_dms_flutter/data/models/student_search_result_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_search_result.dart';
 
 class StudentSearchRemoteDataSource {
   StudentSearchRemoteDataSource(this._dio);
 
   final Dio _dio;
 
-  Future<List<StudentSearchResultModel>> searchInternEligibleStudents({
+  Future<List<StudentSearchResult>> searchInternEligibleStudents({
     required String query,
     required String academicYearId,
   }) async {
@@ -26,6 +26,6 @@ class StudentSearchRemoteDataSource {
     );
 
     final items = asJsonList(response.data);
-    return items.map(StudentSearchResultModel.fromJson).toList(growable: false);
+    return items.map(StudentSearchResult.fromJson).toList(growable: false);
   }
 }

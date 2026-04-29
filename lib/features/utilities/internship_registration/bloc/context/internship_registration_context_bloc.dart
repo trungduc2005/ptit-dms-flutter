@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ptit_dms_flutter/core/utils/error_helpers.dart';
-import 'package:ptit_dms_flutter/data/models/academic_year_option_model.dart';
-import 'package:ptit_dms_flutter/data/models/company_model.dart';
-import 'package:ptit_dms_flutter/data/models/current_intern_registration_model.dart';
-import 'package:ptit_dms_flutter/data/models/eligibility_model.dart';
-import 'package:ptit_dms_flutter/data/models/timeline_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/academic_year_option.dart';
+import 'package:ptit_dms_flutter/domain/entities/company.dart';
+import 'package:ptit_dms_flutter/domain/entities/current_intern_registration.dart';
+import 'package:ptit_dms_flutter/domain/entities/eligibility.dart';
+import 'package:ptit_dms_flutter/domain/entities/timeline.dart';
 import 'package:ptit_dms_flutter/domain/repositories/academic_year_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/company_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/eligibility_repository.dart';
@@ -255,7 +255,7 @@ class InternshipRegistrationContextBloc
 
   Future<void> _loadContextForAcademicYear(
     Emitter<InternshipRegistrationContextState> emit, {
-    required List<AcademicYearOptionModel> academicYears,
+    required List<AcademicYearOption> academicYears,
     required String academicYearId,
   }) async {
     final results = await Future.wait<Object?>([
@@ -272,10 +272,10 @@ class InternshipRegistrationContextBloc
 
     if (emit.isDone || isClosed) return;
 
-    final eligibility = results[0] as EligibilityModel;
-    final timelines = results[1] as List<TimelineModel>;
+    final eligibility = results[0] as Eligibility;
+    final timelines = results[1] as List<Timeline>;
     final companies = _filterCompaniesByAcademicYear(
-      results[2] as List<CompanyModel>,
+      results[2] as List<Company>,
       academicYearId,
     );
     final registrationSnapshot = results[3] as _RegistrationSnapshot;
@@ -342,8 +342,8 @@ class InternshipRegistrationContextBloc
     );
   }
 
-  List<CompanyModel> _filterCompaniesByAcademicYear(
-    List<CompanyModel> companies,
+  List<Company> _filterCompaniesByAcademicYear(
+    List<Company> companies,
     String academicYearId,
   ) {
     return companies
@@ -355,7 +355,7 @@ class InternshipRegistrationContextBloc
   }
 
   String? _resolveSelectedAcademicYearId({
-    required List<AcademicYearOptionModel> academicYears,
+    required List<AcademicYearOption> academicYears,
     String? preferredId,
     String? fallbackId,
   }) {
@@ -374,10 +374,7 @@ class InternshipRegistrationContextBloc
     return academicYears.first.id;
   }
 
-  TimelineModel? _findTimelineByType(
-    List<TimelineModel> timelines,
-    String type,
-  ) {
+  Timeline? _findTimelineByType(List<Timeline> timelines, String type) {
     for (final item in timelines) {
       if (item.type == type) {
         return item;
@@ -386,7 +383,7 @@ class InternshipRegistrationContextBloc
     return null;
   }
 
-  bool _isRegistrationOpen(TimelineModel? timeline) {
+  bool _isRegistrationOpen(Timeline? timeline) {
     final start = timeline?.startTime;
     final end = timeline?.endTime;
 
@@ -400,7 +397,7 @@ class InternshipRegistrationContextBloc
 
   InternshipRegistrationMode _resolveMode({
     required bool hasRegistered,
-    required CurrentInternRegistrationModel? registration,
+    required CurrentInternRegistration? registration,
   }) {
     if (!hasRegistered || registration == null) {
       return InternshipRegistrationMode.create;
@@ -427,5 +424,5 @@ final class _RegistrationSnapshot {
   });
 
   final bool hasRegistered;
-  final CurrentInternRegistrationModel? currentRegistration;
+  final CurrentInternRegistration? currentRegistration;
 }

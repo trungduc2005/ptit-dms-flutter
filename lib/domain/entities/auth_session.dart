@@ -1,39 +1,33 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/model_parsers.dart';
+import 'package:ptit_dms_flutter/core/utils/model_parsers.dart';
 
-class AuthVerifyResponseModel extends Equatable {
-  const AuthVerifyResponseModel({
-    required this.valid,
-    this.user,
-  });
+class AuthSession extends Equatable {
+  const AuthSession({required this.valid, this.user});
 
   final bool valid;
-  final AuthVerifyUserModel? user;
+  final AuthSessionUser? user;
 
-  factory AuthVerifyResponseModel.fromJson(Map<String, dynamic> json) {
+  factory AuthSession.fromJson(Map<String, dynamic> json) {
     final userJson = json['user'];
 
-    return AuthVerifyResponseModel(
+    return AuthSession(
       valid: asBool(json['valid']) ?? false,
       user: userJson is Map
-          ? AuthVerifyUserModel.fromJson(Map<String, dynamic>.from(userJson))
+          ? AuthSessionUser.fromJson(Map<String, dynamic>.from(userJson))
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'valid': valid,
-      'user': user?.toJson(),
-    };
+    return {'valid': valid, 'user': user?.toJson()};
   }
 
   @override
   List<Object?> get props => [valid, user];
 }
 
-class AuthVerifyUserModel extends Equatable {
-  const AuthVerifyUserModel({
+class AuthSessionUser extends Equatable {
+  const AuthSessionUser({
     this.userId,
     this.userCode,
     this.username,
@@ -53,10 +47,10 @@ class AuthVerifyUserModel extends Equatable {
   final int? issuedAt;
   final int? expiresAt;
 
-  factory AuthVerifyUserModel.fromJson(Map<String, dynamic> json) {
+  factory AuthSessionUser.fromJson(Map<String, dynamic> json) {
     final roleManagementsJson = json['roleManagements'];
 
-    return AuthVerifyUserModel(
+    return AuthSessionUser(
       userId: asString(json['userId']),
       userCode: asString(json['userCode']),
       username: asString(json['username']),

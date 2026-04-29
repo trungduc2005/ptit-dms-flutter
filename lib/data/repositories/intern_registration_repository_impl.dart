@@ -1,9 +1,9 @@
 import 'package:ptit_dms_flutter/data/datasources/intern_registration_remote_data_source.dart';
-import 'package:ptit_dms_flutter/data/models/current_intern_registration_model.dart';
-import 'package:ptit_dms_flutter/data/models/intern_registration_check_model.dart';
-import 'package:ptit_dms_flutter/data/models/intern_registration_cv_download_model.dart';
-import 'package:ptit_dms_flutter/data/models/intern_registration_model.dart';
-import 'package:ptit_dms_flutter/data/models/intern_registration_request_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/current_intern_registration.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_check.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_cv_download.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_request.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_registration_repository.dart';
 
 class InternRegistrationRepositoryImpl implements InternRegistrationRepository {
@@ -12,21 +12,21 @@ class InternRegistrationRepositoryImpl implements InternRegistrationRepository {
   final InternRegistrationRemoteDataSource _remoteDataSource;
 
   @override
-  Future<InternRegistrationModel> registerInternship({
-    required InternRegistrationRequestModel request,
+  Future<InternRegistration> registerInternship({
+    required InternRegistrationRequest request,
   }) {
     return _remoteDataSource.registerInternship(request: request);
   }
 
   @override
-  Future<InternRegistrationModel> updateInternship({
-    required InternRegistrationRequestModel request,
+  Future<InternRegistration> updateInternship({
+    required InternRegistrationRequest request,
   }) {
     return _remoteDataSource.updateInternship(request: request);
   }
 
   @override
-  Future<CurrentInternRegistrationModel?> getCurrentRegistration({
+  Future<CurrentInternRegistration?> getCurrentRegistration({
     required String academicYearId,
   }) {
     return _remoteDataSource.getCurrentRegistration(
@@ -35,7 +35,7 @@ class InternRegistrationRepositoryImpl implements InternRegistrationRepository {
   }
 
   @override
-  Future<InternRegistrationCheckModel> checkInternRegistration({
+  Future<InternRegistrationCheck> checkInternRegistration({
     required String studentId,
     required String academicYearId,
   }) {
@@ -46,7 +46,7 @@ class InternRegistrationRepositoryImpl implements InternRegistrationRepository {
   }
 
   @override
-  Future<InternRegistrationCvDownloadModel> downloadRegistrationCv({
+  Future<InternRegistrationCvDownload> downloadRegistrationCv({
     required String studentId,
     required String academicYearId,
   }) {

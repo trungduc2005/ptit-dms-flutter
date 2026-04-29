@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ptit_dms_flutter/core/utils/error_helpers.dart';
-import 'package:ptit_dms_flutter/data/models/intern_registration_model.dart';
-import 'package:ptit_dms_flutter/data/models/intern_registration_request_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_request.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_cv_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_registration_repository.dart';
 
@@ -121,10 +121,10 @@ class InternshipRegistrationSubmitBloc
 
   Future<void> _submitRegistration(
     Emitter<InternshipRegistrationSubmitState> emit, {
-    required InternRegistrationRequestModel request,
+    required InternRegistrationRequest request,
     required int expectedPreferredCompanyCount,
     required bool allowMissingCv,
-    required Future<InternRegistrationModel> Function() action,
+    required Future<InternRegistration> Function() action,
     required String successMessage,
     required String failureMessage,
   }) async {
@@ -187,7 +187,7 @@ class InternshipRegistrationSubmitBloc
   }
 
   String? _validateRequest(
-    InternRegistrationRequestModel request, {
+    InternRegistrationRequest request, {
     required int expectedPreferredCompanyCount,
     required bool allowMissingCv,
   }) {
@@ -215,7 +215,7 @@ class InternshipRegistrationSubmitBloc
       return 'CPA phải nằm trong khoảng 0 - 4.';
     }
 
-    if (request is RegisterWishInternRequestModel) {
+    if (request is RegisterWishInternRequest) {
       if (expectedPreferredCompanyCount <= 0) {
         return 'Chưa có cấu hình số lượng nguyện vọng đăng ký.';
       }
@@ -238,7 +238,7 @@ class InternshipRegistrationSubmitBloc
       }
     }
 
-    if (request is RegisterYourselfInternRequestModel) {
+    if (request is RegisterYourselfInternRequest) {
       if (request.companyName.trim().isEmpty ||
           request.companyField.trim().isEmpty ||
           request.companyAddress.trim().isEmpty ||

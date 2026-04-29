@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ProfileLogoutAction extends StatelessWidget {
-  const ProfileLogoutAction({
-    required this.onTap,
-    super.key,
-  });
+  const ProfileLogoutAction({required this.onTap, super.key});
 
   final VoidCallback onTap;
 

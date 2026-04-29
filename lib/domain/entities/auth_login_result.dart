@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/model_parsers.dart';
+import 'package:ptit_dms_flutter/core/utils/model_parsers.dart';
 
-class AuthLoginResponseModel extends Equatable {
-  const AuthLoginResponseModel({
+class AuthLoginResult extends Equatable {
+  const AuthLoginResult({
     required this.success,
     this.message,
     this.userId,
@@ -14,8 +14,8 @@ class AuthLoginResponseModel extends Equatable {
   final String? userId;
   final String? role;
 
-  factory AuthLoginResponseModel.fromJson(Map<String, dynamic> json) {
-    return AuthLoginResponseModel(
+  factory AuthLoginResult.fromJson(Map<String, dynamic> json) {
+    return AuthLoginResult(
       success: asBool(json['success']) ?? false,
       message: asString(json['message']),
       userId: asString(json['userId']),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ptit_dms_flutter/data/models/required_profile_update_request_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/required_profile_update_request.dart';
 import 'package:ptit_dms_flutter/features/auth/bloc/auth_bloc.dart';
 import 'package:ptit_dms_flutter/features/profile/bloc/required_profile_bloc.dart';
 import 'package:ptit_dms_flutter/features/profile/widgets/required_profile_actions.dart';
@@ -51,16 +51,16 @@ class _RequiredProfileFormState extends State<RequiredProfileForm> {
     FocusScope.of(context).unfocus();
 
     context.read<RequiredProfileBloc>().add(
-          RequiredProfileSubmitted(
-            request: RequiredProfileUpdateRequestModel(
-              email: _emailController.text,
-              phone: _phoneController.text,
-              citizenId: _citizenIdController.text,
-              newPassword: _newPasswordController.text,
-              confirmPassword: _confirmPasswordController.text,
-            ),
-          ),
-        );
+      RequiredProfileSubmitted(
+        request: RequiredProfileUpdateRequest(
+          email: _emailController.text,
+          phone: _phoneController.text,
+          citizenId: _citizenIdController.text,
+          newPassword: _newPasswordController.text,
+          confirmPassword: _confirmPasswordController.text,
+        ),
+      ),
+    );
   }
 
   @override
@@ -123,8 +123,7 @@ class _RequiredProfileFormState extends State<RequiredProfileForm> {
                               ? null
                               : () {
                                   setState(() {
-                                    _obscureNewPassword =
-                                        !_obscureNewPassword;
+                                    _obscureNewPassword = !_obscureNewPassword;
                                   });
                                 },
                           icon: Icon(
@@ -175,9 +174,7 @@ class _RequiredProfileFormState extends State<RequiredProfileForm> {
                           decoration: BoxDecoration(
                             color: const Color(0xFFFFF1F1),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: const Color(0xFFFFD3D3),
-                            ),
+                            border: Border.all(color: const Color(0xFFFFD3D3)),
                           ),
                           child: Text(
                             errorMessage,

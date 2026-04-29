@@ -31,10 +31,7 @@ class LoginForm extends StatelessWidget {
             controller: usernameController,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
-            autofillHints: const [
-              AutofillHints.username,
-              AutofillHints.email,
-            ],
+            autofillHints: const [AutofillHints.username, AutofillHints.email],
           ),
           const SizedBox(height: 18),
           LoginTextField(
@@ -65,8 +62,9 @@ class LoginForm extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: LoginStyles.brandColor,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor:
-                    LoginStyles.brandColor.withValues(alpha: 0.70),
+                disabledBackgroundColor: LoginStyles.brandColor.withValues(
+                  alpha: 0.70,
+                ),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

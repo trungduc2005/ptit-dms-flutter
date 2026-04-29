@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/model_parsers.dart';
+import 'package:ptit_dms_flutter/core/utils/model_parsers.dart';
 
-class CurrentInternRegistrationModel extends Equatable {
-  const CurrentInternRegistrationModel({
+class CurrentInternRegistration extends Equatable {
+  const CurrentInternRegistration({
     required this.id,
     required this.internId,
     required this.studentId,
@@ -39,7 +39,7 @@ class CurrentInternRegistrationModel extends Equatable {
   final String? studentRef;
   final String type;
   final String? cohort;
-  final CurrentInternAcademicYearRefModel? academicYearRef;
+  final CurrentInternAcademicYearRef? academicYearRef;
   final String? companyId;
   final String? companyName;
   final String? companyField;
@@ -47,10 +47,10 @@ class CurrentInternRegistrationModel extends Equatable {
   final String? representativeName;
   final String? representativePhoneNumber;
   final String? representativeJob;
-  final List<CurrentInternPreferredCompanyModel> preferredCompanies;
+  final List<CurrentInternPreferredCompany> preferredCompanies;
   final String? cvFileName;
   final String? cvFileKey;
-  final List<CurrentInternRejectReasonModel> rejectReasons;
+  final List<CurrentInternRejectReason> rejectReasons;
   final String? status;
   final double? cpa;
   final DateTime? expectedStartTime;
@@ -60,14 +60,14 @@ class CurrentInternRegistrationModel extends Equatable {
   final int? version;
   final String? selfContactGroupId;
   final String? representativeStudentId;
-  final List<CurrentInternSelfContactGroupMemberModel> selfContactGroupMembers;
+  final List<CurrentInternSelfContactGroupMember> selfContactGroupMembers;
 
-  factory CurrentInternRegistrationModel.fromJson(Map<String, dynamic> json) {
+  factory CurrentInternRegistration.fromJson(Map<String, dynamic> json) {
     final academicYearRefJson = json['academicYearRef'];
     final preferredCompaniesJson = json['preferredCompanies'];
     final selfContactGroupMembersJson = json['selfContactGroupMembers'];
 
-    return CurrentInternRegistrationModel(
+    return CurrentInternRegistration(
       id: asString(json['_id']) ?? '',
       internId: asString(json['internId']) ?? '',
       studentId: asString(json['studentId']) ?? '',
@@ -75,7 +75,7 @@ class CurrentInternRegistrationModel extends Equatable {
       type: asString(json['type']) ?? '',
       cohort: asString(json['cohort']),
       academicYearRef: academicYearRefJson is Map
-          ? CurrentInternAcademicYearRefModel.fromJson(
+          ? CurrentInternAcademicYearRef.fromJson(
               Map<String, dynamic>.from(academicYearRefJson),
             )
           : null,
@@ -90,7 +90,7 @@ class CurrentInternRegistrationModel extends Equatable {
           ? preferredCompaniesJson
                 .whereType<Map>()
                 .map(
-                  (item) => CurrentInternPreferredCompanyModel.fromJson(
+                  (item) => CurrentInternPreferredCompany.fromJson(
                     Map<String, dynamic>.from(item),
                   ),
                 )
@@ -112,7 +112,7 @@ class CurrentInternRegistrationModel extends Equatable {
           ? selfContactGroupMembersJson
                 .whereType<Map>()
                 .map(
-                  (item) => CurrentInternSelfContactGroupMemberModel.fromJson(
+                  (item) => CurrentInternSelfContactGroupMember.fromJson(
                     Map<String, dynamic>.from(item),
                   ),
                 )
@@ -168,28 +168,24 @@ class CurrentInternRegistrationModel extends Equatable {
     return asString(value);
   }
 
-  static List<CurrentInternRejectReasonModel> _asRejectReasonList(
-    Object? value,
-  ) {
+  static List<CurrentInternRejectReason> _asRejectReasonList(Object? value) {
     if (value is! List) {
       return const [];
     }
 
-    final results = <CurrentInternRejectReasonModel>[];
+    final results = <CurrentInternRejectReason>[];
 
     for (final item in value) {
       if (item is Map) {
         results.add(
-          CurrentInternRejectReasonModel.fromJson(
-            Map<String, dynamic>.from(item),
-          ),
+          CurrentInternRejectReason.fromJson(Map<String, dynamic>.from(item)),
         );
         continue;
       }
 
       final text = item?.toString().trim() ?? '';
       if (text.isNotEmpty) {
-        results.add(CurrentInternRejectReasonModel(reason: text));
+        results.add(CurrentInternRejectReason(reason: text));
       }
     }
 
@@ -229,19 +225,14 @@ class CurrentInternRegistrationModel extends Equatable {
   ];
 }
 
-class CurrentInternAcademicYearRefModel extends Equatable {
-  const CurrentInternAcademicYearRefModel({
-    required this.id,
-    required this.name,
-  });
+class CurrentInternAcademicYearRef extends Equatable {
+  const CurrentInternAcademicYearRef({required this.id, required this.name});
 
   final String id;
   final String name;
 
-  factory CurrentInternAcademicYearRefModel.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    return CurrentInternAcademicYearRefModel(
+  factory CurrentInternAcademicYearRef.fromJson(Map<String, dynamic> json) {
+    return CurrentInternAcademicYearRef(
       id: asString(json['_id']) ?? '',
       name: asString(json['name']) ?? '',
     );
@@ -255,8 +246,8 @@ class CurrentInternAcademicYearRefModel extends Equatable {
   List<Object?> get props => [id, name];
 }
 
-class CurrentInternPreferredCompanyModel extends Equatable {
-  const CurrentInternPreferredCompanyModel({
+class CurrentInternPreferredCompany extends Equatable {
+  const CurrentInternPreferredCompany({
     this.order,
     this.companyId,
     this.companyName,
@@ -266,10 +257,8 @@ class CurrentInternPreferredCompanyModel extends Equatable {
   final String? companyId;
   final String? companyName;
 
-  factory CurrentInternPreferredCompanyModel.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    return CurrentInternPreferredCompanyModel(
+  factory CurrentInternPreferredCompany.fromJson(Map<String, dynamic> json) {
+    return CurrentInternPreferredCompany(
       order: asInt(json['order']),
       companyId: asString(json['companyId']),
       companyName: asString(json['companyName']),
@@ -284,8 +273,8 @@ class CurrentInternPreferredCompanyModel extends Equatable {
   List<Object?> get props => [order, companyId, companyName];
 }
 
-class CurrentInternRejectReasonModel extends Equatable {
-  const CurrentInternRejectReasonModel({
+class CurrentInternRejectReason extends Equatable {
+  const CurrentInternRejectReason({
     required this.reason,
     this.rejectedAt,
     this.rejectedBy,
@@ -295,8 +284,8 @@ class CurrentInternRejectReasonModel extends Equatable {
   final DateTime? rejectedAt;
   final String? rejectedBy;
 
-  factory CurrentInternRejectReasonModel.fromJson(Map<String, dynamic> json) {
-    return CurrentInternRejectReasonModel(
+  factory CurrentInternRejectReason.fromJson(Map<String, dynamic> json) {
+    return CurrentInternRejectReason(
       reason: asString(json['reason']) ?? '',
       rejectedAt: asDateTime(json['rejectedAt']),
       rejectedBy: asString(json['rejectedBy']),
@@ -315,8 +304,8 @@ class CurrentInternRejectReasonModel extends Equatable {
   List<Object?> get props => [reason, rejectedAt, rejectedBy];
 }
 
-class CurrentInternSelfContactGroupMemberModel extends Equatable {
-  const CurrentInternSelfContactGroupMemberModel({
+class CurrentInternSelfContactGroupMember extends Equatable {
+  const CurrentInternSelfContactGroupMember({
     required this.studentId,
     required this.studentName,
     this.cpa,
@@ -332,10 +321,10 @@ class CurrentInternSelfContactGroupMemberModel extends Equatable {
   final String? cvFileKey;
   final bool isRepresentative;
 
-  factory CurrentInternSelfContactGroupMemberModel.fromJson(
+  factory CurrentInternSelfContactGroupMember.fromJson(
     Map<String, dynamic> json,
   ) {
-    return CurrentInternSelfContactGroupMemberModel(
+    return CurrentInternSelfContactGroupMember(
       studentId: asString(json['studentId']) ?? '',
       studentName: asString(json['studentName']) ?? '',
       cpa: asDouble(json['cpa']),

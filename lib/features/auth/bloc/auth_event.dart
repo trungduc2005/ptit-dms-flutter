@@ -12,10 +12,7 @@ final class AuthStarted extends AuthEvent {
 }
 
 final class AuthLoginRequested extends AuthEvent {
-  const AuthLoginRequested({
-    required  this.username, 
-    required  this.password, 
-  });
+  const AuthLoginRequested({required this.username, required this.password});
 
   final String username;
   final String password;

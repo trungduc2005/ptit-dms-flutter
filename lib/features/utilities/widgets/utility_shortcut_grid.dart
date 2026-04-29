@@ -15,10 +15,7 @@ class UtilityShortcutData {
 }
 
 class UtilityShortcutGrid extends StatelessWidget {
-  const UtilityShortcutGrid({
-    required this.shortcuts,
-    super.key,
-  });
+  const UtilityShortcutGrid({required this.shortcuts, super.key});
 
   static const int _slotCount = 4;
 
@@ -49,10 +46,7 @@ class UtilityShortcutGrid extends StatelessWidget {
 }
 
 class UtilityShortcutTile extends StatelessWidget {
-  const UtilityShortcutTile({
-    required this.shortcut,
-    super.key,
-  });
+  const UtilityShortcutTile({required this.shortcut, super.key});
 
   final UtilityShortcutData shortcut;
 

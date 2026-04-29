@@ -1,16 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ptit_dms_flutter/data/models/company_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/company.dart';
 
 void main() {
   test('includes companyField in equality props', () {
-    const first = CompanyModel(
+    const first = Company(
       id: 'id',
       companyId: 'company-id',
       companyName: 'Company',
       companyField: 'Software',
       companyAddress: 'Address',
     );
-    const second = CompanyModel(
+    const second = Company(
       id: 'id',
       companyId: 'company-id',
       companyName: 'Company',

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/required_profile_check_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/required_profile_check.dart';
 
 enum RequiredProfileStatus {
   initial,
@@ -21,12 +21,12 @@ final class RequiredProfileState extends Equatable {
   });
 
   final RequiredProfileStatus status;
-  final RequiredProfileCheckModel? requirement;
+  final RequiredProfileCheck? requirement;
   final String? message;
 
   bool get mustChangePassword => requirement?.mustChangePassword ?? false;
-  RequiredProfileFieldsModel get fields =>
-      requirement?.fields ?? const RequiredProfileFieldsModel();
+  RequiredProfileFields get fields =>
+      requirement?.fields ?? const RequiredProfileFields();
 
   RequiredProfileState copyWith({
     RequiredProfileStatus? status,
@@ -37,7 +37,7 @@ final class RequiredProfileState extends Equatable {
       status: status ?? this.status,
       requirement: identical(requirement, _unset)
           ? this.requirement
-          : requirement as RequiredProfileCheckModel?,
+          : requirement as RequiredProfileCheck?,
       message: identical(message, _unset) ? this.message : message as String?,
     );
   }

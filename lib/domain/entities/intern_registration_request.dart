@@ -10,8 +10,8 @@ enum InternRegistrationType {
   final String value;
 }
 
-abstract class InternRegistrationRequestModel extends Equatable {
-  const InternRegistrationRequestModel({
+abstract class InternRegistrationRequest extends Equatable {
+  const InternRegistrationRequest({
     required this.type,
     required this.academicYearId,
     required this.cpa,
@@ -41,8 +41,8 @@ abstract class InternRegistrationRequestModel extends Equatable {
   List<Object?> get props => [type, academicYearId, cpa, cvFileKey, cvFileName];
 }
 
-class RegisterWishInternRequestModel extends InternRegistrationRequestModel {
-  const RegisterWishInternRequestModel({
+class RegisterWishInternRequest extends InternRegistrationRequest {
+  const RegisterWishInternRequest({
     required super.academicYearId,
     required super.cpa,
     required super.cvFileKey,
@@ -61,9 +61,8 @@ class RegisterWishInternRequestModel extends InternRegistrationRequestModel {
   List<Object?> get props => [...super.props, preferredCompanies];
 }
 
-class RegisterYourselfInternRequestModel
-    extends InternRegistrationRequestModel {
-  const RegisterYourselfInternRequestModel({
+class RegisterYourselfInternRequest extends InternRegistrationRequest {
+  const RegisterYourselfInternRequest({
     required super.academicYearId,
     required super.cpa,
     required super.cvFileKey,
@@ -87,7 +86,7 @@ class RegisterYourselfInternRequestModel
   final String representativeJob;
   final DateTime expectedStartTime;
   final DateTime expectedEndTime;
-  final List<SelfContactGroupMemberRequestModel> selfContactGroupMembers;
+  final List<SelfContactGroupMemberRequest> selfContactGroupMembers;
 
   @override
   Map<String, dynamic> toJson() {
@@ -122,8 +121,8 @@ class RegisterYourselfInternRequestModel
   ];
 }
 
-class SelfContactGroupMemberRequestModel extends Equatable {
-  const SelfContactGroupMemberRequestModel({
+class SelfContactGroupMemberRequest extends Equatable {
+  const SelfContactGroupMemberRequest({
     required this.studentId,
     required this.cpa,
     required this.cvFileKey,

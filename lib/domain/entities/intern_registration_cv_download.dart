@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
 
-class InternRegistrationCvDownloadModel extends Equatable {
-  const InternRegistrationCvDownloadModel({
+class InternRegistrationCvDownload extends Equatable {
+  const InternRegistrationCvDownload({
     required this.bytes,
     required this.fileName,
     this.contentType,

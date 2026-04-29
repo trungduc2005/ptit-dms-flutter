@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ptit_dms_flutter/features/auth/widgets/login/login_styles.dart';
 
 class LoginBackground extends StatelessWidget {
-  const LoginBackground({
-    required this.width,
-    required this.height,
-    super.key,
-  });
+  const LoginBackground({required this.width, required this.height, super.key});
 
   final double width;
   final double height;
@@ -25,10 +21,7 @@ class LoginBackground extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: const [
-                  Color(0xFFFFFCF8),
-                  Color(0xFFF8F2FF),
-                ],
+                colors: const [Color(0xFFFFFCF8), Color(0xFFF8F2FF)],
                 stops: const [0.08, 1.0],
               ),
             ),
@@ -72,10 +65,7 @@ class LoginBackground extends StatelessWidget {
     );
   }
 
-  Widget _buildAmbientShape({
-    required double size,
-    required Color color,
-  }) {
+  Widget _buildAmbientShape({required double size, required Color color}) {
     return Container(
       width: size,
       height: size,

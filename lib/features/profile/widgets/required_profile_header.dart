@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ptit_dms_flutter/features/auth/widgets/login/login_styles.dart';
 
 class RequiredProfileHeader extends StatelessWidget {
-  const RequiredProfileHeader({
-    required this.mustChangePassword,
-    super.key,
-  });
+  const RequiredProfileHeader({required this.mustChangePassword, super.key});
 
   final bool mustChangePassword;
 

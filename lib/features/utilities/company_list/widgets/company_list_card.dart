@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:ptit_dms_flutter/data/models/company_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/company.dart';
 
 class CompanyListCard extends StatelessWidget {
-  const CompanyListCard({
-    required this.company,
-    this.onTap,
-    super.key,
-  });
+  const CompanyListCard({required this.company, this.onTap, super.key});
 
-  final CompanyModel company;
+  final Company company;
   final VoidCallback? onTap;
 
   @override
@@ -91,8 +87,6 @@ class CompanyListCard extends StatelessWidget {
   String _formatCpa(double? value) {
     if (value == null) return '-';
 
-    return value
-        .toStringAsFixed(2)
-        .replaceFirst(RegExp(r'\.?0+$'), '');
+    return value.toStringAsFixed(2).replaceFirst(RegExp(r'\.?0+$'), '');
   }
 }

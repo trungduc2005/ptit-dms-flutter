@@ -1,23 +1,21 @@
-import 'package:ptit_dms_flutter/data/models/student_profile_avatar_upload_model.dart';
-import 'package:ptit_dms_flutter/data/models/student_profile_model.dart';
-import 'package:ptit_dms_flutter/data/models/student_profile_update_request_model.dart';
-import 'package:ptit_dms_flutter/data/models/required_profile_check_model.dart';
-import 'package:ptit_dms_flutter/data/models/required_profile_update_request_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/avatar_upload_result.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_profile.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_profile_update_request.dart';
+import 'package:ptit_dms_flutter/domain/entities/required_profile_check.dart';
+import 'package:ptit_dms_flutter/domain/entities/required_profile_update_request.dart';
 
 abstract class StudentProfileRepository {
-  Future<StudentProfileModel> getProfile();
+  Future<StudentProfile> getProfile();
 
-  Future<StudentProfileModel> updateProfile({
-    required StudentProfileUpdateRequestModel request,
+  Future<StudentProfile> updateProfile({
+    required StudentProfileUpdateRequest request,
   });
 
-  Future<StudentProfileAvatarUploadModel> uploadAvatar({
-    required String filePath,
-  });
+  Future<AvatarUploadResult> uploadAvatar({required String filePath});
 
-  Future<RequiredProfileCheckModel> checkRequiredProfile();
+  Future<RequiredProfileCheck> checkRequiredProfile();
 
   Future<void> updateRequiredProfile({
-    required RequiredProfileUpdateRequestModel request,
+    required RequiredProfileUpdateRequest request,
   });
 }

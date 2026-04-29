@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/model_parsers.dart';
+import 'package:ptit_dms_flutter/core/utils/model_parsers.dart';
 
-class TimelineAcademicYearRefModel extends Equatable {
-  const TimelineAcademicYearRefModel({
+class TimelineAcademicYearRef extends Equatable {
+  const TimelineAcademicYearRef({
     required this.id,
     this.code,
     this.name,
@@ -26,8 +26,8 @@ class TimelineAcademicYearRefModel extends Equatable {
   final DateTime? updatedAt;
   final int? version;
 
-  factory TimelineAcademicYearRefModel.fromJson(Map<String, dynamic> json) {
-    return TimelineAcademicYearRefModel(
+  factory TimelineAcademicYearRef.fromJson(Map<String, dynamic> json) {
+    return TimelineAcademicYearRef(
       id: asString(json['_id']) ?? '',
       code: asString(json['code']),
       name: asString(json['name']),
@@ -58,21 +58,21 @@ class TimelineAcademicYearRefModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        code,
-        name,
-        startYear,
-        endYear,
-        isActive,
-        isCurrent,
-        createdAt,
-        updatedAt,
-        version,
-      ];
+    id,
+    code,
+    name,
+    startYear,
+    endYear,
+    isActive,
+    isCurrent,
+    createdAt,
+    updatedAt,
+    version,
+  ];
 }
 
-class TimelineModel extends Equatable {
-  const TimelineModel({
+class Timeline extends Equatable {
+  const Timeline({
     required this.id,
     required this.name,
     this.type,
@@ -104,12 +104,12 @@ class TimelineModel extends Equatable {
   final int? version;
   final String? academicYearId;
   final String? academicYear;
-  final TimelineAcademicYearRefModel? academicYearRef;
+  final TimelineAcademicYearRef? academicYearRef;
 
-  factory TimelineModel.fromJson(Map<String, dynamic> json) {
+  factory Timeline.fromJson(Map<String, dynamic> json) {
     final academicYearRefJson = json['academicYearRef'];
 
-    return TimelineModel(
+    return Timeline(
       id: asString(json['_id']) ?? '',
       name: asString(json['name']) ?? '',
       type: asString(json['type']),
@@ -125,7 +125,7 @@ class TimelineModel extends Equatable {
       academicYearId: asString(json['academicYearId']),
       academicYear: asString(json['academicYear']),
       academicYearRef: academicYearRefJson is Map
-          ? TimelineAcademicYearRefModel.fromJson(
+          ? TimelineAcademicYearRef.fromJson(
               Map<String, dynamic>.from(academicYearRefJson),
             )
           : null,
@@ -154,20 +154,20 @@ class TimelineModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        type,
-        key,
-        role,
-        startTime,
-        endTime,
-        preferredCompanyCount,
-        autoFilterProcessedAt,
-        createdAt,
-        updatedAt,
-        version,
-        academicYearId,
-        academicYear,
-        academicYearRef,
-      ];
+    id,
+    name,
+    type,
+    key,
+    role,
+    startTime,
+    endTime,
+    preferredCompanyCount,
+    autoFilterProcessedAt,
+    createdAt,
+    updatedAt,
+    version,
+    academicYearId,
+    academicYear,
+    academicYearRef,
+  ];
 }

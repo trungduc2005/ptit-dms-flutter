@@ -13,9 +13,9 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ProfileContextBloc(
-        context.read<StudentProfileRepository>(),
-      )..add(const ProfileContextStarted()),
+      create: (context) =>
+          ProfileContextBloc(context.read<StudentProfileRepository>())
+            ..add(const ProfileContextStarted()),
       child: const _ProfilePageView(),
     );
   }
@@ -38,9 +38,7 @@ class _ProfilePageViewState extends State<_ProfilePageView> {
   void _openAccountInfo() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => const MainTabChildPage(
-          title: 'Thông tin tài khoản',
-        ),
+        builder: (_) => const MainTabChildPage(title: 'Thông tin tài khoản'),
       ),
     );
   }
@@ -96,10 +94,7 @@ class _ProfilePageViewState extends State<_ProfilePageView> {
   Future<void> _showErrorDialog(String message) async {
     await _showPopup<void>(
       builder: (dialogContext) {
-        return AppPopupDialog(
-          title: 'Thông báo',
-          message: message,
-        );
+        return AppPopupDialog(title: 'Thông báo', message: message);
       },
     );
   }
@@ -110,9 +105,7 @@ class _ProfilePageViewState extends State<_ProfilePageView> {
       backgroundColor: const Color(0xFFF8F8F8),
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Container(color: const Color(0xFFF8F8F8)),
-          ),
+          Positioned.fill(child: Container(color: const Color(0xFFF8F8F8))),
           Positioned(
             top: 0,
             left: 0,
@@ -130,9 +123,7 @@ class _ProfilePageViewState extends State<_ProfilePageView> {
                     (current.errorMessage?.trim().isNotEmpty ?? false);
               },
               listener: (context, state) {
-                _showErrorDialog(
-                  state.errorMessage ?? 'Da xay ra loi.',
-                );
+                _showErrorDialog(state.errorMessage ?? 'Đã xảy ra lỗi.');
               },
               child: BlocBuilder<ProfileContextBloc, ProfileContextState>(
                 builder: (context, state) {

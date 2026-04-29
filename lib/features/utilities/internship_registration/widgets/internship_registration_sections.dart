@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ptit_dms_flutter/core/theme/theme.dart';
-import 'package:ptit_dms_flutter/data/models/academic_year_option_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/academic_year_option.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/models/internship_registration_form_type.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_date_field.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_dropdown_field.dart';
@@ -98,7 +98,7 @@ class InternshipRegistrationAcademicYearSection extends StatelessWidget {
     super.key,
   });
 
-  final List<AcademicYearOptionModel> items;
+  final List<AcademicYearOption> items;
   final String? selectedValue;
   final bool isBusy;
   final ValueChanged<String?> onChanged;

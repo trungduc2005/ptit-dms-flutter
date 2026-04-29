@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ptit_dms_flutter/data/models/student_search_result_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_search_result.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_field_shell.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_picker_field.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_section_card.dart';
@@ -50,13 +50,13 @@ class InternshipRegistrationSelfContactGroupSection extends StatelessWidget {
   final bool isAddingMember;
   final List<SelfContactMemberForm> members;
   final TextEditingController searchController;
-  final List<StudentSearchResultModel> searchResults;
+  final List<StudentSearchResult> searchResults;
   final bool isSearching;
   final String? searchError;
   final VoidCallback onStartAdd;
   final VoidCallback onCancelAdd;
   final ValueChanged<String> onSearchChanged;
-  final ValueChanged<StudentSearchResultModel> onAdd;
+  final ValueChanged<StudentSearchResult> onAdd;
   final ValueChanged<SelfContactMemberForm> onRemove;
 
   @override
@@ -65,15 +65,13 @@ class InternshipRegistrationSelfContactGroupSection extends StatelessWidget {
       representativeName ?? representativeLabel,
     );
     final nameFields = <Widget>[
-      InternshipRegistrationPickerField<StudentSearchResultModel>(
+      InternshipRegistrationPickerField<StudentSearchResult>(
         label: 'Thành viên nhóm',
         hintText: '',
         displayText: representativeLabel,
         readOnly: true,
         options:
-            const <
-              InternshipRegistrationPickerOption<StudentSearchResultModel>
-            >[],
+            const <InternshipRegistrationPickerOption<StudentSearchResult>>[],
         trailing: IconButton(
           onPressed: canEditForm && !isAddingMember ? onStartAdd : null,
           icon: const Icon(Icons.add, color: Colors.black),
@@ -81,7 +79,7 @@ class InternshipRegistrationSelfContactGroupSection extends StatelessWidget {
         ),
       ),
       if (isAddingMember)
-        InternshipRegistrationPickerField<StudentSearchResultModel>(
+        InternshipRegistrationPickerField<StudentSearchResult>(
           hintText: 'Tìm sinh viên theo tên hoặc mã sinh viên',
           controller: searchController,
           enabled: canEditForm,
@@ -109,14 +107,12 @@ class InternshipRegistrationSelfContactGroupSection extends StatelessWidget {
           ),
         ),
       ...members.map(
-        (member) => InternshipRegistrationPickerField<StudentSearchResultModel>(
+        (member) => InternshipRegistrationPickerField<StudentSearchResult>(
           hintText: '',
           displayText: member.label,
           readOnly: true,
           options:
-              const <
-                InternshipRegistrationPickerOption<StudentSearchResultModel>
-              >[],
+              const <InternshipRegistrationPickerOption<StudentSearchResult>>[],
           trailing: IconButton(
             onPressed: canEditForm ? () => onRemove(member) : null,
             icon: const Icon(Icons.delete_outline, color: Colors.red),
@@ -166,7 +162,7 @@ class InternshipRegistrationSelfContactGroupSection extends StatelessWidget {
     ];
   }
 
-  String _studentOptionLabel(StudentSearchResultModel student) {
+  String _studentOptionLabel(StudentSearchResult student) {
     final label = student.label.trim();
     if (label.isNotEmpty) return label;
 
@@ -180,7 +176,7 @@ class InternshipRegistrationSelfContactGroupSection extends StatelessWidget {
     return name.isNotEmpty ? name : studentId;
   }
 
-  String? _studentOptionSubtitle(StudentSearchResultModel student) {
+  String? _studentOptionSubtitle(StudentSearchResult student) {
     final studentId = student.studentId.trim();
     final label = student.label.trim();
 

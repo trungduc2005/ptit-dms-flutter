@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/intern_registration_request_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_request.dart';
 
 sealed class InternshipRegistrationSubmitEvent extends Equatable {
   const InternshipRegistrationSubmitEvent();
@@ -13,7 +13,7 @@ final class InternshipCvUploadRequested
   const InternshipCvUploadRequested({
     required this.academicYearId,
     required this.filePath,
-    this.studentId, 
+    this.studentId,
   });
 
   final String academicYearId;
@@ -31,14 +31,11 @@ final class InternshipRegistrationSubmitted
     required this.expectedPreferredCompanyCount,
   });
 
-  final InternRegistrationRequestModel request;
+  final InternRegistrationRequest request;
   final int expectedPreferredCompanyCount;
 
   @override
-  List<Object?> get props => [
-        request,
-        expectedPreferredCompanyCount,
-      ];
+  List<Object?> get props => [request, expectedPreferredCompanyCount];
 }
 
 final class InternshipRegistrationUpdated
@@ -49,16 +46,16 @@ final class InternshipRegistrationUpdated
     this.allowMissingCv = true,
   });
 
-  final InternRegistrationRequestModel request;
+  final InternRegistrationRequest request;
   final int expectedPreferredCompanyCount;
   final bool allowMissingCv;
 
   @override
   List<Object?> get props => [
-        request,
-        expectedPreferredCompanyCount,
-        allowMissingCv,
-      ];
+    request,
+    expectedPreferredCompanyCount,
+    allowMissingCv,
+  ];
 }
 
 final class InternshipRegistrationSubmitStateCleared

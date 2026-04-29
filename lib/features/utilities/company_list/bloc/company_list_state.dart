@@ -1,12 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/company_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/company.dart';
 
-enum CompanyListStatus {
-  initial,
-  loading,
-  success,
-  failure,
-}
+enum CompanyListStatus { initial, loading, success, failure }
 
 const _unset = Object();
 
@@ -18,14 +13,14 @@ final class CompanyListState extends Equatable {
   });
 
   final CompanyListStatus status;
-  final List<CompanyModel> companies;
+  final List<Company> companies;
   final String? errorMessage;
 
   bool get hasCompanies => companies.isNotEmpty;
 
   CompanyListState copyWith({
     CompanyListStatus? status,
-    List<CompanyModel>? companies,
+    List<Company>? companies,
     Object? errorMessage = _unset,
   }) {
     return CompanyListState(

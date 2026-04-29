@@ -1,22 +1,13 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/academic_year_option_model.dart';
-import 'package:ptit_dms_flutter/data/models/company_model.dart';
-import 'package:ptit_dms_flutter/data/models/current_intern_registration_model.dart';
-import 'package:ptit_dms_flutter/data/models/eligibility_model.dart';
-import 'package:ptit_dms_flutter/data/models/timeline_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/academic_year_option.dart';
+import 'package:ptit_dms_flutter/domain/entities/company.dart';
+import 'package:ptit_dms_flutter/domain/entities/current_intern_registration.dart';
+import 'package:ptit_dms_flutter/domain/entities/eligibility.dart';
+import 'package:ptit_dms_flutter/domain/entities/timeline.dart';
 
-enum InternshipRegistrationContextStatus {
-  initial,
-  loading,
-  success,
-  failure,
-}
+enum InternshipRegistrationContextStatus { initial, loading, success, failure }
 
-enum InternshipRegistrationMode {
-  create,
-  edit,
-  view,
-}
+enum InternshipRegistrationMode { create, edit, view }
 
 const _unset = Object();
 
@@ -42,16 +33,16 @@ final class InternshipRegistrationContextState extends Equatable {
 
   final InternshipRegistrationContextStatus status;
   final String studentId;
-  final List<AcademicYearOptionModel> academicYears;
+  final List<AcademicYearOption> academicYears;
   final String? selectedAcademicYearId;
-  final EligibilityModel? eligibility;
-  final List<TimelineModel> timelines;
-  final List<CompanyModel> companies;
+  final Eligibility? eligibility;
+  final List<Timeline> timelines;
+  final List<Company> companies;
   final bool hasRegistered;
   final bool isCheckingRegistrationStatus;
-  final CurrentInternRegistrationModel? currentRegistration;
-  final TimelineModel? registrationTimeline;
-  final TimelineModel? expectedInternshipPeriodTimeline;
+  final CurrentInternRegistration? currentRegistration;
+  final Timeline? registrationTimeline;
+  final Timeline? expectedInternshipPeriodTimeline;
   final int preferredCompanyCount;
   final bool isRegistrationOpen;
   final InternshipRegistrationMode mode;
@@ -91,11 +82,11 @@ final class InternshipRegistrationContextState extends Equatable {
   InternshipRegistrationContextState copyWith({
     InternshipRegistrationContextStatus? status,
     String? studentId,
-    List<AcademicYearOptionModel>? academicYears,
+    List<AcademicYearOption>? academicYears,
     Object? selectedAcademicYearId = _unset,
     Object? eligibility = _unset,
-    List<TimelineModel>? timelines,
-    List<CompanyModel>? companies,
+    List<Timeline>? timelines,
+    List<Company>? companies,
     bool? hasRegistered,
     bool? isCheckingRegistrationStatus,
     Object? currentRegistration = _unset,
@@ -115,7 +106,7 @@ final class InternshipRegistrationContextState extends Equatable {
           : selectedAcademicYearId as String?,
       eligibility: identical(eligibility, _unset)
           ? this.eligibility
-          : eligibility as EligibilityModel?,
+          : eligibility as Eligibility?,
       timelines: timelines ?? this.timelines,
       companies: companies ?? this.companies,
       hasRegistered: hasRegistered ?? this.hasRegistered,
@@ -123,14 +114,14 @@ final class InternshipRegistrationContextState extends Equatable {
           isCheckingRegistrationStatus ?? this.isCheckingRegistrationStatus,
       currentRegistration: identical(currentRegistration, _unset)
           ? this.currentRegistration
-          : currentRegistration as CurrentInternRegistrationModel?,
+          : currentRegistration as CurrentInternRegistration?,
       registrationTimeline: identical(registrationTimeline, _unset)
           ? this.registrationTimeline
-          : registrationTimeline as TimelineModel?,
+          : registrationTimeline as Timeline?,
       expectedInternshipPeriodTimeline:
           identical(expectedInternshipPeriodTimeline, _unset)
-              ? this.expectedInternshipPeriodTimeline
-              : expectedInternshipPeriodTimeline as TimelineModel?,
+          ? this.expectedInternshipPeriodTimeline
+          : expectedInternshipPeriodTimeline as Timeline?,
       preferredCompanyCount:
           preferredCompanyCount ?? this.preferredCompanyCount,
       isRegistrationOpen: isRegistrationOpen ?? this.isRegistrationOpen,
@@ -143,21 +134,21 @@ final class InternshipRegistrationContextState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        studentId,
-        academicYears,
-        selectedAcademicYearId,
-        eligibility,
-        timelines,
-        companies,
-        hasRegistered,
-        isCheckingRegistrationStatus,
-        currentRegistration,
-        registrationTimeline,
-        expectedInternshipPeriodTimeline,
-        preferredCompanyCount,
-        isRegistrationOpen,
-        mode,
-        errorMessage,
-      ];
+    status,
+    studentId,
+    academicYears,
+    selectedAcademicYearId,
+    eligibility,
+    timelines,
+    companies,
+    hasRegistered,
+    isCheckingRegistrationStatus,
+    currentRegistration,
+    registrationTimeline,
+    expectedInternshipPeriodTimeline,
+    preferredCompanyCount,
+    isRegistrationOpen,
+    mode,
+    errorMessage,
+  ];
 }

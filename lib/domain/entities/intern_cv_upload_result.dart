@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/model_parsers.dart';
+import 'package:ptit_dms_flutter/core/utils/model_parsers.dart';
 
-class InternCvUploadResultModel extends Equatable {
-  const InternCvUploadResultModel({
+class InternCvUploadResult extends Equatable {
+  const InternCvUploadResult({
     required this.cvFileKey,
     required this.cvFileName,
   });
@@ -10,8 +10,8 @@ class InternCvUploadResultModel extends Equatable {
   final String cvFileName;
   final String cvFileKey;
 
-  factory InternCvUploadResultModel.fromJson(Map<String, dynamic> json) {
-    return InternCvUploadResultModel(
+  factory InternCvUploadResult.fromJson(Map<String, dynamic> json) {
+    return InternCvUploadResult(
       cvFileKey: asString(json['cvFileKey']) ?? '',
       cvFileName: asString(json['cvFileName']) ?? '',
     );

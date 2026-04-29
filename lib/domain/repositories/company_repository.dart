@@ -1,5 +1,5 @@
-import 'package:ptit_dms_flutter/data/models/company_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/company.dart';
 
 abstract class CompanyRepository {
-  Future<List<CompanyModel>> getCompanies();
+  Future<List<Company>> getCompanies();
 }

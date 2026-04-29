@@ -1,7 +1,7 @@
-import 'package:ptit_dms_flutter/data/models/eligibility_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/eligibility.dart';
 
 abstract class EligibilityRepository {
-  Future<EligibilityModel> getRegistrationEligibility({
+  Future<Eligibility> getRegistrationEligibility({
     required String academicYearId,
   });
 }

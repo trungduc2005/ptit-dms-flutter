@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:ptit_dms_flutter/data/models/student_profile_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_profile.dart';
 
 class ProfileHeaderSection extends StatelessWidget {
   const ProfileHeaderSection({required this.profile, super.key});
 
-  final StudentProfileModel profile;
+  final StudentProfile profile;
 
   @override
   Widget build(BuildContext context) {

@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/model_parsers.dart';
+import 'package:ptit_dms_flutter/core/utils/model_parsers.dart';
 
-class StudentSearchResultModel extends Equatable {
-  const StudentSearchResultModel({
+class StudentSearchResult extends Equatable {
+  const StudentSearchResult({
     required this.studentId,
     required this.label,
     required this.studentName,
@@ -12,8 +12,8 @@ class StudentSearchResultModel extends Equatable {
   final String label;
   final String studentName;
 
-  factory StudentSearchResultModel.fromJson(Map<String, dynamic> json) {
-    return StudentSearchResultModel(
+  factory StudentSearchResult.fromJson(Map<String, dynamic> json) {
+    return StudentSearchResult(
       studentId: asString(json['studentId']) ?? '',
       label: asString(json['label']) ?? '',
       studentName: asString(json['studentName']) ?? '',

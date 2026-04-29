@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:ptit_dms_flutter/data/models/student_profile_update_request_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_profile_update_request.dart';
 
 sealed class ProfileSubmitEvent extends Equatable {
   const ProfileSubmitEvent();
@@ -9,20 +9,16 @@ sealed class ProfileSubmitEvent extends Equatable {
 }
 
 final class ProfileUpdateSubmitted extends ProfileSubmitEvent {
-  const ProfileUpdateSubmitted({
-    required this.request,
-  });
+  const ProfileUpdateSubmitted({required this.request});
 
-  final StudentProfileUpdateRequestModel request;
+  final StudentProfileUpdateRequest request;
 
   @override
   List<Object?> get props => [request];
 }
 
 final class ProfileAvatarUploadRequested extends ProfileSubmitEvent {
-  const ProfileAvatarUploadRequested({
-    required this.filePath,
-  });
+  const ProfileAvatarUploadRequested({required this.filePath});
 
   final String filePath;
 

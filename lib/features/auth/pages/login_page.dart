@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ptit_dms_flutter/core/router/routes.dart';
 import 'package:ptit_dms_flutter/core/widgets/app_popup_dialog.dart';
 import 'package:ptit_dms_flutter/features/auth/bloc/auth_bloc.dart';
 import 'package:ptit_dms_flutter/features/auth/widgets/login/login_background.dart';
@@ -50,10 +51,7 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       barrierDismissible: true,
       builder: (dialogContext) {
-        return AppPopupDialog(
-          title: title,
-          message: message,
-        );
+        return AppPopupDialog(title: title, message: message);
       },
     );
 
@@ -79,11 +77,8 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     context.read<AuthBloc>().add(
-          AuthLoginRequested(
-            username: username,
-            password: password,
-          ),
-        );
+      AuthLoginRequested(username: username, password: password),
+    );
   }
 
   @override
@@ -99,17 +94,14 @@ class _LoginPageState extends State<LoginPage> {
       },
       listener: (context, state) {
         if (state.status == AuthStatus.authenticated) {
-          Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
+          Navigator.pushNamedAndRemoveUntil(context, Routes.home, (_) => false);
           return;
         }
 
         if (state.status == AuthStatus.failure &&
             state.message != null &&
             state.message!.isNotEmpty) {
-          _showPopup(
-            title: 'Đăng nhập thất bại',
-            message: state.message!,
-          );
+          _showPopup(title: 'Đăng nhập thất bại', message: state.message!);
         }
       },
       child: GestureDetector(
@@ -157,8 +149,9 @@ class _LoginPageState extends State<LoginPage> {
                             curve: Curves.easeOut,
                             padding: EdgeInsets.only(top: topInset),
                             child: ConstrainedBox(
-                              constraints:
-                                  BoxConstraints(maxWidth: cardMaxWidth),
+                              constraints: BoxConstraints(
+                                maxWidth: cardMaxWidth,
+                              ),
                               child: LoginCard(
                                 screenWidth: width,
                                 isLoading: isLoading,

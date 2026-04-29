@@ -1,13 +1,13 @@
-import 'package:ptit_dms_flutter/data/models/auth_login_response_model.dart';
-import 'package:ptit_dms_flutter/data/models/auth_verify_response_model.dart';
+import 'package:ptit_dms_flutter/domain/entities/auth_login_result.dart';
+import 'package:ptit_dms_flutter/domain/entities/auth_session.dart';
 
 abstract class AuthRepository {
-  Future<AuthLoginResponseModel> login({
+  Future<AuthLoginResult> login({
     required String username,
     required String password,
   });
 
-  Future<AuthVerifyResponseModel> checkSession();
+  Future<AuthSession> checkSession();
 
   Future<void> logout();
 }
