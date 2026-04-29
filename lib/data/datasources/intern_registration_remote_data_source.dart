@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:ptit_dms_flutter/core/network/bearer_auth_interceptor.dart';
+import 'package:ptit_dms_flutter/core/utils/json_helpers.dart';
 import 'package:ptit_dms_flutter/data/models/current_intern_registration_model.dart';
 import 'package:ptit_dms_flutter/data/models/intern_registration_check_model.dart';
 import 'package:ptit_dms_flutter/data/models/intern_registration_cv_download_model.dart';
@@ -22,7 +23,9 @@ class InternRegistrationRemoteDataSource {
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    return InternRegistrationModel.fromJson(_asJsonMap(response.data));
+    return InternRegistrationModel.fromJson(
+      asJsonMap(response.data, unwrapData: true),
+    );
   }
 
   Future<InternRegistrationModel> updateInternship({
@@ -34,7 +37,9 @@ class InternRegistrationRemoteDataSource {
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    return InternRegistrationModel.fromJson(_asJsonMap(response.data));
+    return InternRegistrationModel.fromJson(
+      asJsonMap(response.data, unwrapData: true),
+    );
   }
 
   Future<CurrentInternRegistrationModel?> getCurrentRegistration({
@@ -46,7 +51,7 @@ class InternRegistrationRemoteDataSource {
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    final json = _asNullableJsonMap(response.data);
+    final json = asNullableJsonMap(response.data, unwrapData: true);
     if (json == null || !_looksLikeCurrentRegistrationPayload(json)) {
       return null;
     }
@@ -64,7 +69,9 @@ class InternRegistrationRemoteDataSource {
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    return InternRegistrationCheckModel.fromJson(_asJsonMap(response.data));
+    return InternRegistrationCheckModel.fromJson(
+      asJsonMap(response.data, unwrapData: true),
+    );
   }
 
   Future<InternRegistrationCvDownloadModel> downloadRegistrationCv({
@@ -82,7 +89,7 @@ class InternRegistrationRemoteDataSource {
 
     final bytes = _asBytes(response.data);
     if (bytes == null || bytes.isEmpty) {
-      throw StateError('Khong nhan duoc du lieu file CV hop le.');
+      throw StateError('Không nhận được dữ liệu file CV hợp lệ.');
     }
 
     return InternRegistrationCvDownloadModel(
@@ -135,50 +142,5 @@ class InternRegistrationRemoteDataSource {
         json.containsKey('internId') ||
         json.containsKey('studentId') ||
         json.containsKey('type');
-  }
-
-  Map<String, dynamic>? _asNullableJsonMap(Object? data) {
-    if (data == null) {
-      return null;
-    }
-
-    Object? source = data;
-
-    if (data is Map) {
-      source = data.containsKey('data') ? data['data'] : data;
-    }
-
-    if (source == null) {
-      return null;
-    }
-
-    if (source is Map<String, dynamic>) {
-      return source.isEmpty ? null : source;
-    }
-
-    if (source is Map) {
-      final map = Map<String, dynamic>.from(source);
-      return map.isEmpty ? null : map;
-    }
-
-    return null;
-  }
-
-  Map<String, dynamic> _asJsonMap(Object? data) {
-    Object? source = data;
-
-    if (data is Map && data['data'] is Map) {
-      source = data['data'];
-    }
-
-    if (source is Map<String, dynamic>) {
-      return source;
-    }
-
-    if (source is Map) {
-      return Map<String, dynamic>.from(source);
-    }
-
-    return <String, dynamic>{};
   }
 }

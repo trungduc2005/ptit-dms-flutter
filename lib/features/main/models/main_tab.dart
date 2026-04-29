@@ -24,15 +24,16 @@ extension MainTabX on MainTab {
       case MainTab.utilities:
         return 'assets/icons/utilities.svg';
       case MainTab.notifications:
-      return 'assets/icons/notification.svg';
+        return 'assets/icons/notification.svg';
       case MainTab.profile:
-      return 'assets/icons/profile.svg';
+        return 'assets/icons/profile.svg';
     }
   }
 
-  Widget buildIcon(Color color){
+  Widget buildIcon(Color color) {
     return SvgPicture.asset(
-      assetPath, width: 24,
+      assetPath,
+      width: 24,
       height: 24,
       colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
     );

@@ -23,9 +23,7 @@ class ProfileViewBody extends StatelessWidget {
     final profile = state.profile;
 
     if (state.status == ProfileContextStatus.loading && profile == null) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (profile == null) {
@@ -42,7 +40,7 @@ class ProfileViewBody extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                state.errorMessage ?? 'Khong the tai du lieu ca nhan.',
+                state.errorMessage ?? 'Không thể tải dữ liệu cá nhân.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 15,
@@ -56,10 +54,7 @@ class ProfileViewBody extends StatelessWidget {
                 onPressed: onRetry,
                 child: const Text(
                   'Thu lai',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                 ),
               ),
             ],

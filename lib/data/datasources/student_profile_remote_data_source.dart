@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:ptit_dms_flutter/core/network/bearer_auth_interceptor.dart';
+import 'package:ptit_dms_flutter/core/utils/json_helpers.dart';
 import 'package:ptit_dms_flutter/data/models/student_profile_avatar_upload_model.dart';
 import 'package:ptit_dms_flutter/data/models/student_profile_model.dart';
 import 'package:ptit_dms_flutter/data/models/student_profile_update_request_model.dart';
@@ -17,7 +18,7 @@ class StudentProfileRemoteDataSource {
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    return StudentProfileModel.fromJson(_asJsonMap(response.data));
+    return StudentProfileModel.fromJson(asJsonMap(response.data));
   }
 
   Future<StudentProfileModel> updateProfile({
@@ -51,7 +52,7 @@ class StudentProfileRemoteDataSource {
       ),
     );
 
-    return StudentProfileAvatarUploadModel.fromJson(_asJsonMap(response.data));
+    return StudentProfileAvatarUploadModel.fromJson(asJsonMap(response.data));
   }
 
   Future<RequiredProfileCheckModel> checkRequiredProfile() async {
@@ -60,7 +61,7 @@ class StudentProfileRemoteDataSource {
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    return RequiredProfileCheckModel.fromJson(_asJsonMap(response.data));
+    return RequiredProfileCheckModel.fromJson(asJsonMap(response.data));
   }
 
   Future<void> updateRequiredProfile({
@@ -73,18 +74,8 @@ class StudentProfileRemoteDataSource {
     );
   }
 
-  Map<String, dynamic> _asJsonMap(Object? data) {
-    if (data is Map<String, dynamic>) {
-      return data;
-    }
-    if (data is Map) {
-      return Map<String, dynamic>.from(data);
-    }
-    return <String, dynamic>{};
-  }
-
   Map<String, dynamic> _asInfoJsonMap(Object? data) {
-    final json = _asJsonMap(data);
+    final json = asJsonMap(data);
     final info = json['info'];
 
     if (info is Map<String, dynamic>) {

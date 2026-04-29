@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:ptit_dms_flutter/data/models/model_parsers.dart';
 
 class CompanyModel extends Equatable {
-  CompanyModel({
+  const CompanyModel({
     required this.id,
     required this.companyId,
     required this.companyName,
@@ -101,7 +101,7 @@ class CompanyModel extends Equatable {
     id,
     companyId,
     companyName,
-    companyAddress,
+    companyField,
     companyAddress,
     representativeName,
     representativePhoneNumber,

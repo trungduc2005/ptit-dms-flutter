@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ptit_dms_flutter/core/utils/error_helpers.dart';
 import 'package:ptit_dms_flutter/data/models/academic_year_option_model.dart';
 import 'package:ptit_dms_flutter/data/models/company_model.dart';
 import 'package:ptit_dms_flutter/data/models/current_intern_registration_model.dart';
@@ -17,20 +18,24 @@ import 'internship_registration_context_state.dart';
 export 'internship_registration_context_event.dart';
 export 'internship_registration_context_state.dart';
 
-class InternshipRegistrationContextBloc extends Bloc<
-    InternshipRegistrationContextEvent, InternshipRegistrationContextState> {
+class InternshipRegistrationContextBloc
+    extends
+        Bloc<
+          InternshipRegistrationContextEvent,
+          InternshipRegistrationContextState
+        > {
   InternshipRegistrationContextBloc({
     required AcademicYearRepository academicYearRepository,
     required EligibilityRepository eligibilityRepository,
     required TimelineRepository timelineRepository,
     required InternRegistrationRepository internRegistrationRepository,
     required CompanyRepository companyRepository,
-  })  : _academicYearRepository = academicYearRepository,
-        _eligibilityRepository = eligibilityRepository,
-        _timelineRepository = timelineRepository,
-        _internRegistrationRepository = internRegistrationRepository,
-        _companyRepository = companyRepository,
-        super(const InternshipRegistrationContextState()) {
+  }) : _academicYearRepository = academicYearRepository,
+       _eligibilityRepository = eligibilityRepository,
+       _timelineRepository = timelineRepository,
+       _internRegistrationRepository = internRegistrationRepository,
+       _companyRepository = companyRepository,
+       super(const InternshipRegistrationContextState()) {
     on<InternshipRegistrationContextStarted>(_onStarted);
     on<InternshipRegistrationAcademicYearSelected>(_onAcademicYearSelected);
     on<InternshipRegistrationContextRefreshed>(_onRefreshed);
@@ -63,8 +68,8 @@ class InternshipRegistrationContextBloc extends Bloc<
     );
 
     try {
-      final academicYears =
-          await _academicYearRepository.getInternAcademicYears();
+      final academicYears = await _academicYearRepository
+          .getInternAcademicYears();
 
       if (emit.isDone || isClosed) return;
 
@@ -109,7 +114,10 @@ class InternshipRegistrationContextBloc extends Bloc<
         state.copyWith(
           status: InternshipRegistrationContextStatus.failure,
           isCheckingRegistrationStatus: false,
-          errorMessage: _readErrorMessage(e),
+          errorMessage: readDioErrorMessage(
+            e,
+            fallback: 'Không thể tải dữ liệu đăng ký thực tập.',
+          ),
         ),
       );
     } catch (_) {
@@ -119,7 +127,7 @@ class InternshipRegistrationContextBloc extends Bloc<
         state.copyWith(
           status: InternshipRegistrationContextStatus.failure,
           isCheckingRegistrationStatus: false,
-          errorMessage: 'Khong the tai du lieu dang ky thuc tap.',
+          errorMessage: 'Không thể tải dữ liệu đăng ký thực tập.',
         ),
       );
     }
@@ -168,7 +176,10 @@ class InternshipRegistrationContextBloc extends Bloc<
         state.copyWith(
           status: InternshipRegistrationContextStatus.failure,
           isCheckingRegistrationStatus: false,
-          errorMessage: _readErrorMessage(e),
+          errorMessage: readDioErrorMessage(
+            e,
+            fallback: 'Không thể tải dữ liệu năm học đã chọn.',
+          ),
         ),
       );
     } catch (_) {
@@ -178,7 +189,7 @@ class InternshipRegistrationContextBloc extends Bloc<
         state.copyWith(
           status: InternshipRegistrationContextStatus.failure,
           isCheckingRegistrationStatus: false,
-          errorMessage: 'Khong the tai du lieu nam hoc da chon.',
+          errorMessage: 'Không thể tải dữ liệu năm học đã chọn.',
         ),
       );
     }
@@ -191,11 +202,7 @@ class InternshipRegistrationContextBloc extends Bloc<
     final academicYearId = state.selectedAcademicYearId;
 
     if (academicYearId == null || academicYearId.isEmpty) {
-      add(
-        InternshipRegistrationContextStarted(
-          studentId: state.studentId,
-        ),
-      );
+      add(InternshipRegistrationContextStarted(studentId: state.studentId));
       return;
     }
 
@@ -227,7 +234,10 @@ class InternshipRegistrationContextBloc extends Bloc<
         state.copyWith(
           status: InternshipRegistrationContextStatus.failure,
           isCheckingRegistrationStatus: false,
-          errorMessage: _readErrorMessage(e),
+          errorMessage: readDioErrorMessage(
+            e,
+            fallback: 'Không thể làm mới dữ liệu đăng ký thực tập.',
+          ),
         ),
       );
     } catch (_) {
@@ -237,7 +247,7 @@ class InternshipRegistrationContextBloc extends Bloc<
         state.copyWith(
           status: InternshipRegistrationContextStatus.failure,
           isCheckingRegistrationStatus: false,
-          errorMessage: 'Khong the lam moi du lieu dang ky thuc tap.',
+          errorMessage: 'Không thể làm mới dữ liệu đăng ký thực tập.',
         ),
       );
     }
@@ -252,9 +262,7 @@ class InternshipRegistrationContextBloc extends Bloc<
       _eligibilityRepository.getRegistrationEligibility(
         academicYearId: academicYearId,
       ),
-      _timelineRepository.getInternTimelines(
-        academicYearId: academicYearId,
-      ),
+      _timelineRepository.getInternTimelines(academicYearId: academicYearId),
       _companyRepository.getCompanies(),
       _loadRegistrationSnapshot(
         academicYearId: academicYearId,
@@ -294,8 +302,7 @@ class InternshipRegistrationContextBloc extends Bloc<
         currentRegistration: registrationSnapshot.currentRegistration,
         registrationTimeline: registrationTimeline,
         expectedInternshipPeriodTimeline: expectedInternshipPeriodTimeline,
-        preferredCompanyCount:
-            registrationTimeline?.preferredCompanyCount ?? 0,
+        preferredCompanyCount: registrationTimeline?.preferredCompanyCount ?? 0,
         isRegistrationOpen: _isRegistrationOpen(registrationTimeline),
         mode: _resolveMode(
           hasRegistered: registrationSnapshot.hasRegistered,
@@ -316,20 +323,18 @@ class InternshipRegistrationContextBloc extends Bloc<
       return const _RegistrationSnapshot();
     }
 
-    final registrationCheck =
-        await _internRegistrationRepository.checkInternRegistration(
-      studentId: normalizedStudentId,
-      academicYearId: academicYearId,
-    );
+    final registrationCheck = await _internRegistrationRepository
+        .checkInternRegistration(
+          studentId: normalizedStudentId,
+          academicYearId: academicYearId,
+        );
 
     if (!registrationCheck.isRegistered) {
       return const _RegistrationSnapshot();
     }
 
-    final currentRegistration =
-        await _internRegistrationRepository.getCurrentRegistration(
-      academicYearId: academicYearId,
-    );
+    final currentRegistration = await _internRegistrationRepository
+        .getCurrentRegistration(academicYearId: academicYearId);
 
     return _RegistrationSnapshot(
       hasRegistered: true,
@@ -341,10 +346,12 @@ class InternshipRegistrationContextBloc extends Bloc<
     List<CompanyModel> companies,
     String academicYearId,
   ) {
-    return companies.where((item) {
-      final ref = item.academicYearRef;
-      return ref == null || ref.isEmpty || ref == academicYearId;
-    }).toList(growable: false);
+    return companies
+        .where((item) {
+          final ref = item.academicYearRef;
+          return ref == null || ref.isEmpty || ref == academicYearId;
+        })
+        .toList(growable: false);
   }
 
   String? _resolveSelectedAcademicYearId({
@@ -410,15 +417,6 @@ class InternshipRegistrationContextBloc extends Bloc<
     }
 
     return InternshipRegistrationMode.edit;
-  }
-
-  String _readErrorMessage(DioException error) {
-    final responseData = error.response?.data;
-    if (responseData is Map && responseData['message'] != null) {
-      return responseData['message'].toString();
-    }
-
-    return error.message ?? 'Khong the tai du lieu dang ky thuc tap.';
   }
 }
 

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ptit_dms_flutter/core/utils/error_helpers.dart';
 import 'package:ptit_dms_flutter/domain/repositories/company_repository.dart';
 
 import 'company_list_event.dart';
@@ -9,8 +10,7 @@ export 'company_list_event.dart';
 export 'company_list_state.dart';
 
 class CompanyListBloc extends Bloc<CompanyListEvent, CompanyListState> {
-  CompanyListBloc(this._companyRepository)
-      : super(const CompanyListState()) {
+  CompanyListBloc(this._companyRepository) : super(const CompanyListState()) {
     on<CompanyListStarted>(_onStarted);
     on<CompanyListRefreshed>(_onRefreshed);
   }
@@ -32,12 +32,7 @@ class CompanyListBloc extends Bloc<CompanyListEvent, CompanyListState> {
   }
 
   Future<void> _loadCompanies(Emitter<CompanyListState> emit) async {
-    emit(
-      state.copyWith(
-        status: CompanyListStatus.loading,
-        errorMessage: null,
-      ),
-    );
+    emit(state.copyWith(status: CompanyListStatus.loading, errorMessage: null));
 
     try {
       final companies = await _companyRepository.getCompanies();
@@ -57,7 +52,10 @@ class CompanyListBloc extends Bloc<CompanyListEvent, CompanyListState> {
       emit(
         state.copyWith(
           status: CompanyListStatus.failure,
-          errorMessage: _readErrorMessage(e),
+          errorMessage: readDioErrorMessage(
+            e,
+            fallback: 'Không thể tải danh sách doanh nghiệp.',
+          ),
         ),
       );
     } catch (_) {
@@ -70,14 +68,5 @@ class CompanyListBloc extends Bloc<CompanyListEvent, CompanyListState> {
         ),
       );
     }
-  }
-
-  String _readErrorMessage(DioException error) {
-    final responseData = error.response?.data;
-    if (responseData is Map && responseData['message'] != null) {
-      return responseData['message'].toString();
-    }
-
-    return error.message ?? 'Không thể tải danh sách doanh nghiệp.';
   }
 }

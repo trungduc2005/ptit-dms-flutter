@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:ptit_dms_flutter/data/models/model_parsers.dart';
 
 class InternCvUploadResultModel extends Equatable {
-  InternCvUploadResultModel({
+  const InternCvUploadResultModel({
     required this.cvFileKey,
     required this.cvFileName,
   });
@@ -18,10 +18,7 @@ class InternCvUploadResultModel extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'cvFileName': cvFileName, 
-      'cvFileKey': cvFileKey, 
-    };
+    return {'cvFileName': cvFileName, 'cvFileKey': cvFileKey};
   }
 
   @override

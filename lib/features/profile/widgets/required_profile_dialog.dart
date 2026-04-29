@@ -13,8 +13,8 @@ class RequiredProfileDialog extends StatelessWidget {
     final media = MediaQuery.of(context);
     final dialogHeight = _clamp(media.size.height * 0.78, 520, 680);
 
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
       child: Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -26,9 +26,7 @@ class RequiredProfileDialog extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: const Color(0xFFE7EAF0),
-              ),
+              border: Border.all(color: const Color(0xFFE7EAF0)),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x14000000),

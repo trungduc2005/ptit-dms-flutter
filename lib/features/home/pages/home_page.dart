@@ -1,22 +1,11 @@
 import 'dart:io';
 
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:ptit_dms_flutter/core/network/dio_client.dart';
-import 'package:ptit_dms_flutter/data/datasources/academic_year_remote_data_source.dart';
-import 'package:ptit_dms_flutter/data/datasources/eligibility_remote_data_source.dart';
-import 'package:ptit_dms_flutter/data/datasources/intern_cv_remote_data_source.dart';
-import 'package:ptit_dms_flutter/data/datasources/timeline_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/models/academic_year_option_model.dart';
 import 'package:ptit_dms_flutter/data/models/eligibility_model.dart';
 import 'package:ptit_dms_flutter/data/models/intern_cv_upload_result_model.dart';
 import 'package:ptit_dms_flutter/data/models/timeline_model.dart';
-import 'package:ptit_dms_flutter/data/repositories/academic_year_repository_impl.dart';
-import 'package:ptit_dms_flutter/data/repositories/eligibility_repository_impl.dart';
-import 'package:ptit_dms_flutter/data/repositories/intern_cv_repository_impl.dart';
-import 'package:ptit_dms_flutter/data/repositories/timeline_repository_impl.dart';
 import 'package:ptit_dms_flutter/domain/repositories/academic_year_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/eligibility_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_cv_repository.dart';
@@ -45,43 +34,6 @@ class _HomePageState extends State<HomePage> {
   List<TimelineModel> _timelines = const [];
   InternCvUploadResultModel? _uploadedCv;
 
-  late final Future<_HomeDependencies> _dependenciesFuture =
-      _createDependencies();
-
-  Future<_HomeDependencies> _createDependencies() async {
-    final directory = await getApplicationDocumentsDirectory();
-
-    final cookieJar = PersistCookieJar(
-      ignoreExpires: false,
-      storage: FileStorage('${directory.path}/.cookies/'),
-    );
-
-    final dio = createDioClient(cookieJar);
-
-    final academicYearRepository = AcademicYearRepositoryImpl(
-      AcademicYearRemoteDataSource(dio),
-    );
-
-    final eligibilityRepository = EligibilityRepositoryImpl(
-      EligibilityRemoteDataSource(dio),
-    );
-
-    final timelineRepository = TimelineRepositoryImpl(
-      TimelineRemoteDataSource(dio),
-    );
-
-    final internCvRepository = InternCvRepositoryImpl(
-      InternCvRemoteDataSource(dio),
-    );
-
-    return _HomeDependencies(
-      academicYearRepository: academicYearRepository,
-      eligibilityRepository: eligibilityRepository,
-      timelineRepository: timelineRepository,
-      internCvRepository: internCvRepository,
-    );
-  }
-
   @override
   void dispose() {
     _cvFilePathController.dispose();
@@ -104,16 +56,16 @@ class _HomePageState extends State<HomePage> {
     });
 
     try {
-      final dependencies = await _dependenciesFuture;
-      final academicYears =
-          await dependencies.academicYearRepository.getInternAcademicYears();
+      final repository = context.read<AcademicYearRepository>();
+      final academicYears = await repository.getInternAcademicYears();
 
       if (!mounted) return;
 
       setState(() {
         _academicYears = academicYears;
-        _selectedAcademicYearId =
-            academicYears.isNotEmpty ? academicYears.first.id : null;
+        _selectedAcademicYearId = academicYears.isNotEmpty
+            ? academicYears.first.id
+            : null;
         _isLoadingYears = false;
       });
     } catch (e) {
@@ -131,7 +83,7 @@ class _HomePageState extends State<HomePage> {
 
     if (academicYearId == null || academicYearId.isEmpty) {
       setState(() {
-        _error = 'Hay goi API academic years va chon 1 nam hoc truoc';
+        _error = 'Hãy gọi API academic years và chọn 1 năm học trước';
       });
       return;
     }
@@ -143,9 +95,8 @@ class _HomePageState extends State<HomePage> {
     });
 
     try {
-      final dependencies = await _dependenciesFuture;
-      final eligibility = await dependencies.eligibilityRepository
-          .getRegistrationEligibility(
+      final repository = context.read<EligibilityRepository>();
+      final eligibility = await repository.getRegistrationEligibility(
         academicYearId: academicYearId,
       );
 
@@ -170,7 +121,7 @@ class _HomePageState extends State<HomePage> {
 
     if (academicYearId == null || academicYearId.isEmpty) {
       setState(() {
-        _error = 'Hay goi API academic years va chon 1 nam hoc truoc';
+        _error = 'Hãy gọi API academic years và chọn 1 năm học trước';
       });
       return;
     }
@@ -182,8 +133,8 @@ class _HomePageState extends State<HomePage> {
     });
 
     try {
-      final dependencies = await _dependenciesFuture;
-      final timelines = await dependencies.timelineRepository.getInternTimelines(
+      final repository = context.read<TimelineRepository>();
+      final timelines = await repository.getInternTimelines(
         academicYearId: academicYearId,
       );
 
@@ -209,14 +160,14 @@ class _HomePageState extends State<HomePage> {
 
     if (academicYearId == null || academicYearId.isEmpty) {
       setState(() {
-        _error = 'Hay goi API academic years va chon 1 nam hoc truoc';
+        _error = 'Hãy gọi API academic years và chọn 1 năm học trước';
       });
       return;
     }
 
     if (filePath.isEmpty) {
       setState(() {
-        _error = 'Hay nhap duong dan file CV truoc';
+        _error = 'Hãy nhập đường dẫn file CV trước';
       });
       return;
     }
@@ -224,7 +175,7 @@ class _HomePageState extends State<HomePage> {
     final file = File(filePath);
     if (!file.existsSync()) {
       setState(() {
-        _error = 'Khong tim thay file: $filePath';
+        _error = 'Không tìm thấy file: $filePath';
       });
       return;
     }
@@ -236,8 +187,8 @@ class _HomePageState extends State<HomePage> {
     });
 
     try {
-      final dependencies = await _dependenciesFuture;
-      final uploadedCv = await dependencies.internCvRepository.uploadCv(
+      final repository = context.read<InternCvRepository>();
+      final uploadedCv = await repository.uploadCv(
         academicYearId: academicYearId,
         filePath: filePath,
       );
@@ -307,10 +258,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(
-        fontWeight: FontWeight.w700,
-        fontSize: 16,
-      ),
+      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
     );
   }
 
@@ -321,10 +269,10 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('So luong nam hoc: ${_academicYears.length}'),
-            Text('So luong timelines: ${_timelines.length}'),
+            Text('Số lượng năm học: ${_academicYears.length}'),
+            Text('Số lượng timelines: ${_timelines.length}'),
             Text(
-              'academicYearId dang chon: ${_selectedAcademicYearId ?? '(chua chon)'}',
+              'academicYearId đang chọn: ${_selectedAcademicYearId ?? '(chưa chọn)'}',
             ),
           ],
         ),
@@ -337,7 +285,7 @@ class _HomePageState extends State<HomePage> {
       return const Card(
         child: Padding(
           padding: EdgeInsets.all(12),
-          child: Text('Chua goi eligibility hoac chua co du lieu'),
+          child: Text('Chưa gọi eligibility hoặc chưa có dữ liệu'),
         ),
       );
     }
@@ -368,7 +316,7 @@ class _HomePageState extends State<HomePage> {
       return const Card(
         child: Padding(
           padding: EdgeInsets.all(12),
-          child: Text('Chua upload CV'),
+          child: Text('Chưa upload CV'),
         ),
       );
     }
@@ -390,7 +338,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = _isLoadingYears ||
+    final isLoading =
+        _isLoadingYears ||
         _isLoadingEligibility ||
         _isLoadingTimelines ||
         _isUploadingCv;
@@ -400,7 +349,7 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Test Intern APIs'),
         actions: [
           IconButton(
-            tooltip: 'Dang xuat',
+            tooltip: 'Đăng xuất',
             icon: const Icon(Icons.logout),
             onPressed: _logout,
           ),
@@ -418,16 +367,15 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   ElevatedButton(
                     onPressed: _isLoadingYears ? null : _loadAcademicYears,
-                    child: const Text('Goi API academic years'),
+                    child: const Text('Gọi API academic years'),
                   ),
                   ElevatedButton(
-                    onPressed:
-                        _isLoadingEligibility ? null : _loadEligibility,
-                    child: const Text('Goi API eligibility'),
+                    onPressed: _isLoadingEligibility ? null : _loadEligibility,
+                    child: const Text('Gọi API eligibility'),
                   ),
                   ElevatedButton(
                     onPressed: _isLoadingTimelines ? null : _loadTimelines,
-                    child: const Text('Goi API timelines'),
+                    child: const Text('Gọi API timelines'),
                   ),
                 ],
               ),
@@ -436,7 +384,7 @@ class _HomePageState extends State<HomePage> {
                 controller: _cvFilePathController,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'Duong dan file CV',
+                  labelText: 'Đường dẫn file CV',
                   hintText: r'C:\Users\Duc\Documents\cv.pdf',
                 ),
                 maxLines: 2,
@@ -450,10 +398,7 @@ class _HomePageState extends State<HomePage> {
               if (isLoading) const LinearProgressIndicator(),
               if (_error != null) ...[
                 const SizedBox(height: 12),
-                Text(
-                  'Loi: $_error',
-                  style: const TextStyle(color: Colors.red),
-                ),
+                Text('Lỗi: $_error', style: const TextStyle(color: Colors.red)),
               ],
               const SizedBox(height: 12),
               _buildSummaryCard(),
@@ -464,7 +409,7 @@ class _HomePageState extends State<HomePage> {
                     _buildSectionTitle('Academic years'),
                     const SizedBox(height: 8),
                     if (_academicYears.isEmpty)
-                      const Text('Chua co academic years')
+                      const Text('Chưa có academic years')
                     else
                       ..._academicYears.map(_buildAcademicYearCard),
                     const SizedBox(height: 16),
@@ -479,7 +424,7 @@ class _HomePageState extends State<HomePage> {
                     _buildSectionTitle('Timelines'),
                     const SizedBox(height: 8),
                     if (_timelines.isEmpty)
-                      const Text('Chua co timelines')
+                      const Text('Chưa có timelines')
                     else
                       ..._timelines.map(_buildTimelineCard),
                   ],
@@ -491,18 +436,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
-
-class _HomeDependencies {
-  const _HomeDependencies({
-    required this.academicYearRepository,
-    required this.eligibilityRepository,
-    required this.timelineRepository,
-    required this.internCvRepository,
-  });
-
-  final AcademicYearRepository academicYearRepository;
-  final EligibilityRepository eligibilityRepository;
-  final TimelineRepository timelineRepository;
-  final InternCvRepository internCvRepository;
 }

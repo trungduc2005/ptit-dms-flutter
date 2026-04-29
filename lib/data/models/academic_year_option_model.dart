@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:ptit_dms_flutter/data/models/model_parsers.dart';
 
 class AcademicYearOptionModel extends Equatable {
-  AcademicYearOptionModel({required this.id, required this.name});
+  const AcademicYearOptionModel({required this.id, required this.name});
 
   final String id;
   final String name;
@@ -15,10 +15,7 @@ class AcademicYearOptionModel extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      '_id': id, 
-      'name': name,
-    };
+    return {'_id': id, 'name': name};
   }
 
   @override

@@ -14,15 +14,15 @@ class AuthInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    if(!_shouldRefresh(err)){
+    if (!_shouldRefresh(err)) {
       handler.next(err);
       return;
     }
-    try{
+    try {
       await _refreshToken();
       final response = await _retry(err.requestOptions);
       handler.resolve(response);
-    } catch(_){
+    } catch (_) {
       handler.next(err);
     }
   }
@@ -75,19 +75,19 @@ class AuthInterceptor extends Interceptor {
       requestOptions.path,
       data: requestOptions.data,
       queryParameters: requestOptions.queryParameters,
-      cancelToken: requestOptions.cancelToken, 
-      onReceiveProgress: requestOptions.onReceiveProgress, 
+      cancelToken: requestOptions.cancelToken,
+      onReceiveProgress: requestOptions.onReceiveProgress,
       onSendProgress: requestOptions.onSendProgress,
       options: Options(
-        method: requestOptions.method, 
-        headers: requestOptions.headers, 
+        method: requestOptions.method,
+        headers: requestOptions.headers,
         extra: extra,
-        responseType: requestOptions.responseType, 
-        sendTimeout: requestOptions.sendTimeout, 
-        receiveTimeout: requestOptions.receiveTimeout, 
+        responseType: requestOptions.responseType,
+        sendTimeout: requestOptions.sendTimeout,
+        receiveTimeout: requestOptions.receiveTimeout,
         validateStatus: requestOptions.validateStatus,
-        receiveDataWhenStatusError: requestOptions.receiveDataWhenStatusError, 
-        followRedirects: requestOptions.followRedirects, 
+        receiveDataWhenStatusError: requestOptions.receiveDataWhenStatusError,
+        followRedirects: requestOptions.followRedirects,
         listFormat: requestOptions.listFormat,
       ),
     );

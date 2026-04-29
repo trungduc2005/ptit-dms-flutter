@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ptit_dms_flutter/core/utils/error_helpers.dart';
 import 'package:ptit_dms_flutter/data/models/student_profile_update_request_model.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 
@@ -11,7 +12,7 @@ export 'profile_submit_state.dart';
 
 class ProfileSubmitBloc extends Bloc<ProfileSubmitEvent, ProfileSubmitState> {
   ProfileSubmitBloc(this._studentProfileRepository)
-      : super(const ProfileSubmitState()) {
+    : super(const ProfileSubmitState()) {
     on<ProfileUpdateSubmitted>(_onProfileUpdateSubmitted);
     on<ProfileAvatarUploadRequested>(_onProfileAvatarUploadRequested);
     on<ProfileSubmitStateCleared>(_onProfileSubmitStateCleared);
@@ -54,7 +55,7 @@ class ProfileSubmitBloc extends Bloc<ProfileSubmitEvent, ProfileSubmitState> {
         state.copyWith(
           submitStatus: ProfileSubmitStatus.success,
           updatedProfile: updatedProfile,
-          message: 'Cap nhat thong tin thanh cong.',
+          message: 'Cập nhật thông tin thành công.',
         ),
       );
     } on DioException catch (e) {
@@ -64,7 +65,10 @@ class ProfileSubmitBloc extends Bloc<ProfileSubmitEvent, ProfileSubmitState> {
         state.copyWith(
           submitStatus: ProfileSubmitStatus.failure,
           updatedProfile: null,
-          message: _readErrorMessage(e, 'Cap nhat thong tin that bai.'),
+          message: readDioErrorMessage(
+            e,
+            fallback: 'Cập nhật thông tin thất bại.',
+          ),
         ),
       );
     } catch (_) {
@@ -74,7 +78,7 @@ class ProfileSubmitBloc extends Bloc<ProfileSubmitEvent, ProfileSubmitState> {
         state.copyWith(
           submitStatus: ProfileSubmitStatus.failure,
           updatedProfile: null,
-          message: 'Cap nhat thong tin that bai.',
+          message: 'Cập nhật thông tin thất bại.',
         ),
       );
     }
@@ -90,7 +94,7 @@ class ProfileSubmitBloc extends Bloc<ProfileSubmitEvent, ProfileSubmitState> {
         state.copyWith(
           uploadStatus: ProfileAvatarUploadStatus.failure,
           uploadedAvatar: null,
-          message: 'Ban phai nhap duong dan file avatar.',
+          message: 'Bạn phải nhập đường dẫn file avatar.',
         ),
       );
       return;
@@ -116,7 +120,7 @@ class ProfileSubmitBloc extends Bloc<ProfileSubmitEvent, ProfileSubmitState> {
           state.copyWith(
             uploadStatus: ProfileAvatarUploadStatus.failure,
             uploadedAvatar: null,
-            message: 'Upload avatar that bai.',
+            message: 'Upload avatar thất bại.',
           ),
         );
         return;
@@ -126,7 +130,7 @@ class ProfileSubmitBloc extends Bloc<ProfileSubmitEvent, ProfileSubmitState> {
         state.copyWith(
           uploadStatus: ProfileAvatarUploadStatus.success,
           uploadedAvatar: uploadedAvatar,
-          message: 'Upload avatar thanh cong.',
+          message: 'Upload avatar thành công.',
         ),
       );
     } on DioException catch (e) {
@@ -136,7 +140,7 @@ class ProfileSubmitBloc extends Bloc<ProfileSubmitEvent, ProfileSubmitState> {
         state.copyWith(
           uploadStatus: ProfileAvatarUploadStatus.failure,
           uploadedAvatar: null,
-          message: _readErrorMessage(e, 'Upload avatar that bai.'),
+          message: readDioErrorMessage(e, fallback: 'Upload avatar thất bại.'),
         ),
       );
     } catch (_) {
@@ -146,7 +150,7 @@ class ProfileSubmitBloc extends Bloc<ProfileSubmitEvent, ProfileSubmitState> {
         state.copyWith(
           uploadStatus: ProfileAvatarUploadStatus.failure,
           uploadedAvatar: null,
-          message: 'Upload avatar that bai.',
+          message: 'Upload avatar thất bại.',
         ),
       );
     }
@@ -172,11 +176,11 @@ class ProfileSubmitBloc extends Bloc<ProfileSubmitEvent, ProfileSubmitState> {
     final phone = request.phone?.trim() ?? '';
 
     if (email.isNotEmpty && !_isValidEmail(email)) {
-      return 'Email khong hop le.';
+      return 'Email không hợp lệ.';
     }
 
     if (phone.isNotEmpty && !_isValidPhone(phone)) {
-      return 'So dien thoai khong hop le.';
+      return 'Số điện thoại không hợp lệ.';
     }
 
     return null;
@@ -188,14 +192,5 @@ class ProfileSubmitBloc extends Bloc<ProfileSubmitEvent, ProfileSubmitState> {
 
   bool _isValidPhone(String value) {
     return RegExp(r'^\d{10}$').hasMatch(value);
-  }
-
-  String _readErrorMessage(DioException error, String fallback) {
-    final responseData = error.response?.data;
-    if (responseData is Map && responseData['message'] != null) {
-      return responseData['message'].toString();
-    }
-
-    return error.message ?? fallback;
   }
 }

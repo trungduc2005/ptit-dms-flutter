@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:ptit_dms_flutter/core/utils/json_helpers.dart';
 import 'package:ptit_dms_flutter/data/models/auth_login_response_model.dart';
 import 'package:ptit_dms_flutter/data/models/auth_verify_response_model.dart';
 
@@ -17,12 +18,12 @@ class AuthRemoteDataSource {
       options: Options(extra: const {'skipAuthRefresh': true}),
     );
 
-    return AuthLoginResponseModel.fromJson(_asJsonMap(response.data));
+    return AuthLoginResponseModel.fromJson(asJsonMap(response.data));
   }
 
   Future<AuthVerifyResponseModel> verify() async {
     final response = await _dio.get('/auth/verify');
-    return AuthVerifyResponseModel.fromJson(_asJsonMap(response.data));
+    return AuthVerifyResponseModel.fromJson(asJsonMap(response.data));
   }
 
   Future<void> logout() async {
@@ -30,15 +31,5 @@ class AuthRemoteDataSource {
       '/auth/logout',
       options: Options(extra: const {'skipAuthRefresh': true}),
     );
-  }
-
-  Map<String, dynamic> _asJsonMap(Object? data) {
-    if (data is Map<String, dynamic>) {
-      return data;
-    }
-    if (data is Map) {
-      return Map<String, dynamic>.from(data);
-    }
-    return <String, dynamic>{};
   }
 }

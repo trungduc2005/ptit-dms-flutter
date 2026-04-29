@@ -10,18 +10,21 @@ class CsrfInterceptor extends Interceptor {
   final CookieJar _cookieJar;
 
   @override
-  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final cookies = await _cookieJar.loadForRequest(options.uri);
 
-    String? csrfToken; 
-    for(final cookie in cookies){
-      if(cookie.name == csrfCookieName){
+    String? csrfToken;
+    for (final cookie in cookies) {
+      if (cookie.name == csrfCookieName) {
         csrfToken = cookie.value;
         break;
       }
     }
 
-    if(csrfToken != null && csrfToken.isNotEmpty){
+    if (csrfToken != null && csrfToken.isNotEmpty) {
       options.headers[csrfHeaderName] = csrfToken;
     }
 

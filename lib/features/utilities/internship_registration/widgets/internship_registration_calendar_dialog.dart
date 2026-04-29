@@ -98,27 +98,6 @@ class _InternshipCalendarDialogState extends State<_InternshipCalendarDialog> {
     fontWeight: FontWeight.w500,
   );
 
-  static const TextStyle _dayStyle = TextStyle(
-    color: Color(0xFF666666),
-    fontSize: 24,
-    fontFamily: 'Inter',
-    fontWeight: FontWeight.w500,
-  );
-
-  static const TextStyle _selectedDayStyle = TextStyle(
-    color: Colors.white,
-    fontSize: 24,
-    fontFamily: 'Inter',
-    fontWeight: FontWeight.w500,
-  );
-
-  static const TextStyle _disabledDayStyle = TextStyle(
-    color: Color(0xFFC7CDD4),
-    fontSize: 24,
-    fontFamily: 'Inter',
-    fontWeight: FontWeight.w500,
-  );
-
   late DateTime _selectedDate;
   late DateTime _visibleMonth;
 

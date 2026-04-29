@@ -37,9 +37,7 @@ class _CompaniesView extends StatelessWidget {
           if (state.status == CompanyListStatus.loading ||
               state.status == CompanyListStatus.initial) {
             return const Center(
-              child: CircularProgressIndicator(
-                color: AppTheme.brandColor,
-              ),
+              child: CircularProgressIndicator(color: AppTheme.brandColor),
             );
           }
 
@@ -50,16 +48,14 @@ class _CompaniesView extends StatelessWidget {
               actionLabel: 'Thử lại',
               onPressed: () {
                 context.read<CompanyListBloc>().add(
-                      const CompanyListRefreshed(),
-                    );
+                  const CompanyListRefreshed(),
+                );
               },
             );
           }
 
           if (!state.hasCompanies) {
-            return const _CompanyListMessage(
-              message: 'Chưa có doanh nghiệp.',
-            );
+            return const _CompanyListMessage(message: 'Chưa có doanh nghiệp.');
           }
 
           return RefreshIndicator(
@@ -67,12 +63,9 @@ class _CompaniesView extends StatelessWidget {
             onRefresh: () => _refresh(context),
             child: ListView.separated(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 20,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               itemCount: state.companies.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final company = state.companies[index];
 
@@ -134,10 +127,7 @@ class _CompanyListMessage extends StatelessWidget {
             ),
             if (actionLabel != null && onPressed != null) ...[
               const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: onPressed,
-                child: Text(actionLabel!),
-              ),
+              ElevatedButton(onPressed: onPressed, child: Text(actionLabel!)),
             ],
           ],
         ),

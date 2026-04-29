@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ptit_dms_flutter/core/utils/error_helpers.dart';
 import 'package:ptit_dms_flutter/data/models/intern_registration_model.dart';
 import 'package:ptit_dms_flutter/data/models/intern_registration_request_model.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_cv_repository.dart';
@@ -11,14 +12,18 @@ import 'internship_registration_submit_state.dart';
 export 'internship_registration_submit_event.dart';
 export 'internship_registration_submit_state.dart';
 
-class InternshipRegistrationSubmitBloc extends Bloc<
-    InternshipRegistrationSubmitEvent, InternshipRegistrationSubmitState> {
+class InternshipRegistrationSubmitBloc
+    extends
+        Bloc<
+          InternshipRegistrationSubmitEvent,
+          InternshipRegistrationSubmitState
+        > {
   InternshipRegistrationSubmitBloc({
     required InternCvRepository internCvRepository,
     required InternRegistrationRepository internRegistrationRepository,
-  })  : _internCvRepository = internCvRepository,
-        _internRegistrationRepository = internRegistrationRepository,
-        super(const InternshipRegistrationSubmitState()) {
+  }) : _internCvRepository = internCvRepository,
+       _internRegistrationRepository = internRegistrationRepository,
+       super(const InternshipRegistrationSubmitState()) {
     on<InternshipCvUploadRequested>(_onCvUploadRequested);
     on<InternshipRegistrationSubmitted>(_onRegistrationSubmitted);
     on<InternshipRegistrationUpdated>(_onRegistrationUpdated);
@@ -54,7 +59,7 @@ class InternshipRegistrationSubmitBloc extends Bloc<
         state.copyWith(
           uploadStatus: InternshipCvUploadStatus.success,
           uploadedCv: uploadedCv,
-          message: 'Upload CV thanh cong.',
+          message: 'Upload CV thành công.',
         ),
       );
     } on DioException catch (e) {
@@ -64,7 +69,7 @@ class InternshipRegistrationSubmitBloc extends Bloc<
         state.copyWith(
           uploadStatus: InternshipCvUploadStatus.failure,
           uploadedCv: null,
-          message: _readErrorMessage(e, 'Upload CV that bai.'),
+          message: readDioErrorMessage(e, fallback: 'Upload CV thất bại.'),
         ),
       );
     } catch (_) {
@@ -74,7 +79,7 @@ class InternshipRegistrationSubmitBloc extends Bloc<
         state.copyWith(
           uploadStatus: InternshipCvUploadStatus.failure,
           uploadedCv: null,
-          message: 'Upload CV that bai.',
+          message: 'Upload CV thất bại.',
         ),
       );
     }
@@ -92,8 +97,8 @@ class InternshipRegistrationSubmitBloc extends Bloc<
       action: () => _internRegistrationRepository.registerInternship(
         request: event.request,
       ),
-      successMessage: 'Dang ky thuc tap thanh cong.',
-      failureMessage: 'Dang ky thuc tap that bai.',
+      successMessage: 'Đăng ký thực tập thành công.',
+      failureMessage: 'Đăng ký thực tập thất bại.',
     );
   }
 
@@ -109,8 +114,8 @@ class InternshipRegistrationSubmitBloc extends Bloc<
       action: () => _internRegistrationRepository.updateInternship(
         request: event.request,
       ),
-      successMessage: 'Cap nhat dang ky thuc tap thanh cong.',
-      failureMessage: 'Cap nhat dang ky thuc tap that bai.',
+      successMessage: 'Cập nhật đăng ký thực tập thành công.',
+      failureMessage: 'Cập nhật đăng ký thực tập thất bại.',
     );
   }
 
@@ -166,7 +171,7 @@ class InternshipRegistrationSubmitBloc extends Bloc<
       emit(
         state.copyWith(
           submitStatus: InternshipRegistrationSubmitStatus.failure,
-          message: _readErrorMessage(e, failureMessage),
+          message: readDioErrorMessage(e, fallback: failureMessage),
         ),
       );
     } catch (_) {
@@ -187,7 +192,7 @@ class InternshipRegistrationSubmitBloc extends Bloc<
     required bool allowMissingCv,
   }) {
     if (request.academicYearId.trim().isEmpty) {
-      return 'Thieu nam hoc dang ky.';
+      return 'Thiếu năm học đăng ký.';
     }
 
     final cvFileKey = request.cvFileKey.trim();
@@ -198,25 +203,25 @@ class InternshipRegistrationSubmitBloc extends Bloc<
       final hasFullCvValue = cvFileKey.isNotEmpty && cvFileName.isNotEmpty;
 
       if (hasAnyCvValue && !hasFullCvValue) {
-        return 'Thong tin CV khong hop le.';
+        return 'Thông tin CV không hợp lệ.';
       }
     } else {
       if (cvFileKey.isEmpty || cvFileName.isEmpty) {
-        return 'Ban phai upload CV truoc khi gui dang ky.';
+        return 'Bạn phải upload CV trước khi gửi đăng ký.';
       }
     }
 
     if (request.cpa < 0 || request.cpa > 4) {
-      return 'CPA phai nam trong khoang 0 - 4.';
+      return 'CPA phải nằm trong khoảng 0 - 4.';
     }
 
     if (request is RegisterWishInternRequestModel) {
       if (expectedPreferredCompanyCount <= 0) {
-        return 'Chua co cau hinh so luong nguyen vong dang ky.';
+        return 'Chưa có cấu hình số lượng nguyện vọng đăng ký.';
       }
 
       if (request.preferredCompanies.length != expectedPreferredCompanyCount) {
-        return 'Ban phai chon du $expectedPreferredCompanyCount doanh nghiep nguyen vong.';
+        return 'Bạn phải chọn đủ $expectedPreferredCompanyCount doanh nghiệp nguyện vọng.';
       }
 
       final normalized = request.preferredCompanies
@@ -225,11 +230,11 @@ class InternshipRegistrationSubmitBloc extends Bloc<
           .toList(growable: false);
 
       if (normalized.length != request.preferredCompanies.length) {
-        return 'Danh sach doanh nghiep nguyen vong khong hop le.';
+        return 'Danh sách doanh nghiệp nguyện vọng không hợp lệ.';
       }
 
       if (normalized.toSet().length != normalized.length) {
-        return 'Cac nguyen vong doanh nghiep khong duoc trung nhau.';
+        return 'Các nguyện vọng doanh nghiệp không được trùng nhau.';
       }
     }
 
@@ -240,15 +245,15 @@ class InternshipRegistrationSubmitBloc extends Bloc<
           request.representativeName.trim().isEmpty ||
           request.representativePhoneNumber.trim().isEmpty ||
           request.representativeJob.trim().isEmpty) {
-        return 'Ban phai nhap day du thong tin doanh nghiep tu lien he.';
+        return 'Bạn phải nhập đầy đủ thông tin doanh nghiệp tự liên hệ.';
       }
 
       if (!_isValidPhoneNumber(request.representativePhoneNumber)) {
-        return 'So dien thoai nguoi huong dan phai co dung 10 chu so.';
+        return 'Số điện thoại người hướng dẫn phải có đúng 10 chữ số.';
       }
 
       if (request.expectedEndTime.isBefore(request.expectedStartTime)) {
-        return 'Thoi gian thuc tap du kien khong hop le.';
+        return 'Thời gian thực tập dự kiến không hợp lệ.';
       }
     }
 
@@ -285,14 +290,5 @@ class InternshipRegistrationSubmitBloc extends Bloc<
         uploadedCv: null,
       ),
     );
-  }
-
-  String _readErrorMessage(DioException error, String fallback) {
-    final responseData = error.response?.data;
-    if (responseData is Map && responseData['message'] != null) {
-      return responseData['message'].toString();
-    }
-
-    return error.message ?? fallback;
   }
 }

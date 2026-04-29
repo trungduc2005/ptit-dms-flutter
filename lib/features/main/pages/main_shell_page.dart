@@ -37,15 +37,11 @@ class _MainShellPageState extends State<MainShellPage> {
       for (final tab in MainTab.values) tab: GlobalKey<NavigatorState>(),
     };
 
-    _tabCanPop = {
-      for (final tab in MainTab.values) tab: false,
-    };
+    _tabCanPop = {for (final tab in MainTab.values) tab: false};
 
     _observers = {
       for (final tab in MainTab.values)
-        tab: TabNavigationObserver(
-          onStackChanged: () => _syncCanPopState(tab),
-        ),
+        tab: TabNavigationObserver(onStackChanged: () => _syncCanPopState(tab)),
     };
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -85,22 +81,27 @@ class _MainShellPageState extends State<MainShellPage> {
     });
   }
 
-  Future<bool> _onWillPop() async {
+  bool get _canPopRoute {
+    return _currentTab == MainTab.home && !(_tabCanPop[_currentTab] ?? false);
+  }
+
+  void _handlePopInvoked(bool didPop) {
+    if (didPop) {
+      return;
+    }
+
     final currentNavigator = _navigatorKeys[_currentTab]!.currentState;
 
     if (currentNavigator?.canPop() ?? false) {
       currentNavigator!.pop();
-      return false;
+      return;
     }
 
     if (_currentTab != MainTab.home) {
       setState(() {
         _currentTab = MainTab.home;
       });
-      return false;
     }
-
-    return true;
   }
 
   Future<void> _showRequiredProfileDialog() async {
@@ -151,9 +152,7 @@ class _MainShellPageState extends State<MainShellPage> {
         _isRequiredProfileDialogOpen) {
       Navigator.of(context, rootNavigator: true).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Cap nhat thong tin thanh cong.'),
-        ),
+        const SnackBar(content: Text('Cập nhật thông tin thành công.')),
       );
       return;
     }
@@ -161,9 +160,9 @@ class _MainShellPageState extends State<MainShellPage> {
     if (state.status == RequiredProfileStatus.failure &&
         state.requirement == null &&
         (state.message?.trim().isNotEmpty ?? false)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(state.message!)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(state.message!)));
     }
   }
 
@@ -184,8 +183,11 @@ class _MainShellPageState extends State<MainShellPage> {
             listener: _handleRequiredProfileChanged,
           ),
         ],
-        child: WillPopScope(
-          onWillPop: _onWillPop,
+        child: PopScope(
+          canPop: _canPopRoute,
+          onPopInvokedWithResult: (didPop, result) {
+            _handlePopInvoked(didPop);
+          },
           child: Scaffold(
             body: IndexedStack(
               index: _currentTab.index,

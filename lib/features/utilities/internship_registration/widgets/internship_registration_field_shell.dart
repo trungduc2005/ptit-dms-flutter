@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ptit_dms_flutter/core/theme/theme.dart';
 
 class InternshipRegistrationFieldShell extends StatelessWidget {
   const InternshipRegistrationFieldShell({

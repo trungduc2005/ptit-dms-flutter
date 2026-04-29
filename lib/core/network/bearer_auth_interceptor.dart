@@ -5,17 +5,17 @@ const requiresBearerAuthKey = 'requiresBearerAuth';
 const accessTokenCookieName = 'token';
 const authorizationHeaderName = 'Authorization';
 
-class BearerAuthInterceptor extends Interceptor{
+class BearerAuthInterceptor extends Interceptor {
   BearerAuthInterceptor(this._cookieJar);
 
   final CookieJar _cookieJar;
 
   @override
   Future<void> onRequest(
-    RequestOptions options, 
-    RequestInterceptorHandler handler, 
+    RequestOptions options,
+    RequestInterceptorHandler handler,
   ) async {
-    if (options.extra[requiresBearerAuthKey] != true){
+    if (options.extra[requiresBearerAuthKey] != true) {
       handler.next(options);
       return;
     }
@@ -24,14 +24,14 @@ class BearerAuthInterceptor extends Interceptor{
 
     String? accessToken;
 
-    for(final cookie in cookies){
-      if(cookie.name == accessTokenCookieName){
+    for (final cookie in cookies) {
+      if (cookie.name == accessTokenCookieName) {
         accessToken = cookie.value;
         break;
       }
     }
 
-    if(accessToken != null && accessToken.isNotEmpty){
+    if (accessToken != null && accessToken.isNotEmpty) {
       options.headers[authorizationHeaderName] = 'Bearer $accessToken';
     }
 

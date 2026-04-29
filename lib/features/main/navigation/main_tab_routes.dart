@@ -41,11 +41,7 @@ class MainTabRoutes {
 
     switch (routeName) {
       case Navigator.defaultRouteName:
-      case '/':
-        return MaterialPageRoute(
-          builder: (_) => rootPage,
-          settings: settings,
-        );
+        return MaterialPageRoute(builder: (_) => rootPage, settings: settings);
       default:
         return MaterialPageRoute(
           builder: (_) => MainTabChildPage(title: '${tab.label} - $routeName'),

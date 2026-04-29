@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ptit_dms_flutter/core/utils/error_helpers.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 
 import 'profile_context_event.dart';
@@ -8,9 +9,10 @@ import 'profile_context_state.dart';
 export 'profile_context_event.dart';
 export 'profile_context_state.dart';
 
-class ProfileContextBloc extends Bloc<ProfileContextEvent, ProfileContextState> {
+class ProfileContextBloc
+    extends Bloc<ProfileContextEvent, ProfileContextState> {
   ProfileContextBloc(this._studentProfileRepository)
-      : super(const ProfileContextState()) {
+    : super(const ProfileContextState()) {
     on<ProfileContextStarted>(_onStarted);
     on<ProfileContextRefreshed>(_onRefreshed);
   }
@@ -33,10 +35,7 @@ class ProfileContextBloc extends Bloc<ProfileContextEvent, ProfileContextState> 
 
   Future<void> _loadProfile(Emitter<ProfileContextState> emit) async {
     emit(
-      state.copyWith(
-        status: ProfileContextStatus.loading,
-        errorMessage: null,
-      ),
+      state.copyWith(status: ProfileContextStatus.loading, errorMessage: null),
     );
 
     try {
@@ -57,7 +56,10 @@ class ProfileContextBloc extends Bloc<ProfileContextEvent, ProfileContextState> 
       emit(
         state.copyWith(
           status: ProfileContextStatus.failure,
-          errorMessage: _readErrorMessage(e),
+          errorMessage: readDioErrorMessage(
+            e,
+            fallback: 'Không thể tải thông tin cá nhân.',
+          ),
         ),
       );
     } catch (_) {
@@ -66,18 +68,9 @@ class ProfileContextBloc extends Bloc<ProfileContextEvent, ProfileContextState> 
       emit(
         state.copyWith(
           status: ProfileContextStatus.failure,
-          errorMessage: 'Khong the tai thong tin ca nhan.',
+          errorMessage: 'Không thể tải thông tin cá nhân.',
         ),
       );
     }
-  }
-
-  String _readErrorMessage(DioException error) {
-    final responseData = error.response?.data;
-    if (responseData is Map && responseData['message'] != null) {
-      return responseData['message'].toString();
-    }
-
-    return error.message ?? 'Khong the tai thong tin ca nhan.';
   }
 }

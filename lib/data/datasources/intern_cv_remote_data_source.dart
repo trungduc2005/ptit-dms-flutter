@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:ptit_dms_flutter/core/network/bearer_auth_interceptor.dart';
+import 'package:ptit_dms_flutter/core/utils/json_helpers.dart';
 import 'package:ptit_dms_flutter/data/models/intern_cv_upload_result_model.dart';
 
 class InternCvRemoteDataSource {
@@ -32,25 +33,9 @@ class InternCvRemoteDataSource {
       ),
     );
 
-    return InternCvUploadResultModel.fromJson(_asJsonMap(response.data));
-  }
-
-  Map<String, dynamic> _asJsonMap(Object? data) {
-    Object? source = data;
-
-    if (data is Map && data['data'] is Map) {
-      source = data['data'];
-    }
-
-    if (source is Map<String, dynamic>) {
-      return source;
-    }
-
-    if (source is Map) {
-      return Map<String, dynamic>.from(source);
-    }
-
-    return <String, dynamic>{};
+    return InternCvUploadResultModel.fromJson(
+      asJsonMap(response.data, unwrapData: true),
+    );
   }
 
   String _extractFileName(String filePath) {

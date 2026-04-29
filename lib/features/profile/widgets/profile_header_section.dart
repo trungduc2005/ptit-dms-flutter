@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:ptit_dms_flutter/data/models/student_profile_model.dart';
 
 class ProfileHeaderSection extends StatelessWidget {
-  const ProfileHeaderSection({
-    required this.profile,
-    super.key,
-  });
+  const ProfileHeaderSection({required this.profile, super.key});
 
   final StudentProfileModel profile;
 
   @override
   Widget build(BuildContext context) {
     final user = profile.user;
-    final fullName = _textOrFallback(user?.fullName, fallback: 'Chua cap nhat');
+    final fullName = _textOrFallback(user?.fullName, fallback: 'Chưa cập nhật');
     final studentId = _textOrFallback(profile.studentId, fallback: '---');
     final avatarUrl = user?.avatarUrl?.trim();
     final primaryColor = Theme.of(context).colorScheme.primary;
@@ -63,9 +60,7 @@ class ProfileHeaderSection extends StatelessWidget {
 }
 
 class _ProfileAvatar extends StatelessWidget {
-  const _ProfileAvatar({
-    required this.avatarUrl,
-  });
+  const _ProfileAvatar({required this.avatarUrl});
 
   final String? avatarUrl;
 
@@ -78,18 +73,11 @@ class _ProfileAvatar extends StatelessWidget {
         width: 55,
         height: 55,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.16),
-          border: Border.all(
-            color: Colors.white,
-            width: 2,
-          ),
+          color: Colors.white.withValues(alpha: 0.16),
+          border: Border.all(color: Colors.white, width: 2),
           shape: BoxShape.circle,
         ),
-        child: const Icon(
-          Icons.person_rounded,
-          size: 28,
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.person_rounded, size: 28, color: Colors.white),
       );
     }
 
@@ -98,18 +86,15 @@ class _ProfileAvatar extends StatelessWidget {
       height: 55,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.white,
-          width: 2,
-        ),
+        border: Border.all(color: Colors.white, width: 2),
       ),
       child: ClipOval(
         child: Image.network(
           avatarUrl!,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) {
+          errorBuilder: (context, error, stackTrace) {
             return Container(
-              color: Colors.white.withOpacity(0.16),
+              color: Colors.white.withValues(alpha: 0.16),
               child: const Icon(
                 Icons.person_rounded,
                 size: 28,
@@ -123,10 +108,7 @@ class _ProfileAvatar extends StatelessWidget {
   }
 }
 
-String _textOrFallback(
-  String? value, {
-  required String fallback,
-}) {
+String _textOrFallback(String? value, {required String fallback}) {
   final text = value?.trim() ?? '';
   return text.isEmpty ? fallback : text;
 }

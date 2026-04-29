@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ptit_dms_flutter/core/theme/theme.dart';
 
 class InternshipRegistrationDropdownField<T> extends StatefulWidget {
   const InternshipRegistrationDropdownField({
@@ -127,7 +126,7 @@ class _InternshipRegistrationDropdownFieldState<T>
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
                         itemCount: widget.items.length,
-                        separatorBuilder: (_, __) => const Divider(
+                        separatorBuilder: (context, index) => const Divider(
                           height: 1,
                           thickness: 0.5,
                           color: Color(0xFFECECEC),
@@ -138,7 +137,7 @@ class _InternshipRegistrationDropdownFieldState<T>
 
                           return Material(
                             color: isSelected
-                                ? widget.accentColor.withOpacity(0.08)
+                                ? widget.accentColor.withValues(alpha: 0.08)
                                 : Colors.white,
                             child: InkWell(
                               onTap: () {

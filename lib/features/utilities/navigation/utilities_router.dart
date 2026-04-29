@@ -15,7 +15,6 @@ class UtilitiesRouter {
 
     switch (routeName) {
       case Navigator.defaultRouteName:
-      case '/':
         return MaterialPageRoute(
           builder: (_) => const UtilitiesPage(),
           settings: settings,
@@ -33,9 +32,7 @@ class UtilitiesRouter {
               return CompanyDetailPage(company: company);
             }
 
-            return const UtilityPlaceholderPage(
-              title: 'Chi tiết doanh nghiệp',
-            );
+            return const UtilityPlaceholderPage(title: 'Chi tiết doanh nghiệp');
           },
           settings: settings,
         );
@@ -46,9 +43,8 @@ class UtilitiesRouter {
         );
       case UtilitiesRoutes.registrationResult:
         return MaterialPageRoute(
-          builder: (_) => const UtilityPlaceholderPage(
-            title: 'Kết quả đăng ký',
-          ),
+          builder: (_) =>
+              const UtilityPlaceholderPage(title: 'Kết quả đăng ký'),
           settings: settings,
         );
       default:
