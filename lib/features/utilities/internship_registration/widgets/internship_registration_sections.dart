@@ -240,6 +240,7 @@ class InternshipRegistrationWishSection extends StatelessWidget {
               value: currentValue?.trim().isEmpty ?? true ? null : currentValue,
               hintText: 'Chọn công ty',
               enabled: canEditForm,
+              enableLocalSearch: true,
               options: companyItemsBuilder(currentValue),
               onChanged: (value) => onChanged(index, value),
             ),
