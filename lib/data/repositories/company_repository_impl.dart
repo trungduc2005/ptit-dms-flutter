@@ -8,7 +8,13 @@ class CompanyRepositoryImpl implements CompanyRepository {
   final CompanyRemoteDataSource _remoteDataSource;
 
   @override
-  Future<List<Company>> getCompanies() {
-    return _remoteDataSource.getCompanies();
+  Future<List<Company>> getCompanies({
+    required String academicYearCode,
+    String search = '',
+  }) {
+    return _remoteDataSource.getCompanies(
+      academicYearCode: academicYearCode,
+      search: search,
+    );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:ptit_dms_flutter/data/datasources/intern_cv_remote_data_source.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_accepted_company_proof.dart';
 import 'package:ptit_dms_flutter/domain/entities/intern_cv_upload_result.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_cv_repository.dart';
 
@@ -17,6 +18,17 @@ class InternCvRepositoryImpl implements InternCvRepository {
       academicYearId: academicYearId,
       filePath: filePath,
       studentId: studentId,
+    );
+  }
+
+  @override
+  Future<InternRegistrationEvidenceUploadResult> uploadAcceptedCompanyEvidence({
+    required String academicYearId,
+    required String filePath,
+  }) {
+    return _remoteDataSource.uploadAcceptedCompanyEvidence(
+      academicYearId: academicYearId,
+      filePath: filePath,
     );
   }
 }

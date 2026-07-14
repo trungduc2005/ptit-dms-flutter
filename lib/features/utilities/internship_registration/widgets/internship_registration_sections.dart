@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ptit_dms_flutter/core/theme/theme.dart';
 import 'package:ptit_dms_flutter/domain/entities/academic_year_option.dart';
+import 'package:ptit_dms_flutter/domain/entities/current_intern_registration.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_request.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/models/internship_registration_form_type.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_date_field.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_dropdown_field.dart';
@@ -85,6 +87,393 @@ class InternshipRegistrationInfoBanner extends StatelessWidget {
                 ),
               ],
             ),
+    );
+  }
+}
+
+class InternshipRegistrationSegmentedTabs extends StatelessWidget {
+  const InternshipRegistrationSegmentedTabs({
+    required this.selectedIndex,
+    required this.onChanged,
+    super.key,
+  });
+
+  final int selectedIndex;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEEEEEE),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          _InternshipRegistrationTabButton(
+            label: 'Thông tin đăng ký',
+            isSelected: selectedIndex == 0,
+            onTap: () => onChanged(0),
+          ),
+          _InternshipRegistrationTabButton(
+            label: 'Trạng thái',
+            isSelected: selectedIndex == 1,
+            onTap: () => onChanged(1),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InternshipRegistrationTabButton extends StatelessWidget {
+  const _InternshipRegistrationTabButton({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: isSelected
+                ? const [
+                    BoxShadow(
+                      color: Color(0x0C000000),
+                      blurRadius: 2,
+                      offset: Offset(0, 1),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: isSelected
+                  ? const Color(0xFF8E0012)
+                  : const Color(0xFF5D5F5F),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              height: 1.43,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class InternshipRegistrationRegisteredTabs extends StatelessWidget {
+  const InternshipRegistrationRegisteredTabs({
+    required this.selectedIndex,
+    required this.onChanged,
+    required this.informationContent,
+    required this.statusContent,
+    super.key,
+  });
+
+  final int selectedIndex;
+  final ValueChanged<int> onChanged;
+  final Widget informationContent;
+  final Widget statusContent;
+
+  @override
+  Widget build(BuildContext context) {
+    final activeIndex = selectedIndex == 1 ? 1 : 0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InternshipRegistrationSegmentedTabs(
+          selectedIndex: activeIndex,
+          onChanged: onChanged,
+        ),
+        const SizedBox(height: 24),
+        activeIndex == 0 ? informationContent : statusContent,
+      ],
+    );
+  }
+}
+
+class InternshipRegistrationStatusSection extends StatelessWidget {
+  const InternshipRegistrationStatusSection({
+    required this.registration,
+    super.key,
+  });
+
+  final CurrentInternRegistration registration;
+
+  @override
+  Widget build(BuildContext context) {
+    final preferredCompanies = [...registration.preferredCompanies]
+      ..sort((a, b) => (a.order ?? 0).compareTo(b.order ?? 0));
+
+    return InternshipRegistrationSectionCard(
+      title: '',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _InternshipRegistrationStatusRow(
+            label: 'Trạng thái',
+            value: _formatStatus(registration.status),
+            valueColor: _statusColor(registration.status),
+          ),
+          const SizedBox(height: 12),
+          _InternshipRegistrationStatusRow(
+            label: 'Hình thức đăng ký',
+            value: _formatType(registration.type),
+          ),
+          if (registration.cpa != null) ...[
+            const SizedBox(height: 12),
+            _InternshipRegistrationStatusRow(
+              label: 'CPA',
+              value: _formatCpa(registration.cpa),
+            ),
+          ],
+          const SizedBox(height: 12),
+          _InternshipRegistrationStatusRow(
+            label: 'CV',
+            value: _textOrDash(registration.cvFileName),
+          ),
+          if (registration.type == InternRegistrationType.registerWish.value)
+            ..._buildPreferredCompanyRows(preferredCompanies),
+          if (registration.type != InternRegistrationType.registerWish.value)
+            ..._buildCompanyRows(registration),
+          if (registration.selfContactGroupMembers.isNotEmpty)
+            ..._buildSelfContactMemberRows(
+              registration.selfContactGroupMembers,
+            ),
+          if (registration.rejectReasons.isNotEmpty)
+            ..._buildRejectReasonRows(registration.rejectReasons),
+        ],
+      ),
+    );
+  }
+
+  static List<Widget> _buildPreferredCompanyRows(
+    List<CurrentInternPreferredCompany> preferredCompanies,
+  ) {
+    return [
+      for (var index = 0; index < preferredCompanies.length; index++) ...[
+        const SizedBox(height: 12),
+        _InternshipRegistrationStatusRow(
+          label: 'Nguyện vọng ${index + 1}',
+          value: _textOrDash(preferredCompanies[index].companyName),
+        ),
+      ],
+    ];
+  }
+
+  static List<Widget> _buildCompanyRows(
+    CurrentInternRegistration registration,
+  ) {
+    return [
+      const SizedBox(height: 12),
+      _InternshipRegistrationStatusRow(
+        label: 'Tên công ty',
+        value: _textOrDash(registration.companyName),
+      ),
+      const SizedBox(height: 12),
+      _InternshipRegistrationStatusRow(
+        label: 'Lĩnh vực',
+        value: _textOrDash(registration.companyField),
+      ),
+      const SizedBox(height: 12),
+      _InternshipRegistrationStatusRow(
+        label: 'Địa chỉ công ty',
+        value: _textOrDash(registration.companyAddress),
+      ),
+      const SizedBox(height: 12),
+      _InternshipRegistrationStatusRow(
+        label: 'Người hướng dẫn',
+        value: _textOrDash(registration.representativeName),
+      ),
+    ];
+  }
+
+  static List<Widget> _buildSelfContactMemberRows(
+    List<CurrentInternSelfContactGroupMember> members,
+  ) {
+    return [
+      const SizedBox(height: 20),
+      const Text(
+        'Nhóm tự liên hệ',
+        style: TextStyle(
+          color: Color(0xFF1F1F1F),
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      const SizedBox(height: 12),
+      for (final member in members) ...[
+        _InternshipRegistrationStatusRow(
+          label: member.isRepresentative ? 'Đại diện' : member.studentId,
+          value: _textOrDash(member.studentName),
+        ),
+        const SizedBox(height: 12),
+      ],
+    ];
+  }
+
+  static List<Widget> _buildRejectReasonRows(
+    List<CurrentInternRejectReason> reasons,
+  ) {
+    return [
+      const SizedBox(height: 20),
+      const Text(
+        'Lý do từ chối',
+        style: TextStyle(
+          color: Color(0xFF1F1F1F),
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      const SizedBox(height: 10),
+      for (final reason in reasons) ...[
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF1F1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFFFC9C9)),
+          ),
+          child: Text(
+            _textOrDash(reason.reason),
+            style: const TextStyle(
+              color: Color(0xFF1F1F1F),
+              fontSize: 14,
+              height: 1.35,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+      ],
+    ];
+  }
+
+  static String _formatType(String value) {
+    if (value == InternRegistrationType.registerWish.value) {
+      return 'Chọn doanh nghiệp thực tập';
+    }
+
+    if (value == InternRegistrationType.yourself.value) {
+      return 'Tự liên hệ';
+    }
+
+    if (value == InternRegistrationType.facultyAssign.value) {
+      return 'Khoa phân công';
+    }
+
+    return _textOrDash(value);
+  }
+
+  static String _formatStatus(String? value) {
+    switch (value?.trim()) {
+      case 'pending':
+        return 'Chờ duyệt';
+      case 'approved':
+        return 'Đã duyệt';
+      case 'assigned':
+        return 'Đã phân công';
+      case 'rejected':
+        return 'Từ chối';
+      case 'cancelled':
+        return 'Đã hủy';
+      default:
+        return _textOrDash(value);
+    }
+  }
+
+  static Color _statusColor(String? value) {
+    switch (value?.trim()) {
+      case 'approved':
+      case 'assigned':
+        return const Color(0xFF1F7A3E);
+      case 'rejected':
+      case 'cancelled':
+        return const Color(0xFFBA1A1A);
+      case 'pending':
+        return AppTheme.brandColor;
+      default:
+        return const Color(0xFF1F1F1F);
+    }
+  }
+
+  static String _formatCpa(double? cpa) {
+    if (cpa == null) return '---';
+    final value = cpa.toStringAsFixed(2);
+    return value.endsWith('00')
+        ? cpa.toStringAsFixed(0)
+        : value.endsWith('0')
+        ? cpa.toStringAsFixed(1)
+        : value;
+  }
+
+  static String _textOrDash(String? value) {
+    final text = value?.trim();
+    if (text == null || text.isEmpty) return '---';
+    return text;
+  }
+}
+
+class _InternshipRegistrationStatusRow extends StatelessWidget {
+  const _InternshipRegistrationStatusRow({
+    required this.label,
+    required this.value,
+    this.valueColor = const Color(0xFF1F1F1F),
+  });
+
+  final String label;
+  final String value;
+  final Color valueColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 128,
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF5D5F5F),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              height: 1.35,
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+              color: valueColor,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              height: 1.35,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

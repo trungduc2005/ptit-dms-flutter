@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:ptit_dms_flutter/core/utils/model_parsers.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_accepted_company_proof.dart';
 
 class InternRegistration extends Equatable {
   const InternRegistration({
@@ -10,6 +11,7 @@ class InternRegistration extends Equatable {
     required this.type,
     this.cvFile,
     this.companyInfo,
+    this.acceptedCompanyProof,
     required this.preferredCompanies,
     this.cohort,
     this.academicYearRef,
@@ -30,6 +32,7 @@ class InternRegistration extends Equatable {
   final String type;
   final InternRegistrationCvFile? cvFile;
   final InternRegistrationCompanyInfo? companyInfo;
+  final InternRegistrationAcceptedCompanyProof? acceptedCompanyProof;
   final List<InternRegistrationPreferredCompany> preferredCompanies;
   final String? cohort;
   final String? academicYearRef;
@@ -45,6 +48,7 @@ class InternRegistration extends Equatable {
   factory InternRegistration.fromJson(Map<String, dynamic> json) {
     final cvFileJson = json['cvFile'];
     final companyInfoJson = json['companyInfo'];
+    final acceptedCompanyProofJson = json['acceptedCompanyProof'];
     final preferredCompaniesJson = json['preferredCompanies'];
 
     return InternRegistration(
@@ -61,6 +65,11 @@ class InternRegistration extends Equatable {
       companyInfo: companyInfoJson is Map
           ? InternRegistrationCompanyInfo.fromJson(
               Map<String, dynamic>.from(companyInfoJson),
+            )
+          : null,
+      acceptedCompanyProof: acceptedCompanyProofJson is Map
+          ? InternRegistrationAcceptedCompanyProof.fromJson(
+              Map<String, dynamic>.from(acceptedCompanyProofJson),
             )
           : null,
       preferredCompanies: preferredCompaniesJson is List
@@ -95,6 +104,7 @@ class InternRegistration extends Equatable {
       'type': type,
       'cvFile': cvFile?.toJson(),
       'companyInfo': companyInfo?.toJson(),
+      'acceptedCompanyProof': acceptedCompanyProof?.toJson(),
       'preferredCompanies': preferredCompanies
           .map((item) => item.toJson())
           .toList(growable: false),
@@ -158,6 +168,7 @@ class InternRegistration extends Equatable {
     type,
     cvFile,
     companyInfo,
+    acceptedCompanyProof,
     preferredCompanies,
     cohort,
     academicYearRef,

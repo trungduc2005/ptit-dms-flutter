@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ptit_dms_flutter/features/utilities/widgets/utilities_header.dart';
+import 'package:ptit_dms_flutter/core/widgets/app_header.dart';
 
 class UtilityPlaceholderPage extends StatelessWidget {
   const UtilityPlaceholderPage({required this.title, super.key});
@@ -10,7 +10,7 @@ class UtilityPlaceholderPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAF9F6),
-      appBar: UtilitiesHeader(title: title, showBackButton: true),
+      appBar: AppHeader(title: title, showBackButton: true),
       body: Center(
         child: Text(
           title,

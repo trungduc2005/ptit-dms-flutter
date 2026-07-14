@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ptit_dms_flutter/core/widgets/app_header.dart';
 import 'package:ptit_dms_flutter/domain/entities/company.dart';
-import 'package:ptit_dms_flutter/features/utilities/widgets/utilities_header.dart';
 
 class CompanyDetailPage extends StatelessWidget {
   const CompanyDetailPage({required this.company, super.key});
@@ -11,10 +11,7 @@ class CompanyDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAF9F6),
-      appBar: const UtilitiesHeader(
-        title: 'Doanh nghiệp',
-        showBackButton: true,
-      ),
+      appBar: const AppHeader(title: 'Doanh nghiệp', showBackButton: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(22, 20, 22, 32),
         child: Column(

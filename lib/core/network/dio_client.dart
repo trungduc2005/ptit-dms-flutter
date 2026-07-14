@@ -6,7 +6,7 @@ import 'package:ptit_dms_flutter/core/network/bearer_auth_interceptor.dart';
 
 import 'csrf_interceptor.dart';
 
-const apiBaseUrl = 'https://beta.ptit.me/api';
+const apiBaseUrl = 'http://10.0.2.2:3001/api';
 
 Dio createDioClient(CookieJar cookieJar) {
   final dio = Dio(

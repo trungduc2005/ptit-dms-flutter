@@ -17,4 +17,15 @@ class StudentSearchRepositoryImpl implements StudentSearchRepository {
       academicYearId: academicYearId,
     );
   }
+
+  @override
+  Future<List<StudentSearchResult>> searchProjectEligibleStudents({
+    required String query,
+    required String academicYearId,
+  }) {
+    return _remoteDataSource.searchProjectEligibleStudents(
+      query: query,
+      academicYearId: academicYearId,
+    );
+  }
 }

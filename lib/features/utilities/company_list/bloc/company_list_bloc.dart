@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ptit_dms_flutter/core/utils/error_helpers.dart';
+import 'package:ptit_dms_flutter/domain/repositories/academic_year_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/company_repository.dart';
 
 import 'company_list_event.dart';
@@ -10,12 +11,16 @@ export 'company_list_event.dart';
 export 'company_list_state.dart';
 
 class CompanyListBloc extends Bloc<CompanyListEvent, CompanyListState> {
-  CompanyListBloc(this._companyRepository) : super(const CompanyListState()) {
+  CompanyListBloc(this._companyRepository, this._academicYearRepository)
+      : super(const CompanyListState()) {
     on<CompanyListStarted>(_onStarted);
     on<CompanyListRefreshed>(_onRefreshed);
   }
 
   final CompanyRepository _companyRepository;
+  final AcademicYearRepository _academicYearRepository;
+
+  String _resolvedAcademicYearCode = '';
 
   Future<void> _onStarted(
     CompanyListStarted event,
@@ -35,7 +40,25 @@ class CompanyListBloc extends Bloc<CompanyListEvent, CompanyListState> {
     emit(state.copyWith(status: CompanyListStatus.loading, errorMessage: null));
 
     try {
-      final companies = await _companyRepository.getCompanies();
+      final academicYears =
+          await _academicYearRepository.getInternAcademicYears();
+
+      if (emit.isDone || isClosed) return;
+
+      if (academicYears.isEmpty) {
+        emit(state.copyWith(
+          status: CompanyListStatus.success,
+          companies: const [],
+          errorMessage: null,
+        ));
+        return;
+      }
+
+      _resolvedAcademicYearCode = academicYears.first.code;
+
+      final companies = await _companyRepository.getCompanies(
+        academicYearCode: _resolvedAcademicYearCode,
+      );
 
       if (emit.isDone || isClosed) return;
 

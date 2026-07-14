@@ -258,12 +258,17 @@ class InternshipRegistrationContextBloc
     required List<AcademicYearOption> academicYears,
     required String academicYearId,
   }) async {
+    final academicYearCode = _resolveAcademicYearCode(
+      academicYears: academicYears,
+      academicYearId: academicYearId,
+    );
+
     final results = await Future.wait<Object?>([
       _eligibilityRepository.getRegistrationEligibility(
         academicYearId: academicYearId,
       ),
       _timelineRepository.getInternTimelines(academicYearId: academicYearId),
-      _companyRepository.getCompanies(),
+      _companyRepository.getCompanies(academicYearCode: academicYearCode),
       _loadRegistrationSnapshot(
         academicYearId: academicYearId,
         studentId: state.studentId,
@@ -340,6 +345,19 @@ class InternshipRegistrationContextBloc
       hasRegistered: true,
       currentRegistration: currentRegistration,
     );
+  }
+
+  String _resolveAcademicYearCode({
+    required List<AcademicYearOption> academicYears,
+    required String academicYearId,
+  }) {
+    for (final item in academicYears) {
+      if (item.id == academicYearId && item.code.isNotEmpty) {
+        return item.code;
+      }
+    }
+
+    return academicYearId;
   }
 
   List<Company> _filterCompaniesByAcademicYear(

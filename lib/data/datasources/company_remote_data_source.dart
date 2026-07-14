@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:ptit_dms_flutter/core/network/bearer_auth_interceptor.dart';
 import 'package:ptit_dms_flutter/core/utils/json_helpers.dart';
 import 'package:ptit_dms_flutter/domain/entities/company.dart';
 
@@ -8,12 +7,17 @@ class CompanyRemoteDataSource {
 
   final Dio _dio;
 
-  Future<List<Company>> getCompanies() async {
+  Future<List<Company>> getCompanies({
+    required String academicYearCode,
+    String search = '',
+  }) async {
     final response = await _dio.get(
-      '/companies',
-      options: Options(extra: const {requiresBearerAuthKey: true}),
+      '/public/internship-companies/$academicYearCode',
+      queryParameters: {'search': search},
     );
-    final items = asJsonList(response.data);
+
+    final json = asJsonMap(response.data, unwrapData: true);
+    final items = asJsonList(json['data']);
 
     return items.map(Company.fromJson).toList(growable: false);
   }

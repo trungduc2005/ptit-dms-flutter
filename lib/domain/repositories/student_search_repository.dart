@@ -5,4 +5,9 @@ abstract class StudentSearchRepository {
     required String query,
     required String academicYearId,
   });
+
+  Future<List<StudentSearchResult>> searchProjectEligibleStudents({
+    required String query,
+    required String academicYearId,
+  });
 }

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ptit_dms_flutter/core/theme/theme.dart';
+import 'package:ptit_dms_flutter/core/widgets/app_header.dart';
+import 'package:ptit_dms_flutter/domain/repositories/academic_year_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/company_repository.dart';
 import 'package:ptit_dms_flutter/features/utilities/company_list/bloc/company_list_bloc.dart';
 import 'package:ptit_dms_flutter/features/utilities/company_list/widgets/company_list_card.dart';
 import 'package:ptit_dms_flutter/features/utilities/navigation/utilities_routes.dart';
-import 'package:ptit_dms_flutter/features/utilities/widgets/utilities_header.dart';
 
 class CompaniesPage extends StatelessWidget {
   const CompaniesPage({super.key});
@@ -13,9 +14,10 @@ class CompaniesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          CompanyListBloc(context.read<CompanyRepository>())
-            ..add(const CompanyListStarted()),
+      create: (context) => CompanyListBloc(
+        context.read<CompanyRepository>(),
+        context.read<AcademicYearRepository>(),
+      )..add(const CompanyListStarted()),
       child: const _CompaniesView(),
     );
   }
@@ -28,10 +30,7 @@ class _CompaniesView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAF9F6),
-      appBar: const UtilitiesHeader(
-        title: 'Doanh nghiệp',
-        showBackButton: true,
-      ),
+      appBar: const AppHeader(title: 'Doanh nghiệp', showBackButton: true),
       body: BlocBuilder<CompanyListBloc, CompanyListState>(
         builder: (context, state) {
           if (state.status == CompanyListStatus.loading ||

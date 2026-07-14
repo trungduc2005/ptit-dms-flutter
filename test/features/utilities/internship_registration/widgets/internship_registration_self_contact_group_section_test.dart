@@ -1,9 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ptit_dms_flutter/domain/entities/current_intern_registration.dart';
 import 'package:ptit_dms_flutter/domain/entities/student_search_result.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_self_contact_group_section.dart';
 
 void main() {
+  test('member form restores cpa and cv from current registration member', () {
+    final form = SelfContactMemberForm.fromCurrentGroupMember(
+      const CurrentInternSelfContactGroupMember(
+        studentId: 'B21DCCN002',
+        studentName: 'Nguyen Viet Hai',
+        cpa: 3.25,
+        cvFileName: 'hai-cv.pdf',
+        cvFileKey: 'hai-cv-key',
+      ),
+    );
+
+    expect(form.studentId, 'B21DCCN002');
+    expect(form.label, 'Nguyen Viet Hai - B21DCCN002');
+    expect(form.studentName, 'Nguyen Viet Hai');
+    expect(form.cpaText, '3.25');
+    expect(form.cvFileName, 'hai-cv.pdf');
+    expect(form.cvFileKey, 'hai-cv-key');
+    expect(form.hasCv, isTrue);
+  });
+
   testWidgets(
     'group section stacks member name fields before cpa fields only',
     (tester) async {

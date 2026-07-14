@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:ptit_dms_flutter/core/network/bearer_auth_interceptor.dart';
 import 'package:ptit_dms_flutter/core/utils/json_helpers.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_accepted_company_proof.dart';
 import 'package:ptit_dms_flutter/domain/entities/intern_cv_upload_result.dart';
 
 class InternCvRemoteDataSource {
@@ -34,6 +35,32 @@ class InternCvRemoteDataSource {
     );
 
     return InternCvUploadResult.fromJson(
+      asJsonMap(response.data, unwrapData: true),
+    );
+  }
+
+  Future<InternRegistrationEvidenceUploadResult> uploadAcceptedCompanyEvidence({
+    required String academicYearId,
+    required String filePath,
+  }) async {
+    final formData = FormData.fromMap({
+      'evidenceFile': await MultipartFile.fromFile(
+        filePath,
+        filename: _extractFileName(filePath),
+      ),
+    });
+
+    final response = await _dio.post(
+      '/interns/registrations/accepted-company-proof/evidence',
+      queryParameters: {'academicYearId': academicYearId},
+      data: formData,
+      options: Options(
+        contentType: Headers.multipartFormDataContentType,
+        extra: const {requiresBearerAuthKey: true},
+      ),
+    );
+
+    return InternRegistrationEvidenceUploadResult.fromJson(
       asJsonMap(response.data, unwrapData: true),
     );
   }

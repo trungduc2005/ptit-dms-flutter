@@ -22,7 +22,7 @@ import 'package:ptit_dms_flutter/features/utilities/internship_registration/mode
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_picker_field.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_sections.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_self_contact_group_section.dart';
-import 'package:ptit_dms_flutter/features/utilities/widgets/utilities_header.dart';
+import 'package:ptit_dms_flutter/core/widgets/app_header.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_calendar_dialog.dart';
 import 'package:ptit_dms_flutter/core/widgets/app_popup_dialog.dart';
 import 'package:ptit_dms_flutter/domain/entities/student_search_result.dart';
@@ -100,6 +100,7 @@ class _InternshipRegistrationViewState
   DateTime? _expectedEndTime;
   String? _pickedFileName;
   String _lastSyncedKey = '';
+  int _selectedRegisteredTabIndex = 0;
 
   @override
   void initState() {
@@ -528,6 +529,7 @@ class _InternshipRegistrationViewState
             registration.representativeJob ?? '';
         _expectedStartTime = registration.expectedStartTime ?? defaultStart;
         _expectedEndTime = registration.expectedEndTime ?? defaultEnd;
+        _syncSelfContactMembersFromRegistration(registration, state);
         _preferredCompanyIds = List<String?>.filled(
           slotCount,
           null,
@@ -578,6 +580,32 @@ class _InternshipRegistrationViewState
 
       _lastSyncedKey = syncKey;
     });
+  }
+
+  void _syncSelfContactMembersFromRegistration(
+    CurrentInternRegistration registration,
+    InternshipRegistrationContextState state,
+  ) {
+    final representativeStudentId =
+        (registration.representativeStudentId?.trim().isNotEmpty ?? false)
+        ? registration.representativeStudentId!.trim()
+        : _representativeStudentIdForState(state);
+
+    _selfContactMembers = registration.selfContactGroupMembers
+        .where((member) {
+          final studentId = member.studentId.trim();
+          if (studentId.isEmpty) {
+            return false;
+          }
+
+          if (member.isRepresentative) {
+            return false;
+          }
+
+          return studentId != representativeStudentId;
+        })
+        .map(SelfContactMemberForm.fromCurrentGroupMember)
+        .toList(growable: false);
   }
 
   void _clearSelfContactFields() {
@@ -1045,14 +1073,146 @@ class _InternshipRegistrationViewState
     );
   }
 
+  List<Widget> _buildRegistrationFormSections({
+    required InternshipRegistrationContextState contextState,
+    required InternshipRegistrationSubmitState submitState,
+    required bool canEditForm,
+    required bool hasEffectiveCv,
+    required int slotCount,
+    required CurrentInternRegistration? registration,
+    required bool isSelfContactForm,
+    required bool showRejectReasons,
+  }) {
+    return [
+      InternshipRegistrationGeneralSection(
+        majorText: (_profile?.major ?? const []).join(', '),
+        cpaController: _cpaController,
+        canEditForm: canEditForm,
+        isFacultyAssign: _isFacultyAssign(contextState),
+        showCpaField: !isSelfContactForm,
+        selectedType: _selectedType,
+        onTypeChanged: (value) {
+          if (value == null) return;
+          setState(() {
+            _selectedType = value;
+          });
+        },
+      ),
+      if (isSelfContactForm)
+        InternshipRegistrationSelfContactGroupSection(
+          canEditForm: canEditForm,
+          representativeLabel: _representativeLabelForState(contextState),
+          representativeName: _representativeNameForState(contextState),
+          representativeCpaController: _cpaController,
+          isAddingMember: _isAddingSelfContactMember,
+          members: _selfContactMembers,
+          searchController: _memberSearchController,
+          searchResults: _memberSearchResults,
+          isSearching: _isSearchingMembers,
+          searchError: _memberSearchError,
+          onStartAdd: _startAddingSelfContactMember,
+          onCancelAdd: _cancelAddingSelfContactMember,
+          onSearchChanged: (value) =>
+              _onSelfContactSearchChanged(contextState, value),
+          onAdd: _addSelfContactMember,
+          onRemove: _removeSelfContactMember,
+        ),
+      if (_isFacultyAssign(contextState))
+        InternshipRegistrationAssignedSummarySection(
+          status: registration?.status ?? '',
+          companyName: registration?.companyName ?? '',
+          companyField: registration?.companyField ?? '',
+          companyAddress: registration?.companyAddress ?? '',
+        )
+      else if (_selectedType == InternshipRegistrationFormType.wish)
+        InternshipRegistrationWishSection(
+          slotCount: slotCount,
+          canEditForm: canEditForm,
+          preferredCompanyIds: _preferredCompanyIds,
+          companyItemsBuilder: (currentValue) {
+            return _buildCompanyItems(contextState, currentValue: currentValue);
+          },
+          onChanged: (index, value) {
+            setState(() {
+              final values = List<String?>.from(_preferredCompanyIds);
+              while (values.length < slotCount) {
+                values.add(null);
+              }
+              values[index] = value;
+              _preferredCompanyIds = values;
+            });
+          },
+        )
+      else ...[
+        InternshipRegistrationSelfContactSection(
+          canEditForm: canEditForm,
+          companyNameController: _companyNameController,
+          companyFieldController: _companyFieldController,
+          companyAddressController: _companyAddressController,
+          representativeNameController: _representativeNameController,
+          representativePhoneController: _representativePhoneController,
+          representativeJobController: _representativeJobController,
+          expectedStartTime: _expectedStartTime,
+          expectedEndTime: _expectedEndTime,
+          onStartDateTap: () =>
+              _pickDate(isStartDate: true, contextState: contextState),
+          onEndDateTap: () =>
+              _pickDate(isStartDate: false, contextState: contextState),
+          formatDate: _formatDate,
+        ),
+        InternshipRegistrationSelfContactGroupCvSection(
+          canEditForm: canEditForm,
+          representativeName: _representativeNameForState(contextState),
+          hasRepresentativeCv: hasEffectiveCv,
+          representativeCvName: _effectiveCvName(contextState, submitState),
+          pickedRepresentativeCvName: _pickedFileName,
+          isUploadingRepresentativeCv:
+              submitState.uploadStatus == InternshipCvUploadStatus.loading,
+          members: _selfContactMembers,
+          uploadingMemberStudentId: _uploadingMemberStudentId,
+          onPickCv: (member) => _pickAndUploadMemberCv(contextState, member),
+          onPickRepresentativeCv: () => _pickAndUploadCv(contextState),
+        ),
+      ],
+      if (!isSelfContactForm)
+        InternshipRegistrationCvSection(
+          canEditForm: canEditForm,
+          hasEffectiveCv: hasEffectiveCv,
+          hasExistingCv: _hasExistingCv(contextState),
+          hasUploadedCv: submitState.hasUploadedCv,
+          effectiveCvName: _effectiveCvName(contextState, submitState),
+          pickedFileName: _pickedFileName,
+          onPickCv: () => _pickAndUploadCv(contextState),
+        ),
+      if (showRejectReasons)
+        InternshipRegistrationRejectReasonsSection(
+          reasons: (registration?.rejectReasons ?? const [])
+              .map((item) => item.reason)
+              .toList(growable: false),
+        ),
+      InternshipRegistrationSubmitSection(
+        isViewOnly: contextState.isViewOnly,
+        canSubmit:
+            !submitState.isBusy &&
+            (contextState.canCreateRegistration ||
+                contextState.canEditRegistration) &&
+            hasEffectiveCv &&
+            !(_selectedType == InternshipRegistrationFormType.wish &&
+                contextState.preferredCompanySlots <= 0),
+        hasEffectiveCv: hasEffectiveCv,
+        buttonLabel: contextState.canEditRegistration
+            ? 'Cập nhật đăng ký'
+            : 'Gửi đăng ký',
+        onSubmit: () => _submitForm(contextState, submitState),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-      appBar: const UtilitiesHeader(
-        title: 'Đăng ký thực tập',
-        showBackButton: true,
-      ),
+      appBar: const AppHeader(title: 'Đăng ký thực tập', showBackButton: true),
       body: MultiBlocListener(
         listeners: [
           BlocListener<
@@ -1100,6 +1260,16 @@ class _InternshipRegistrationViewState
                 final isSelfContactForm =
                     !_isFacultyAssign(contextState) &&
                     _selectedType != InternshipRegistrationFormType.wish;
+                final formSections = _buildRegistrationFormSections(
+                  contextState: contextState,
+                  submitState: submitState,
+                  canEditForm: canEditForm,
+                  hasEffectiveCv: hasEffectiveCv,
+                  slotCount: slotCount,
+                  registration: registration,
+                  isSelfContactForm: isSelfContactForm,
+                  showRejectReasons: registration == null,
+                );
 
                 return RefreshIndicator(
                   onRefresh: () async {
@@ -1142,6 +1312,7 @@ class _InternshipRegistrationViewState
                           setState(() {
                             _lastSyncedKey = '';
                             _pickedFileName = null;
+                            _selectedRegisteredTabIndex = 0;
                           });
 
                           context.read<InternshipRegistrationContextBloc>().add(
@@ -1149,155 +1320,24 @@ class _InternshipRegistrationViewState
                           );
                         },
                       ),
-                      InternshipRegistrationGeneralSection(
-                        majorText: (_profile?.major ?? const []).join(', '),
-                        cpaController: _cpaController,
-                        canEditForm: canEditForm,
-                        isFacultyAssign: _isFacultyAssign(contextState),
-                        showCpaField: !isSelfContactForm,
-                        selectedType: _selectedType,
-                        onTypeChanged: (value) {
-                          if (value == null) return;
-                          setState(() {
-                            _selectedType = value;
-                          });
-                        },
-                      ),
-                      if (isSelfContactForm)
-                        InternshipRegistrationSelfContactGroupSection(
-                          canEditForm: canEditForm,
-                          representativeLabel: _representativeLabelForState(
-                            contextState,
-                          ),
-                          representativeName: _representativeNameForState(
-                            contextState,
-                          ),
-                          representativeCpaController: _cpaController,
-                          isAddingMember: _isAddingSelfContactMember,
-                          members: _selfContactMembers,
-                          searchController: _memberSearchController,
-                          searchResults: _memberSearchResults,
-                          isSearching: _isSearchingMembers,
-                          searchError: _memberSearchError,
-                          onStartAdd: _startAddingSelfContactMember,
-                          onCancelAdd: _cancelAddingSelfContactMember,
-                          onSearchChanged: (value) =>
-                              _onSelfContactSearchChanged(contextState, value),
-                          onAdd: _addSelfContactMember,
-                          onRemove: _removeSelfContactMember,
-                        ),
-                      if (_isFacultyAssign(contextState))
-                        InternshipRegistrationAssignedSummarySection(
-                          status: registration?.status ?? '',
-                          companyName: registration?.companyName ?? '',
-                          companyField: registration?.companyField ?? '',
-                          companyAddress: registration?.companyAddress ?? '',
-                        )
-                      else if (_selectedType ==
-                          InternshipRegistrationFormType.wish)
-                        InternshipRegistrationWishSection(
-                          slotCount: slotCount,
-                          canEditForm: canEditForm,
-                          preferredCompanyIds: _preferredCompanyIds,
-                          companyItemsBuilder: (currentValue) {
-                            return _buildCompanyItems(
-                              contextState,
-                              currentValue: currentValue,
-                            );
-                          },
-                          onChanged: (index, value) {
+                      if (registration == null)
+                        ...formSections
+                      else
+                        InternshipRegistrationRegisteredTabs(
+                          selectedIndex: _selectedRegisteredTabIndex,
+                          onChanged: (value) {
                             setState(() {
-                              final values = List<String?>.from(
-                                _preferredCompanyIds,
-                              );
-                              while (values.length < slotCount) {
-                                values.add(null);
-                              }
-                              values[index] = value;
-                              _preferredCompanyIds = values;
+                              _selectedRegisteredTabIndex = value;
                             });
                           },
-                        )
-                      else ...[
-                        InternshipRegistrationSelfContactSection(
-                          canEditForm: canEditForm,
-                          companyNameController: _companyNameController,
-                          companyFieldController: _companyFieldController,
-                          companyAddressController: _companyAddressController,
-                          representativeNameController:
-                              _representativeNameController,
-                          representativePhoneController:
-                              _representativePhoneController,
-                          representativeJobController:
-                              _representativeJobController,
-                          expectedStartTime: _expectedStartTime,
-                          expectedEndTime: _expectedEndTime,
-                          onStartDateTap: () => _pickDate(
-                            isStartDate: true,
-                            contextState: contextState,
+                          informationContent: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: formSections,
                           ),
-                          onEndDateTap: () => _pickDate(
-                            isStartDate: false,
-                            contextState: contextState,
+                          statusContent: InternshipRegistrationStatusSection(
+                            registration: registration,
                           ),
-                          formatDate: _formatDate,
                         ),
-                        InternshipRegistrationSelfContactGroupCvSection(
-                          canEditForm: canEditForm,
-                          representativeName: _representativeNameForState(
-                            contextState,
-                          ),
-                          hasRepresentativeCv: hasEffectiveCv,
-                          representativeCvName: _effectiveCvName(
-                            contextState,
-                            submitState,
-                          ),
-                          pickedRepresentativeCvName: _pickedFileName,
-                          isUploadingRepresentativeCv:
-                              submitState.uploadStatus ==
-                              InternshipCvUploadStatus.loading,
-                          members: _selfContactMembers,
-                          uploadingMemberStudentId: _uploadingMemberStudentId,
-                          onPickCv: (member) =>
-                              _pickAndUploadMemberCv(contextState, member),
-                          onPickRepresentativeCv: () =>
-                              _pickAndUploadCv(contextState),
-                        ),
-                      ],
-                      if (!isSelfContactForm)
-                        InternshipRegistrationCvSection(
-                          canEditForm: canEditForm,
-                          hasEffectiveCv: hasEffectiveCv,
-                          hasExistingCv: _hasExistingCv(contextState),
-                          hasUploadedCv: submitState.hasUploadedCv,
-                          effectiveCvName: _effectiveCvName(
-                            contextState,
-                            submitState,
-                          ),
-                          pickedFileName: _pickedFileName,
-                          onPickCv: () => _pickAndUploadCv(contextState),
-                        ),
-                      InternshipRegistrationRejectReasonsSection(
-                        reasons: (registration?.rejectReasons ?? const [])
-                            .map((item) => item.reason)
-                            .toList(growable: false),
-                      ),
-                      InternshipRegistrationSubmitSection(
-                        isViewOnly: contextState.isViewOnly,
-                        canSubmit:
-                            !submitState.isBusy &&
-                            (contextState.canCreateRegistration ||
-                                contextState.canEditRegistration) &&
-                            hasEffectiveCv &&
-                            !(_selectedType ==
-                                    InternshipRegistrationFormType.wish &&
-                                contextState.preferredCompanySlots <= 0),
-                        hasEffectiveCv: hasEffectiveCv,
-                        buttonLabel: contextState.canEditRegistration
-                            ? 'Cập nhật đăng ký'
-                            : 'Gửi đăng ký',
-                        onSubmit: () => _submitForm(contextState, submitState),
-                      ),
                     ],
                   ),
                 );

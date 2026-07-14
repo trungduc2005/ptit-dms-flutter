@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_accepted_company_proof.dart';
 
 enum InternRegistrationType {
   registerWish('registerWish'),
@@ -17,6 +18,7 @@ abstract class InternRegistrationRequest extends Equatable {
     required this.cpa,
     required this.cvFileKey,
     required this.cvFileName,
+    this.acceptedCompanyProof,
   });
 
   final InternRegistrationType type;
@@ -24,6 +26,7 @@ abstract class InternRegistrationRequest extends Equatable {
   final double cpa;
   final String cvFileKey;
   final String cvFileName;
+  final InternRegistrationAcceptedCompanyProof? acceptedCompanyProof;
 
   Map<String, dynamic> toJson();
 
@@ -34,11 +37,20 @@ abstract class InternRegistrationRequest extends Equatable {
       'cpa': cpa,
       'cvFileKey': cvFileKey,
       'cvFileName': cvFileName,
+      if (acceptedCompanyProof != null)
+        'acceptedCompanyProof': acceptedCompanyProof!.toJson(),
     };
   }
 
   @override
-  List<Object?> get props => [type, academicYearId, cpa, cvFileKey, cvFileName];
+  List<Object?> get props => [
+    type,
+    academicYearId,
+    cpa,
+    cvFileKey,
+    cvFileName,
+    acceptedCompanyProof,
+  ];
 }
 
 class RegisterWishInternRequest extends InternRegistrationRequest {
@@ -48,6 +60,7 @@ class RegisterWishInternRequest extends InternRegistrationRequest {
     required super.cvFileKey,
     required super.cvFileName,
     required this.preferredCompanies,
+    super.acceptedCompanyProof,
   }) : super(type: InternRegistrationType.registerWish);
 
   final List<String> preferredCompanies;
@@ -67,6 +80,7 @@ class RegisterYourselfInternRequest extends InternRegistrationRequest {
     required super.cpa,
     required super.cvFileKey,
     required super.cvFileName,
+    super.acceptedCompanyProof,
     required this.companyName,
     required this.companyField,
     required this.companyAddress,

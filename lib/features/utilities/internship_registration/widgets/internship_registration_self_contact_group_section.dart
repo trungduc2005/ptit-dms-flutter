@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ptit_dms_flutter/domain/entities/current_intern_registration.dart';
 import 'package:ptit_dms_flutter/domain/entities/student_search_result.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_field_shell.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/widgets/internship_registration_picker_field.dart';
@@ -11,6 +12,24 @@ class SelfContactMemberForm {
     required this.studentName,
   });
 
+  factory SelfContactMemberForm.fromCurrentGroupMember(
+    CurrentInternSelfContactGroupMember member,
+  ) {
+    final studentId = member.studentId.trim();
+    final studentName = member.studentName.trim();
+    final form = SelfContactMemberForm(
+      studentId: studentId,
+      label: _memberLabel(studentName: studentName, studentId: studentId),
+      studentName: studentName,
+    );
+
+    form.cpaText = _formatCpa(member.cpa);
+    form.cvFileKey = member.cvFileKey?.trim() ?? '';
+    form.cvFileName = member.cvFileName?.trim() ?? '';
+
+    return form;
+  }
+
   final String studentId;
   final String label;
   final String studentName;
@@ -21,6 +40,28 @@ class SelfContactMemberForm {
   double get cpa => double.tryParse(cpaText.trim().replaceAll(',', '.')) ?? -1;
 
   bool get hasCv => cvFileKey.trim().isNotEmpty && cvFileName.trim().isNotEmpty;
+
+  static String _memberLabel({
+    required String studentName,
+    required String studentId,
+  }) {
+    if (studentName.isNotEmpty && studentId.isNotEmpty) {
+      return '$studentName - $studentId';
+    }
+
+    return studentName.isNotEmpty ? studentName : studentId;
+  }
+
+  static String _formatCpa(double? cpa) {
+    if (cpa == null) return '';
+
+    final value = cpa.toStringAsFixed(2);
+    return value.endsWith('00')
+        ? cpa.toStringAsFixed(0)
+        : value.endsWith('0')
+        ? cpa.toStringAsFixed(1)
+        : value;
+  }
 }
 
 class InternshipRegistrationSelfContactGroupSection extends StatelessWidget {

@@ -11,4 +11,9 @@ class AcademicYearRepositoryImpl implements AcademicYearRepository {
   Future<List<AcademicYearOption>> getInternAcademicYears() {
     return _remoteDataSource.getInternAcademicYears();
   }
+
+  @override
+  Future<List<AcademicYearOption>> getProjectAcademicYears() {
+    return _remoteDataSource.getProjectAcademicYears();
+  }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ptit_dms_flutter/core/theme/theme.dart';
 
-class UtilitiesHeader extends StatelessWidget implements PreferredSizeWidget {
-  const UtilitiesHeader({
+class AppHeader extends StatelessWidget implements PreferredSizeWidget {
+  const AppHeader({
     required this.title,
     this.showBackButton = false,
     super.key,

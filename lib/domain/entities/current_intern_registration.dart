@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:ptit_dms_flutter/core/utils/model_parsers.dart';
+import 'package:ptit_dms_flutter/domain/entities/intern_registration_accepted_company_proof.dart';
 
 class CurrentInternRegistration extends Equatable {
   const CurrentInternRegistration({
@@ -17,6 +18,7 @@ class CurrentInternRegistration extends Equatable {
     this.representativeName,
     this.representativePhoneNumber,
     this.representativeJob,
+    this.acceptedCompanyProof,
     required this.preferredCompanies,
     this.cvFileName,
     this.cvFileKey,
@@ -47,6 +49,7 @@ class CurrentInternRegistration extends Equatable {
   final String? representativeName;
   final String? representativePhoneNumber;
   final String? representativeJob;
+  final InternRegistrationAcceptedCompanyProof? acceptedCompanyProof;
   final List<CurrentInternPreferredCompany> preferredCompanies;
   final String? cvFileName;
   final String? cvFileKey;
@@ -64,6 +67,7 @@ class CurrentInternRegistration extends Equatable {
 
   factory CurrentInternRegistration.fromJson(Map<String, dynamic> json) {
     final academicYearRefJson = json['academicYearRef'];
+    final acceptedCompanyProofJson = json['acceptedCompanyProof'];
     final preferredCompaniesJson = json['preferredCompanies'];
     final selfContactGroupMembersJson = json['selfContactGroupMembers'];
 
@@ -86,6 +90,11 @@ class CurrentInternRegistration extends Equatable {
       representativeName: asString(json['representativeName']),
       representativePhoneNumber: asString(json['representativePhoneNumber']),
       representativeJob: asString(json['representativeJob']),
+      acceptedCompanyProof: acceptedCompanyProofJson is Map
+          ? InternRegistrationAcceptedCompanyProof.fromJson(
+              Map<String, dynamic>.from(acceptedCompanyProofJson),
+            )
+          : null,
       preferredCompanies: preferredCompaniesJson is List
           ? preferredCompaniesJson
                 .whereType<Map>()
@@ -137,6 +146,7 @@ class CurrentInternRegistration extends Equatable {
       'representativeName': representativeName,
       'representativePhoneNumber': representativePhoneNumber,
       'representativeJob': representativeJob,
+      'acceptedCompanyProof': acceptedCompanyProof?.toJson(),
       'preferredCompanies': preferredCompanies
           .map((item) => item.toJson())
           .toList(growable: false),
@@ -208,6 +218,7 @@ class CurrentInternRegistration extends Equatable {
     representativeName,
     representativePhoneNumber,
     representativeJob,
+    acceptedCompanyProof,
     preferredCompanies,
     cvFileName,
     cvFileKey,

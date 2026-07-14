@@ -28,4 +28,25 @@ class StudentSearchRemoteDataSource {
     final items = asJsonList(response.data);
     return items.map(StudentSearchResult.fromJson).toList(growable: false);
   }
+
+  Future<List<StudentSearchResult>> searchProjectEligibleStudents({
+    required String query,
+    required String academicYearId,
+  }) async {
+    final keyword = query.trim();
+    if (keyword.isEmpty) return const [];
+
+    final response = await _dio.get(
+      '/students/search',
+      queryParameters: {
+        'q': keyword,
+        'academicYearId': academicYearId,
+        'canRegisterProject': true,
+      },
+      options: Options(extra: const {requiresBearerAuthKey: true}),
+    );
+
+    final items = asJsonList(response.data);
+    return items.map(StudentSearchResult.fromJson).toList(growable: false);
+  }
 }

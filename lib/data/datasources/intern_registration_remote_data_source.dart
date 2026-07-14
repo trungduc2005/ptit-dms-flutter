@@ -51,7 +51,7 @@ class InternRegistrationRemoteDataSource {
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    final json = asNullableJsonMap(response.data, unwrapData: true);
+    final json = _extractCurrentRegistrationPayload(response.data);
     if (json == null || !_looksLikeCurrentRegistrationPayload(json)) {
       return null;
     }
@@ -134,7 +134,29 @@ class InternRegistrationRemoteDataSource {
     final basicMatch = RegExp(
       r'filename="?([^"]+)"?',
     ).firstMatch(contentDisposition);
-    return basicMatch?.group(1);
+    final fileName = basicMatch?.group(1);
+    return fileName == null ? null : Uri.decodeComponent(fileName);
+  }
+
+  Map<String, dynamic>? _extractCurrentRegistrationPayload(Object? data) {
+    final json = asNullableJsonMap(data, unwrapData: true);
+    if (json == null) {
+      return null;
+    }
+
+    if (json.containsKey('intern')) {
+      final internJson = json['intern'];
+      if (internJson is! Map) {
+        return null;
+      }
+
+      final payload = Map<String, dynamic>.from(internJson);
+      payload.putIfAbsent('expectedStartTime', () => json['expectedStartTime']);
+      payload.putIfAbsent('expectedEndTime', () => json['expectedEndTime']);
+      return payload;
+    }
+
+    return json;
   }
 
   bool _looksLikeCurrentRegistrationPayload(Map<String, dynamic> json) {
