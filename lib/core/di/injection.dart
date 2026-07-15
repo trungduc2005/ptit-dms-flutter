@@ -8,6 +8,7 @@ import 'package:ptit_dms_flutter/data/datasources/eligibility_remote_data_source
 import 'package:ptit_dms_flutter/data/datasources/intern_cv_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/intern_registration_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/student_profile_remote_data_source.dart';
+import 'package:ptit_dms_flutter/data/datasources/project_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/student_search_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/timeline_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/repositories/academic_year_repository_impl.dart';
@@ -16,6 +17,7 @@ import 'package:ptit_dms_flutter/data/repositories/company_repository_impl.dart'
 import 'package:ptit_dms_flutter/data/repositories/eligibility_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/intern_cv_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/intern_registration_repository_impl.dart';
+import 'package:ptit_dms_flutter/data/repositories/project_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/student_profile_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/student_search_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/timeline_repository_impl.dart';
@@ -25,6 +27,7 @@ import 'package:ptit_dms_flutter/domain/repositories/company_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/eligibility_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_cv_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_registration_repository.dart';
+import 'package:ptit_dms_flutter/domain/repositories/project_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_search_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/timeline_repository.dart';
@@ -39,6 +42,7 @@ class AppDependencies {
     required this.companyRepository,
     required this.internCvRepository,
     required this.internRegistrationRepository,
+    required this.projectRepository,
     required this.studentSearchRepository,
   });
 
@@ -50,6 +54,7 @@ class AppDependencies {
   final CompanyRepository companyRepository;
   final InternCvRepository internCvRepository;
   final InternRegistrationRepository internRegistrationRepository;
+  final ProjectRepository projectRepository;
   final StudentSearchRepository studentSearchRepository;
 
   static Future<AppDependencies> create() async {
@@ -78,6 +83,9 @@ class AppDependencies {
       internCvRepository: InternCvRepositoryImpl(InternCvRemoteDataSource(dio)),
       internRegistrationRepository: InternRegistrationRepositoryImpl(
         InternRegistrationRemoteDataSource(dio),
+      ),
+      projectRepository: ProjectRepositoryImpl(
+        ProjectRemoteDataSource(dio),
       ),
       studentSearchRepository: StudentSearchRepositoryImpl(
         StudentSearchRemoteDataSource(dio),

@@ -4,5 +4,6 @@ class UtilitiesRoutes {
   static const companies = '/utilities/companies';
   static const companyDetail = '/utilities/company-detail';
   static const internshipRegistration = '/utilities/internship-registration';
+  static const projectRegistration = '/utilities/project-registration';
   static const registrationResult = '/utilities/registration-result';
 }

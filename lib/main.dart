@@ -18,6 +18,7 @@ Future<void> main() async {
       companyRepository: dependencies.companyRepository,
       internCvRepository: dependencies.internCvRepository,
       internRegistrationRepository: dependencies.internRegistrationRepository,
+      projectRepository: dependencies.projectRepository,
       studentSearchRepository: dependencies.studentSearchRepository,
     ),
   );

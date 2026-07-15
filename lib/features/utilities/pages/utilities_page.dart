@@ -25,6 +25,14 @@ class UtilitiesPage extends StatelessWidget {
     // ),
   ];
 
+  static const List<UtilityShortcutData> _projectShortcuts = [
+    UtilityShortcutData(
+      title: 'Đăng ký\nđồ án',
+      iconAsset: 'assets/icons/project.svg',
+      routeName: UtilitiesRoutes.projectRegistration,
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,9 +40,18 @@ class UtilitiesPage extends StatelessWidget {
       appBar: const AppHeader(title: 'Tiện ích'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-        child: const UtilitiesSectionCard(
-          title: 'Thực tập',
-          child: UtilityShortcutGrid(shortcuts: _internshipShortcuts),
+        child: Column(
+          children: [
+            const UtilitiesSectionCard(
+              title: 'Thực tập',
+              child: UtilityShortcutGrid(shortcuts: _internshipShortcuts),
+            ),
+            const SizedBox(height: 16),
+            const UtilitiesSectionCard(
+              title: 'Đồ án',
+              child: UtilityShortcutGrid(shortcuts: _projectShortcuts),
+            ),
+          ],
         ),
       ),
     );

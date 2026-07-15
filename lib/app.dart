@@ -8,10 +8,11 @@ import 'package:ptit_dms_flutter/domain/repositories/company_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/eligibility_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_cv_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_registration_repository.dart';
+import 'package:ptit_dms_flutter/domain/repositories/project_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
+import 'package:ptit_dms_flutter/domain/repositories/student_search_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/timeline_repository.dart';
 import 'package:ptit_dms_flutter/features/auth/bloc/auth_bloc.dart';
-import 'package:ptit_dms_flutter/domain/repositories/student_search_repository.dart';
 
 class App extends StatelessWidget {
   const App({
@@ -23,6 +24,7 @@ class App extends StatelessWidget {
     required this.companyRepository,
     required this.internCvRepository,
     required this.internRegistrationRepository,
+    required this.projectRepository,
     required this.studentSearchRepository,
     super.key,
   });
@@ -35,6 +37,7 @@ class App extends StatelessWidget {
   final CompanyRepository companyRepository;
   final InternCvRepository internCvRepository;
   final InternRegistrationRepository internRegistrationRepository;
+  final ProjectRepository projectRepository;
   final StudentSearchRepository studentSearchRepository;
 
   @override
@@ -56,6 +59,9 @@ class App extends StatelessWidget {
         RepositoryProvider<InternCvRepository>.value(value: internCvRepository),
         RepositoryProvider<InternRegistrationRepository>.value(
           value: internRegistrationRepository,
+        ),
+        RepositoryProvider<ProjectRepository>.value(
+          value: projectRepository,
         ),
         RepositoryProvider<StudentSearchRepository>.value(
           value: studentSearchRepository,
