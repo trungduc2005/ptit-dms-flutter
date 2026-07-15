@@ -3,8 +3,8 @@ import 'package:ptit_dms_flutter/domain/entities/company.dart';
 import 'package:ptit_dms_flutter/features/utilities/company_list/pages/companies_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/company_list/pages/company_detail_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/navigation/utilities_routes.dart';
-import 'package:ptit_dms_flutter/features/utilities/pages/internship_registration_page.dart';
-import 'package:ptit_dms_flutter/features/utilities/pages/project_registration_page.dart';
+import 'package:ptit_dms_flutter/features/utilities/internship_registration/pages/internship_registration_page.dart';
+import 'package:ptit_dms_flutter/features/utilities/project_registration/pages/project_registration_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/pages/utilities_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/pages/utility_placeholder_page.dart';
 

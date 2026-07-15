@@ -47,10 +47,7 @@ final class ProjectStudentSearchEmpty extends ProjectStudentSearchState {
 
 /// Lỗi khi tìm kiếm.
 final class ProjectStudentSearchError extends ProjectStudentSearchState {
-  const ProjectStudentSearchError({
-    required this.query,
-    required this.message,
-  });
+  const ProjectStudentSearchError({required this.query, required this.message});
 
   final String query;
   final String message;
@@ -62,13 +59,11 @@ final class ProjectStudentSearchError extends ProjectStudentSearchState {
 extension ProjectStudentSearchStateX on ProjectStudentSearchState {
   bool get isLoading => this is ProjectStudentSearchLoading;
 
-  List<StudentSearchResult> get results =>
-      this is ProjectStudentSearchLoaded
-          ? (this as ProjectStudentSearchLoaded).results
-          : const [];
+  List<StudentSearchResult> get results => this is ProjectStudentSearchLoaded
+      ? (this as ProjectStudentSearchLoaded).results
+      : const [];
 
-  String? get error =>
-      this is ProjectStudentSearchError
-          ? (this as ProjectStudentSearchError).message
-          : null;
+  String? get error => this is ProjectStudentSearchError
+      ? (this as ProjectStudentSearchError).message
+      : null;
 }

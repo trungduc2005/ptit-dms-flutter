@@ -20,8 +20,7 @@ class FormFieldShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolvedBorderColor =
-        borderColor ?? const Color(0xFFADACB2);
+    final resolvedBorderColor = borderColor ?? const Color(0xFFADACB2);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

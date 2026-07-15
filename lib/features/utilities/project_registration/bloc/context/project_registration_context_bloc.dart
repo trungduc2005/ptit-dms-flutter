@@ -14,10 +14,7 @@ export 'project_registration_context_state.dart';
 
 class ProjectRegistrationContextBloc
     extends
-        Bloc<
-          ProjectRegistrationContextEvent,
-          ProjectRegistrationContextState
-        > {
+        Bloc<ProjectRegistrationContextEvent, ProjectRegistrationContextState> {
   ProjectRegistrationContextBloc({
     required AcademicYearRepository academicYearRepository,
     required ProjectRepository projectRepository,
@@ -48,8 +45,8 @@ class ProjectRegistrationContextBloc
     );
 
     try {
-      final academicYears =
-          await _academicYearRepository.getProjectAcademicYears();
+      final academicYears = await _academicYearRepository
+          .getProjectAcademicYears();
 
       if (emit.isDone || isClosed) return;
 

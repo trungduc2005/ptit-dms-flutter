@@ -12,7 +12,7 @@ export 'company_list_state.dart';
 
 class CompanyListBloc extends Bloc<CompanyListEvent, CompanyListState> {
   CompanyListBloc(this._companyRepository, this._academicYearRepository)
-      : super(const CompanyListState()) {
+    : super(const CompanyListState()) {
     on<CompanyListStarted>(_onStarted);
     on<CompanyListRefreshed>(_onRefreshed);
   }
@@ -40,17 +40,19 @@ class CompanyListBloc extends Bloc<CompanyListEvent, CompanyListState> {
     emit(state.copyWith(status: CompanyListStatus.loading, errorMessage: null));
 
     try {
-      final academicYears =
-          await _academicYearRepository.getInternAcademicYears();
+      final academicYears = await _academicYearRepository
+          .getInternAcademicYears();
 
       if (emit.isDone || isClosed) return;
 
       if (academicYears.isEmpty) {
-        emit(state.copyWith(
-          status: CompanyListStatus.success,
-          companies: const [],
-          errorMessage: null,
-        ));
+        emit(
+          state.copyWith(
+            status: CompanyListStatus.success,
+            companies: const [],
+            errorMessage: null,
+          ),
+        );
         return;
       }
 

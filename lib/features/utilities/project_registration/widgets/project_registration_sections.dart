@@ -395,7 +395,11 @@ class _MemberSearchField extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.search, size: 18, color: Color(0xFF757575)),
+                    const Icon(
+                      Icons.search,
+                      size: 18,
+                      color: Color(0xFF757575),
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: TextField(

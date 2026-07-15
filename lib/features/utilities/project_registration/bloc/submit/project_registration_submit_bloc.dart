@@ -11,14 +11,11 @@ export 'project_registration_submit_event.dart';
 export 'project_registration_submit_state.dart';
 
 class ProjectRegistrationSubmitBloc
-    extends Bloc<
-      ProjectRegistrationSubmitEvent,
-      ProjectRegistrationSubmitState
-    > {
-  ProjectRegistrationSubmitBloc({
-    required ProjectRepository projectRepository,
-  }) : _projectRepository = projectRepository,
-       super(const ProjectRegistrationSubmitState()) {
+    extends
+        Bloc<ProjectRegistrationSubmitEvent, ProjectRegistrationSubmitState> {
+  ProjectRegistrationSubmitBloc({required ProjectRepository projectRepository})
+    : _projectRepository = projectRepository,
+      super(const ProjectRegistrationSubmitState()) {
     on<ProjectRegistrationFormInitialized>(_onFormInitialized);
     on<ProjectRegistrationProjectNameChanged>(_onProjectNameChanged);
     on<ProjectRegistrationFieldChanged>(_onFieldChanged);

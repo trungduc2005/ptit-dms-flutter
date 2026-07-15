@@ -84,9 +84,7 @@ class AppDependencies {
       internRegistrationRepository: InternRegistrationRepositoryImpl(
         InternRegistrationRemoteDataSource(dio),
       ),
-      projectRepository: ProjectRepositoryImpl(
-        ProjectRemoteDataSource(dio),
-      ),
+      projectRepository: ProjectRepositoryImpl(ProjectRemoteDataSource(dio)),
       studentSearchRepository: StudentSearchRepositoryImpl(
         StudentSearchRemoteDataSource(dio),
       ),

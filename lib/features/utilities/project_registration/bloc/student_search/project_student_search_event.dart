@@ -8,8 +8,7 @@ abstract class ProjectStudentSearchEvent extends Equatable {
 }
 
 /// Sinh viên nhập text vào ô tìm kiếm (được debounce 350ms).
-final class ProjectStudentSearchQueryChanged
-    extends ProjectStudentSearchEvent {
+final class ProjectStudentSearchQueryChanged extends ProjectStudentSearchEvent {
   const ProjectStudentSearchQueryChanged({
     required this.query,
     required this.academicYearId,

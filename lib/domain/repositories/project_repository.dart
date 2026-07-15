@@ -11,9 +11,7 @@ abstract class ProjectRepository {
   });
 
   /// Cập nhật đồ án (khi status = project_needs_revision).
-  Future<Project> updateProject({
-    required ProjectRegistrationRequest request,
-  });
+  Future<Project> updateProject({required ProjectRegistrationRequest request});
 
   /// Thành viên xác nhận tham gia nhóm.
   Future<void> approveProjectMembership({

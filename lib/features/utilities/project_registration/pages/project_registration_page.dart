@@ -107,8 +107,9 @@ class _ProjectRegistrationViewState extends State<_ProjectRegistrationView> {
     });
 
     try {
-      final profile =
-          await context.read<StudentProfileRepository>().getProfile();
+      final profile = await context
+          .read<StudentProfileRepository>()
+          .getProfile();
 
       if (!mounted) return;
 
@@ -187,8 +188,7 @@ class _ProjectRegistrationViewState extends State<_ProjectRegistrationView> {
     }
 
     _memberSearchDebounce = Timer(const Duration(milliseconds: 350), () {
-      final academicYearId =
-          contextState.selectedAcademicYearId?.trim() ?? '';
+      final academicYearId = contextState.selectedAcademicYearId?.trim() ?? '';
       context.read<ProjectStudentSearchBloc>().add(
         ProjectStudentSearchQueryChanged(
           query: trimmed,
@@ -297,8 +297,7 @@ class _ProjectRegistrationViewState extends State<_ProjectRegistrationView> {
     ProjectRegistrationContextState contextState,
     ProjectRegistrationSubmitState submitState,
   ) {
-    final academicYearId =
-        contextState.selectedAcademicYearId?.trim() ?? '';
+    final academicYearId = contextState.selectedAcademicYearId?.trim() ?? '';
 
     if (academicYearId.isEmpty) {
       _showError('Bạn phải chọn năm học.');
@@ -373,10 +372,7 @@ class _ProjectRegistrationViewState extends State<_ProjectRegistrationView> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: AppTheme.brandColor,
-        ),
+        SnackBar(content: Text(message), backgroundColor: AppTheme.brandColor),
       );
   }
 
@@ -429,16 +425,10 @@ class _ProjectRegistrationViewState extends State<_ProjectRegistrationView> {
             Text(
               _bootstrapError ?? 'Đã xảy ra lỗi.',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _bootstrap,
-              child: const Text('Thử lại'),
-            ),
+            ElevatedButton(onPressed: _bootstrap, child: const Text('Thử lại')),
           ],
         ),
       ),
@@ -449,10 +439,7 @@ class _ProjectRegistrationViewState extends State<_ProjectRegistrationView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAF9F6),
-      appBar: const AppHeader(
-        title: 'Đăng ký đồ án',
-        showBackButton: true,
-      ),
+      appBar: const AppHeader(title: 'Đăng ký đồ án', showBackButton: true),
       body: MultiBlocListener(
         listeners: [
           BlocListener<
@@ -464,135 +451,141 @@ class _ProjectRegistrationViewState extends State<_ProjectRegistrationView> {
             ProjectRegistrationSubmitState
           >(listener: _handleSubmitStateChanged),
         ],
-        child: BlocBuilder<
-          ProjectRegistrationContextBloc,
-          ProjectRegistrationContextState
-        >(
-          builder: (context, contextState) {
-            final submitState =
-                context.watch<ProjectRegistrationSubmitBloc>().state;
-            final searchState =
-                context.watch<ProjectStudentSearchBloc>().state;
+        child:
+            BlocBuilder<
+              ProjectRegistrationContextBloc,
+              ProjectRegistrationContextState
+            >(
+              builder: (context, contextState) {
+                final submitState = context
+                    .watch<ProjectRegistrationSubmitBloc>()
+                    .state;
+                final searchState = context
+                    .watch<ProjectStudentSearchBloc>()
+                    .state;
 
-            if (_isBootstrapping ||
-                (contextState.status ==
-                        ProjectRegistrationContextStatus.initial &&
-                    _bootstrapError == null)) {
-              return _buildLoadingState();
-            }
+                if (_isBootstrapping ||
+                    (contextState.status ==
+                            ProjectRegistrationContextStatus.initial &&
+                        _bootstrapError == null)) {
+                  return _buildLoadingState();
+                }
 
-            if (_bootstrapError != null &&
-                contextState.status ==
-                    ProjectRegistrationContextStatus.initial) {
-              return _buildBootstrapError();
-            }
+                if (_bootstrapError != null &&
+                    contextState.status ==
+                        ProjectRegistrationContextStatus.initial) {
+                  return _buildBootstrapError();
+                }
 
-            final canEdit = !contextState.isViewOnly &&
-                !submitState.isBusy &&
-                (contextState.canCreateRegistration ||
-                    contextState.canEditRegistration);
+                final canEdit =
+                    !contextState.isViewOnly &&
+                    !submitState.isBusy &&
+                    (contextState.canCreateRegistration ||
+                        contextState.canEditRegistration);
 
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<ProjectRegistrationContextBloc>().add(
-                  const ProjectRegistrationContextRefreshed(),
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    context.read<ProjectRegistrationContextBloc>().add(
+                      const ProjectRegistrationContextRefreshed(),
+                    );
+                  },
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
+                    children: [
+                      // Loading indicator
+                      if (contextState.status ==
+                              ProjectRegistrationContextStatus.loading ||
+                          submitState.isBusy)
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 16),
+                          child: LinearProgressIndicator(),
+                        ),
+
+                      // Section 1: Năm học + Học kỳ + Lĩnh vực
+                      ProjectRegistrationInfoSection(
+                        academicYears: contextState.academicYears,
+                        selectedAcademicYearId:
+                            contextState.selectedAcademicYearId,
+                        selectedPeriod: _selectedPeriod,
+                        fieldController: _fieldController,
+                        isBusy: submitState.isBusy,
+                        canEdit: canEdit,
+                        onAcademicYearChanged: (value) {
+                          if (value == null || value.trim().isEmpty) return;
+
+                          setState(() {
+                            _lastSyncedKey = '';
+                          });
+
+                          context.read<ProjectRegistrationContextBloc>().add(
+                            ProjectRegistrationAcademicYearSelected(value),
+                          );
+                        },
+                        onPeriodChanged: (value) {
+                          setState(() {
+                            _selectedPeriod = value;
+                          });
+                        },
+                      ),
+
+                      // Section 2: Thông tin sinh viên
+                      ProjectRegistrationStudentSection(
+                        studentId: _studentId,
+                        fullName: _fullName,
+                        className: _className,
+                      ),
+
+                      // Section 3: Thông tin đề tài
+                      ProjectRegistrationProjectSection(
+                        projectNameController: _projectNameController,
+                        keywordController: _keywordController,
+                        descriptionController: _descriptionController,
+                        outcomeController: _outcomeController,
+                        canEdit: canEdit,
+                      ),
+
+                      // Section 4: Giảng viên hướng dẫn
+                      ProjectRegistrationGuiderSection(
+                        guiderNameController: _guiderNameController,
+                        canEdit: canEdit,
+                      ),
+
+                      // Section 5: Thành viên nhóm
+                      ProjectRegistrationMembersSection(
+                        members: _members,
+                        searchController: _memberSearchController,
+                        searchResults: searchState.results,
+                        isSearching: searchState.isLoading,
+                        searchError: searchState.error,
+                        isAddingMember: _isAddingMember,
+                        canEdit: canEdit,
+                        onStartAdd: _startAddingMember,
+                        onCancelAdd: _cancelAddingMember,
+                        onSearchChanged: (query) =>
+                            _onSearchChanged(contextState, query),
+                        onAdd: _addMember,
+                        onRemove: _removeMember,
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // Submit button
+                      ProjectRegistrationSubmitButton(
+                        label: contextState.canEditRegistration
+                            ? 'Cập nhật đăng ký'
+                            : 'Gửi đăng ký',
+                        canSubmit:
+                            canEdit &&
+                            contextState.selectedAcademicYearId != null,
+                        isViewOnly: contextState.isViewOnly,
+                        onSubmit: () => _submitForm(contextState, submitState),
+                      ),
+                    ],
+                  ),
                 );
               },
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
-                children: [
-                  // Loading indicator
-                  if (contextState.status ==
-                          ProjectRegistrationContextStatus.loading ||
-                      submitState.isBusy)
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 16),
-                      child: LinearProgressIndicator(),
-                    ),
-
-                  // Section 1: Năm học + Học kỳ + Lĩnh vực
-                  ProjectRegistrationInfoSection(
-                    academicYears: contextState.academicYears,
-                    selectedAcademicYearId: contextState.selectedAcademicYearId,
-                    selectedPeriod: _selectedPeriod,
-                    fieldController: _fieldController,
-                    isBusy: submitState.isBusy,
-                    canEdit: canEdit,
-                    onAcademicYearChanged: (value) {
-                      if (value == null || value.trim().isEmpty) return;
-
-                      setState(() {
-                        _lastSyncedKey = '';
-                      });
-
-                      context.read<ProjectRegistrationContextBloc>().add(
-                        ProjectRegistrationAcademicYearSelected(value),
-                      );
-                    },
-                    onPeriodChanged: (value) {
-                      setState(() {
-                        _selectedPeriod = value;
-                      });
-                    },
-                  ),
-
-                  // Section 2: Thông tin sinh viên
-                  ProjectRegistrationStudentSection(
-                    studentId: _studentId,
-                    fullName: _fullName,
-                    className: _className,
-                  ),
-
-                  // Section 3: Thông tin đề tài
-                  ProjectRegistrationProjectSection(
-                    projectNameController: _projectNameController,
-                    keywordController: _keywordController,
-                    descriptionController: _descriptionController,
-                    outcomeController: _outcomeController,
-                    canEdit: canEdit,
-                  ),
-
-                  // Section 4: Giảng viên hướng dẫn
-                  ProjectRegistrationGuiderSection(
-                    guiderNameController: _guiderNameController,
-                    canEdit: canEdit,
-                  ),
-
-                  // Section 5: Thành viên nhóm
-                  ProjectRegistrationMembersSection(
-                    members: _members,
-                    searchController: _memberSearchController,
-                    searchResults: searchState.results,
-                    isSearching: searchState.isLoading,
-                    searchError: searchState.error,
-                    isAddingMember: _isAddingMember,
-                    canEdit: canEdit,
-                    onStartAdd: _startAddingMember,
-                    onCancelAdd: _cancelAddingMember,
-                    onSearchChanged: (query) =>
-                        _onSearchChanged(contextState, query),
-                    onAdd: _addMember,
-                    onRemove: _removeMember,
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // Submit button
-                  ProjectRegistrationSubmitButton(
-                    label: contextState.canEditRegistration
-                        ? 'Cập nhật đăng ký'
-                        : 'Gửi đăng ký',
-                    canSubmit: canEdit &&
-                        contextState.selectedAcademicYearId != null,
-                    isViewOnly: contextState.isViewOnly,
-                    onSubmit: () => _submitForm(contextState, submitState),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
+            ),
       ),
     );
   }

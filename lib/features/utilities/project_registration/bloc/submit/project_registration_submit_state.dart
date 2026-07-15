@@ -58,8 +58,7 @@ final class ProjectRegistrationSubmitState extends Equatable {
       description.trim().isNotEmpty &&
       outcome.trim().isNotEmpty;
 
-  bool get isSubmitting =>
-      status == ProjectRegistrationSubmitStatus.submitting;
+  bool get isSubmitting => status == ProjectRegistrationSubmitStatus.submitting;
 
   bool get isBusy =>
       status == ProjectRegistrationSubmitStatus.inProgress ||

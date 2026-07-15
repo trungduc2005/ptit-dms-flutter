@@ -126,7 +126,8 @@ class ProjectMemberApprovalHistory {
       actorName: json['actorName'] as String?,
       actorRole: json['actorRole'] as String?,
       reason: json['reason'] as String?,
-      createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
+      createdAt:
+          DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
           DateTime.now(),
     );
   }
@@ -141,9 +142,12 @@ class Project {
   final String keyword;
   final String description;
   final String outcome;
-  final String status; // pending | approved | rejected | hasIssue | project_needs_revision
-  final String guiderReceptionStatus; // processing | assigned | approved | rejected
-  final String memberApprovalStatus; // waiting_members | completed | needs_revision
+  final String
+  status; // pending | approved | rejected | hasIssue | project_needs_revision
+  final String
+  guiderReceptionStatus; // processing | assigned | approved | rejected
+  final String
+  memberApprovalStatus; // waiting_members | completed | needs_revision
   final DateTime? memberApprovalDeadline;
   final bool isNameConflict;
   final String academicYearRef;
@@ -206,8 +210,11 @@ class Project {
           .toList(),
       memberApprovalHistory:
           (json['memberApprovalHistory'] as List<dynamic>? ?? [])
-              .map((h) => ProjectMemberApprovalHistory.fromJson(
-                  h as Map<String, dynamic>))
+              .map(
+                (h) => ProjectMemberApprovalHistory.fromJson(
+                  h as Map<String, dynamic>,
+                ),
+              )
               .toList(),
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
@@ -227,6 +234,5 @@ class Project {
   /// True if waiting for at least one member to respond
   bool get isWaitingMembers => memberApprovalStatus == 'waiting_members';
 
-  ProjectMember? get leader =>
-      members.where((m) => m.isLeader).firstOrNull;
+  ProjectMember? get leader => members.where((m) => m.isLeader).firstOrNull;
 }

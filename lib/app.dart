@@ -60,9 +60,7 @@ class App extends StatelessWidget {
         RepositoryProvider<InternRegistrationRepository>.value(
           value: internRegistrationRepository,
         ),
-        RepositoryProvider<ProjectRepository>.value(
-          value: projectRepository,
-        ),
+        RepositoryProvider<ProjectRepository>.value(value: projectRepository),
         RepositoryProvider<StudentSearchRepository>.value(
           value: studentSearchRepository,
         ),

@@ -96,11 +96,12 @@ final class ProjectRegistrationPartnerStudentRemoved
 }
 
 /// Gửi đăng ký mới.
-final class ProjectRegistrationSubmitted extends ProjectRegistrationSubmitEvent {
+final class ProjectRegistrationSubmitted
+    extends ProjectRegistrationSubmitEvent {
   const ProjectRegistrationSubmitted({required this.request});
-  
+
   final ProjectRegistrationRequest request;
-  
+
   @override
   List<Object?> get props => [request];
 }
@@ -108,9 +109,9 @@ final class ProjectRegistrationSubmitted extends ProjectRegistrationSubmitEvent 
 /// Cập nhật đăng ký hiện tại.
 final class ProjectRegistrationUpdated extends ProjectRegistrationSubmitEvent {
   const ProjectRegistrationUpdated({required this.request});
-  
+
   final ProjectRegistrationRequest request;
-  
+
   @override
   List<Object?> get props => [request];
 }

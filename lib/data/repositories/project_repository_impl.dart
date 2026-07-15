@@ -21,9 +21,7 @@ class ProjectRepositoryImpl implements ProjectRepository {
   }
 
   @override
-  Future<Project> updateProject({
-    required ProjectRegistrationRequest request,
-  }) {
+  Future<Project> updateProject({required ProjectRegistrationRequest request}) {
     return _remoteDataSource.updateProject(request: request);
   }
 
