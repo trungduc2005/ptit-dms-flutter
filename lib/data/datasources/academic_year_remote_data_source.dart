@@ -16,12 +16,6 @@ class AcademicYearRemoteDataSource {
 
     final items = asJsonList(response.data);
 
-    // DEBUG: print raw JSON to find correct field name for academic year code
-    if (items.isNotEmpty) {
-      // ignore: avoid_print
-      print('[AcademicYearRemoteDataSource] raw first item: ${items.first}');
-    }
-
     return items.map(AcademicYearOption.fromJson).toList();
   }
 

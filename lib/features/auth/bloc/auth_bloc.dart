@@ -150,7 +150,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       await _authRepository.logout();
-    } catch (_) {}
+    } catch (e) {
+      // Logout failure is non-critical - proceed to clear local state
+      // Error is intentionally not propagated to avoid blocking user logout
+    }
 
     if (emit.isDone || isClosed) return;
 
