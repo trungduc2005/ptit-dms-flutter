@@ -10,6 +10,7 @@ import 'package:ptit_dms_flutter/domain/repositories/academic_year_repository.da
 import 'package:ptit_dms_flutter/domain/repositories/company_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/eligibility_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_registration_repository.dart';
+import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/timeline_repository.dart';
 
 import 'internship_registration_context_event.dart';
@@ -25,12 +26,14 @@ class InternshipRegistrationContextBloc
           InternshipRegistrationContextState
         > {
   InternshipRegistrationContextBloc({
+    required StudentProfileRepository studentProfileRepository,
     required AcademicYearRepository academicYearRepository,
     required EligibilityRepository eligibilityRepository,
     required TimelineRepository timelineRepository,
     required InternRegistrationRepository internRegistrationRepository,
     required CompanyRepository companyRepository,
-  }) : _academicYearRepository = academicYearRepository,
+  }) : _studentProfileRepository = studentProfileRepository,
+       _academicYearRepository = academicYearRepository,
        _eligibilityRepository = eligibilityRepository,
        _timelineRepository = timelineRepository,
        _internRegistrationRepository = internRegistrationRepository,
@@ -41,6 +44,7 @@ class InternshipRegistrationContextBloc
     on<InternshipRegistrationContextRefreshed>(_onRefreshed);
   }
 
+  final StudentProfileRepository _studentProfileRepository;
   final AcademicYearRepository _academicYearRepository;
   final EligibilityRepository _eligibilityRepository;
   final TimelineRepository _timelineRepository;
@@ -54,7 +58,8 @@ class InternshipRegistrationContextBloc
     emit(
       state.copyWith(
         status: InternshipRegistrationContextStatus.loading,
-        studentId: event.studentId.trim(),
+        profile: null,
+        studentId: '',
         hasRegistered: false,
         isCheckingRegistrationStatus: true,
         currentRegistration: null,
@@ -68,6 +73,12 @@ class InternshipRegistrationContextBloc
     );
 
     try {
+      final profile = await _studentProfileRepository.getProfile();
+
+      if (emit.isDone || isClosed) return;
+
+      final studentId = profile.studentId.trim();
+
       final academicYears = await _academicYearRepository
           .getInternAcademicYears();
 
@@ -140,7 +151,6 @@ class InternshipRegistrationContextBloc
     if (state.academicYears.isEmpty) {
       add(
         InternshipRegistrationContextStarted(
-          studentId: state.studentId,
           initialAcademicYearId: event.academicYearId,
         ),
       );
@@ -202,7 +212,7 @@ class InternshipRegistrationContextBloc
     final academicYearId = state.selectedAcademicYearId;
 
     if (academicYearId == null || academicYearId.isEmpty) {
-      add(InternshipRegistrationContextStarted(studentId: state.studentId));
+      add(const InternshipRegistrationContextStarted());
       return;
     }
 

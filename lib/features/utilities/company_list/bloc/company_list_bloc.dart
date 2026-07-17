@@ -1,6 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ptit_dms_flutter/core/utils/error_helpers.dart';
+import 'package:ptit_dms_flutter/core/error/app_exception.dart';
 import 'package:ptit_dms_flutter/domain/repositories/academic_year_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/company_repository.dart';
 
@@ -40,8 +39,8 @@ class CompanyListBloc extends Bloc<CompanyListEvent, CompanyListState> {
     emit(state.copyWith(status: CompanyListStatus.loading, errorMessage: null));
 
     try {
-      final academicYears = await _academicYearRepository
-          .getInternAcademicYears();
+      final academicYears =
+          await _academicYearRepository.getInternAcademicYears();
 
       if (emit.isDone || isClosed) return;
 
@@ -71,25 +70,13 @@ class CompanyListBloc extends Bloc<CompanyListEvent, CompanyListState> {
           errorMessage: null,
         ),
       );
-    } on DioException catch (e) {
+    } on AppException catch (e) {
       if (emit.isDone || isClosed) return;
 
       emit(
         state.copyWith(
           status: CompanyListStatus.failure,
-          errorMessage: readDioErrorMessage(
-            e,
-            fallback: 'Không thể tải danh sách doanh nghiệp.',
-          ),
-        ),
-      );
-    } catch (_) {
-      if (emit.isDone || isClosed) return;
-
-      emit(
-        state.copyWith(
-          status: CompanyListStatus.failure,
-          errorMessage: 'Không thể tải danh sách doanh nghiệp.',
+          errorMessage: e.message,
         ),
       );
     }

@@ -3,6 +3,7 @@ import 'package:ptit_dms_flutter/domain/entities/academic_year_option.dart';
 import 'package:ptit_dms_flutter/domain/entities/company.dart';
 import 'package:ptit_dms_flutter/domain/entities/current_intern_registration.dart';
 import 'package:ptit_dms_flutter/domain/entities/eligibility.dart';
+import 'package:ptit_dms_flutter/domain/entities/student_profile.dart';
 import 'package:ptit_dms_flutter/domain/entities/timeline.dart';
 
 enum InternshipRegistrationContextStatus { initial, loading, success, failure }
@@ -14,6 +15,7 @@ const _unset = Object();
 final class InternshipRegistrationContextState extends Equatable {
   const InternshipRegistrationContextState({
     this.status = InternshipRegistrationContextStatus.initial,
+    this.profile,
     this.studentId = '',
     this.academicYears = const [],
     this.selectedAcademicYearId,
@@ -32,6 +34,7 @@ final class InternshipRegistrationContextState extends Equatable {
   });
 
   final InternshipRegistrationContextStatus status;
+  final StudentProfile? profile;
   final String studentId;
   final List<AcademicYearOption> academicYears;
   final String? selectedAcademicYearId;
@@ -81,6 +84,7 @@ final class InternshipRegistrationContextState extends Equatable {
 
   InternshipRegistrationContextState copyWith({
     InternshipRegistrationContextStatus? status,
+    Object? profile = _unset,
     String? studentId,
     List<AcademicYearOption>? academicYears,
     Object? selectedAcademicYearId = _unset,
@@ -99,6 +103,9 @@ final class InternshipRegistrationContextState extends Equatable {
   }) {
     return InternshipRegistrationContextState(
       status: status ?? this.status,
+      profile: identical(profile, _unset)
+          ? this.profile
+          : profile as StudentProfile?,
       studentId: studentId ?? this.studentId,
       academicYears: academicYears ?? this.academicYears,
       selectedAcademicYearId: identical(selectedAcademicYearId, _unset)
@@ -135,6 +142,7 @@ final class InternshipRegistrationContextState extends Equatable {
   @override
   List<Object?> get props => [
     status,
+    profile,
     studentId,
     academicYears,
     selectedAcademicYearId,

@@ -962,13 +962,6 @@ class InternshipRegistrationSubmitSection extends StatelessWidget {
             child: Text(buttonLabel),
           ),
         ),
-        // if (!hasEffectiveCv) ...[
-        //   const SizedBox(height: 10),
-        //   const Text(
-        //     'Bạn phải upload CV trước khi gửi đăng ký.',
-        //     style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
-        //   ),
-        // ],
       ],
     );
   }

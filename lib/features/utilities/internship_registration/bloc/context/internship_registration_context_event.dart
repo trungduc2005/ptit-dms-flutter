@@ -10,15 +10,13 @@ sealed class InternshipRegistrationContextEvent extends Equatable {
 final class InternshipRegistrationContextStarted
     extends InternshipRegistrationContextEvent {
   const InternshipRegistrationContextStarted({
-    required this.studentId,
     this.initialAcademicYearId,
   });
 
-  final String studentId;
   final String? initialAcademicYearId;
 
   @override
-  List<Object?> get props => [studentId, initialAcademicYearId];
+  List<Object?> get props => [initialAcademicYearId];
 }
 
 final class InternshipRegistrationAcademicYearSelected

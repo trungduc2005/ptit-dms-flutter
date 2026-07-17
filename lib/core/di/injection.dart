@@ -28,6 +28,7 @@ import 'package:ptit_dms_flutter/domain/repositories/eligibility_repository.dart
 import 'package:ptit_dms_flutter/domain/repositories/intern_cv_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_registration_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_repository.dart';
+import 'package:ptit_dms_flutter/core/error/dio_exception_mapper.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_search_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/timeline_repository.dart';
@@ -67,26 +68,49 @@ class AppDependencies {
 
     final dio = createDioClient(cookieJar);
 
+    const mapper = DioExceptionMapper();
+
     return AppDependencies(
-      authRepository: AuthRepositoryImpl(AuthRemoteDataSource(dio), cookieJar),
+      authRepository: AuthRepositoryImpl(
+        AuthRemoteDataSource(dio),
+        cookieJar,
+        mapper,
+      ),
       studentProfileRepository: StudentProfileRepositoryImpl(
         StudentProfileRemoteDataSource(dio),
+        mapper,
       ),
       academicYearRepository: AcademicYearRepositoryImpl(
         AcademicYearRemoteDataSource(dio),
+        mapper,
       ),
       eligibilityRepository: EligibilityRepositoryImpl(
         EligibilityRemoteDataSource(dio),
+        mapper,
       ),
-      timelineRepository: TimelineRepositoryImpl(TimelineRemoteDataSource(dio)),
-      companyRepository: CompanyRepositoryImpl(CompanyRemoteDataSource(dio)),
-      internCvRepository: InternCvRepositoryImpl(InternCvRemoteDataSource(dio)),
+      timelineRepository: TimelineRepositoryImpl(
+        TimelineRemoteDataSource(dio),
+        mapper,
+      ),
+      companyRepository: CompanyRepositoryImpl(
+        CompanyRemoteDataSource(dio),
+        mapper,
+      ),
+      internCvRepository: InternCvRepositoryImpl(
+        InternCvRemoteDataSource(dio),
+        mapper,
+      ),
       internRegistrationRepository: InternRegistrationRepositoryImpl(
         InternRegistrationRemoteDataSource(dio),
+        mapper,
       ),
-      projectRepository: ProjectRepositoryImpl(ProjectRemoteDataSource(dio)),
+      projectRepository: ProjectRepositoryImpl(
+        ProjectRemoteDataSource(dio),
+        mapper,
+      ),
       studentSearchRepository: StudentSearchRepositoryImpl(
         StudentSearchRemoteDataSource(dio),
+        mapper,
       ),
     );
   }

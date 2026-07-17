@@ -8,7 +8,6 @@ import 'package:ptit_dms_flutter/core/theme/theme.dart';
 import 'package:ptit_dms_flutter/domain/entities/company.dart';
 import 'package:ptit_dms_flutter/domain/entities/current_intern_registration.dart';
 import 'package:ptit_dms_flutter/domain/entities/intern_registration_request.dart';
-import 'package:ptit_dms_flutter/domain/entities/student_profile.dart';
 import 'package:ptit_dms_flutter/domain/repositories/academic_year_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/company_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/eligibility_repository.dart';
@@ -43,6 +42,7 @@ class InternshipRegistrationPage extends StatelessWidget {
             internRegistrationRepository: context
                 .read<InternRegistrationRepository>(),
             companyRepository: context.read<CompanyRepository>(),
+            studentProfileRepository: context.read<StudentProfileRepository>(),
           ),
         ),
         BlocProvider(
@@ -91,9 +91,6 @@ class _InternshipRegistrationViewState
 
   bool _isPopupOpen = false;
 
-  StudentProfile? _profile;
-  bool _isBootstrapping = true;
-  String? _bootstrapError;
   InternshipRegistrationFormType? _selectedType;
   List<String?> _preferredCompanyIds = const [];
   DateTime? _expectedStartTime;
@@ -105,7 +102,9 @@ class _InternshipRegistrationViewState
   @override
   void initState() {
     super.initState();
-    _bootstrap();
+    context.read<InternshipRegistrationContextBloc>().add(
+      const InternshipRegistrationContextStarted(),
+    );
   }
 
   @override
@@ -122,41 +121,11 @@ class _InternshipRegistrationViewState
     super.dispose();
   }
 
-  Future<void> _bootstrap() async {
-    setState(() {
-      _isBootstrapping = true;
-      _bootstrapError = null;
-    });
-
-    try {
-      final profile = await context
-          .read<StudentProfileRepository>()
-          .getProfile();
-
-      if (!mounted) return;
-
-      setState(() {
-        _profile = profile;
-        _isBootstrapping = false;
-      });
-
-      context.read<InternshipRegistrationContextBloc>().add(
-        InternshipRegistrationContextStarted(studentId: profile.studentId),
-      );
-    } catch (_) {
-      if (!mounted) return;
-
-      setState(() {
-        _isBootstrapping = false;
-        _bootstrapError = 'Không thể tải thông tin sinh viên.';
-      });
-    }
-  }
 
   String _representativeStudentIdForState(
     InternshipRegistrationContextState state,
   ) {
-    final profileStudentId = _profile?.studentId.trim() ?? '';
+    final profileStudentId = state.profile?.studentId.trim() ?? '';
     return profileStudentId.isNotEmpty
         ? profileStudentId
         : state.studentId.trim();
@@ -177,7 +146,7 @@ class _InternshipRegistrationViewState
     InternshipRegistrationContextState state,
   ) {
     final studentId = _representativeStudentIdForState(state);
-    final fullName = _profile?.user?.fullName.trim() ?? '';
+    final fullName = state.profile?.user?.fullName.trim() ?? '';
 
     if (fullName.isNotEmpty && studentId.isNotEmpty) {
       return '$fullName - $studentId';
@@ -187,7 +156,7 @@ class _InternshipRegistrationViewState
   }
 
   String _representativeNameForState(InternshipRegistrationContextState state) {
-    final fullName = _profile?.user?.fullName.trim() ?? '';
+    final fullName = state.profile?.user?.fullName.trim() ?? '';
     if (fullName.isNotEmpty) {
       return fullName;
     }
@@ -771,8 +740,8 @@ class _InternshipRegistrationViewState
       InternshipCvUploadRequested(
         academicYearId: academicYearId,
         filePath: filePath,
-        studentId: (_profile?.studentId.trim().isNotEmpty ?? false)
-            ? _profile!.studentId.trim()
+        studentId: (contextState.profile?.studentId.trim().isNotEmpty ?? false)
+            ? contextState.profile!.studentId.trim()
             : null,
       ),
     );
@@ -1053,25 +1022,6 @@ class _InternshipRegistrationViewState
     return const Center(child: CircularProgressIndicator());
   }
 
-  Widget _buildBootstrapError() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              _bootstrapError ?? 'Đã xảy ra lỗi.',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(onPressed: _bootstrap, child: const Text('Thử lại')),
-          ],
-        ),
-      ),
-    );
-  }
 
   List<Widget> _buildRegistrationFormSections({
     required InternshipRegistrationContextState contextState,
@@ -1085,7 +1035,7 @@ class _InternshipRegistrationViewState
   }) {
     return [
       InternshipRegistrationGeneralSection(
-        majorText: (_profile?.major ?? const []).join(', '),
+        majorText: (contextState.profile?.major ?? const []).join(', '),
         cpaController: _cpaController,
         canEditForm: canEditForm,
         isFacultyAssign: _isFacultyAssign(contextState),
@@ -1234,17 +1184,12 @@ class _InternshipRegistrationViewState
                     .watch<InternshipRegistrationSubmitBloc>()
                     .state;
 
-                if (_isBootstrapping ||
-                    (contextState.status ==
-                            InternshipRegistrationContextStatus.initial &&
-                        _bootstrapError == null)) {
-                  return _buildLoadingState();
-                }
-
-                if (_bootstrapError != null &&
+                if (contextState.status ==
+                    InternshipRegistrationContextStatus.initial ||
                     contextState.status ==
-                        InternshipRegistrationContextStatus.initial) {
-                  return _buildBootstrapError();
+                    InternshipRegistrationContextStatus.loading &&
+                    contextState.selectedAcademicYearId == null) {
+                  return _buildLoadingState();
                 }
 
                 final canEditForm = _canEditForm(contextState, submitState);

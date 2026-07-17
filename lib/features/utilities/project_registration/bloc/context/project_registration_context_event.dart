@@ -8,18 +8,16 @@ sealed class ProjectRegistrationContextEvent extends Equatable {
 }
 
 /// Khởi tạo trang đăng ký đồ án.
+///
+/// BLoC sẽ tự động load profile và student info.
 final class ProjectRegistrationContextStarted
     extends ProjectRegistrationContextEvent {
-  const ProjectRegistrationContextStarted({
-    required this.studentId,
-    this.initialAcademicYearId,
-  });
+  const ProjectRegistrationContextStarted({this.initialAcademicYearId});
 
-  final String studentId;
   final String? initialAcademicYearId;
 
   @override
-  List<Object?> get props => [studentId, initialAcademicYearId];
+  List<Object?> get props => [initialAcademicYearId];
 }
 
 /// Sinh viên thay đổi năm học trong dropdown.

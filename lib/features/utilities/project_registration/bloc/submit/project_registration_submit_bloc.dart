@@ -1,6 +1,6 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ptit_dms_flutter/core/utils/error_helpers.dart';
+import 'package:ptit_dms_flutter/core/error/app_exception.dart';
+import 'package:ptit_dms_flutter/domain/entities/project.dart';
 import 'package:ptit_dms_flutter/domain/entities/project_registration_request.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_repository.dart';
 
@@ -25,6 +25,8 @@ class ProjectRegistrationSubmitBloc
     on<ProjectRegistrationOutcomeChanged>(_onOutcomeChanged);
     on<ProjectRegistrationPartnerStudentSelected>(_onPartnerStudentSelected);
     on<ProjectRegistrationPartnerStudentRemoved>(_onPartnerStudentRemoved);
+    on<ProjectRegistrationSubmitted>(_onSubmitted);
+    on<ProjectRegistrationUpdated>(_onUpdated);
     on<ProjectRegistrationSaved>(_onSaved);
   }
 
@@ -170,53 +172,155 @@ class ProjectRegistrationSubmitBloc
     );
   }
 
+  Future<void> _onSubmitted(
+    ProjectRegistrationSubmitted event,
+    Emitter<ProjectRegistrationSubmitState> emit,
+  ) async {
+    await _submitRequest(
+      emit,
+      request: event.request,
+      action: () => _projectRepository.registerProject(request: event.request),
+      successMessage: 'Đăng ký đồ án thành công.',
+      failureMessage: 'Không thể đăng ký đồ án. Vui lòng thử lại.',
+    );
+  }
+
+  Future<void> _onUpdated(
+    ProjectRegistrationUpdated event,
+    Emitter<ProjectRegistrationSubmitState> emit,
+  ) async {
+    await _submitRequest(
+      emit,
+      request: event.request,
+      action: () => _projectRepository.updateProject(request: event.request),
+      successMessage: 'Cập nhật đăng ký đồ án thành công.',
+      failureMessage: 'Không thể cập nhật đồ án. Vui lòng thử lại.',
+    );
+  }
+
   Future<void> _onSaved(
     ProjectRegistrationSaved event,
     Emitter<ProjectRegistrationSubmitState> emit,
   ) async {
-    if (!state.isValid) return;
+    if (!state.isValid) {
+      emit(
+        state.copyWith(
+          status: ProjectRegistrationSubmitStatus.failure,
+          errorMessage: 'Bạn phải nhập đầy đủ thông tin bắt buộc.',
+        ),
+      );
+      return;
+    }
 
-    emit(state.copyWith(status: ProjectRegistrationSubmitStatus.submitting));
+    final request = _buildRequest(state);
+    await _submitRequest(
+      emit,
+      request: request,
+      action: () => state.isEditMode
+          ? _projectRepository.updateProject(request: request)
+          : _projectRepository.registerProject(request: request),
+      successMessage: state.isEditMode
+          ? 'Cập nhật đăng ký đồ án thành công.'
+          : 'Đăng ký đồ án thành công.',
+      failureMessage: state.isEditMode
+          ? 'Không thể cập nhật đồ án. Vui lòng thử lại.'
+          : 'Không thể đăng ký đồ án. Vui lòng thử lại.',
+    );
+  }
+
+  Future<void> _submitRequest(
+    Emitter<ProjectRegistrationSubmitState> emit, {
+    required ProjectRegistrationRequest request,
+    required Future<Project> Function() action,
+    required String successMessage,
+    required String failureMessage,
+  }) async {
+    final validationMessage = _validateRequest(request);
+    if (validationMessage != null) {
+      emit(
+        state.copyWith(
+          status: ProjectRegistrationSubmitStatus.failure,
+          submittedProject: null,
+          errorMessage: validationMessage,
+        ),
+      );
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        status: ProjectRegistrationSubmitStatus.submitting,
+        submittedProject: null,
+        errorMessage: null,
+      ),
+    );
 
     try {
-      final request = _buildRequest(state);
-
-      // Chọn đúng endpoint theo mode
-      final project = state.isEditMode
-          ? await _projectRepository.updateProject(request: request)
-          : await _projectRepository.registerProject(request: request);
-
+      final project = await action();
       if (emit.isDone || isClosed) return;
 
       emit(
         state.copyWith(
           status: ProjectRegistrationSubmitStatus.success,
           submittedProject: project,
-          errorMessage: null,
+          errorMessage: successMessage,
         ),
       );
-    } on DioException catch (e) {
+    } on AppException catch (error) {
       if (emit.isDone || isClosed) return;
+
       emit(
         state.copyWith(
           status: ProjectRegistrationSubmitStatus.failure,
-          errorMessage: readDioErrorMessage(
-            e,
-            fallback: state.isEditMode
-                ? 'Không thể cập nhật đồ án. Vui lòng thử lại.'
-                : 'Không thể đăng ký đồ án. Vui lòng thử lại.',
-          ),
+          submittedProject: null,
+          errorMessage: error.message,
         ),
       );
     } catch (_) {
       if (emit.isDone || isClosed) return;
+
       emit(
         state.copyWith(
           status: ProjectRegistrationSubmitStatus.failure,
-          errorMessage: 'Đã xảy ra lỗi không xác định. Vui lòng thử lại.',
+          submittedProject: null,
+          errorMessage: failureMessage,
         ),
       );
     }
+  }
+
+  String? _validateRequest(ProjectRegistrationRequest request) {
+    if (request.academicYearId.trim().isEmpty) {
+      return 'Bạn phải chọn năm học.';
+    }
+    if (request.period.trim().isEmpty) {
+      return 'Bạn phải chọn học kỳ.';
+    }
+    if (request.field.trim().isEmpty) {
+      return 'Bạn phải nhập lĩnh vực đề tài.';
+    }
+    if (request.projectName.trim().isEmpty) {
+      return 'Bạn phải nhập tên đề tài.';
+    }
+    if (request.keyword.trim().isEmpty) {
+      return 'Bạn phải nhập từ khóa.';
+    }
+    if (request.description.trim().isEmpty) {
+      return 'Bạn phải nhập mô tả đề tài.';
+    }
+    if (request.outcome.trim().isEmpty) {
+      return 'Bạn phải nhập kết quả dự kiến.';
+    }
+
+    final memberIds = request.members
+        .map((member) => member['studentId']?.toString().trim() ?? '')
+        .toList(growable: false);
+    if (memberIds.any((id) => id.isEmpty) ||
+        memberIds.toSet().length != memberIds.length) {
+      return 'Danh sách thành viên không hợp lệ.';
+    }
+
+    return null;
   }
 
   /// Xây dựng request từ form state.

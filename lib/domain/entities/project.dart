@@ -146,6 +146,7 @@ class Project {
   status; // pending | approved | rejected | hasIssue | project_needs_revision
   final String
   guiderReceptionStatus; // processing | assigned | approved | rejected
+  final String guiderApprovalStatus; // processing | approved | rejected
   final String
   memberApprovalStatus; // waiting_members | completed | needs_revision
   final DateTime? memberApprovalDeadline;
@@ -169,6 +170,7 @@ class Project {
     required this.outcome,
     required this.status,
     required this.guiderReceptionStatus,
+    required this.guiderApprovalStatus,
     required this.memberApprovalStatus,
     this.memberApprovalDeadline,
     this.isNameConflict = false,
@@ -194,6 +196,8 @@ class Project {
       status: json['status'] as String? ?? 'pending',
       guiderReceptionStatus:
           json['guiderReceptionStatus'] as String? ?? 'processing',
+      guiderApprovalStatus:
+          json['guiderApprovalStatus'] as String? ?? 'processing',
       memberApprovalStatus:
           json['memberApprovalStatus'] as String? ?? 'waiting_members',
       memberApprovalDeadline: json['memberApprovalDeadline'] != null
@@ -225,8 +229,10 @@ class Project {
     );
   }
 
-  /// True if status allows editing by student
-  bool get isEditable => status == 'project_needs_revision';
+  /// Mirrors the web registration rule: a project can be edited until it is
+  /// approved. The presentation layer must additionally verify that the
+  /// current student is the group leader.
+  bool get isEditable => status != 'approved';
 
   /// True if all members have confirmed
   bool get isFullyApproved => memberApprovalStatus == 'completed';

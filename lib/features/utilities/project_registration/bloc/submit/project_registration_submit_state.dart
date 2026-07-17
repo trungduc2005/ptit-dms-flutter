@@ -60,9 +60,12 @@ final class ProjectRegistrationSubmitState extends Equatable {
 
   bool get isSubmitting => status == ProjectRegistrationSubmitStatus.submitting;
 
-  bool get isBusy =>
-      status == ProjectRegistrationSubmitStatus.inProgress ||
-      status == ProjectRegistrationSubmitStatus.submitting;
+  /// Chỉ khóa form trong lúc request đang được gửi.
+  ///
+  /// `inProgress` là trạng thái người dùng đang nhập liệu, không phải trạng
+  /// thái loading. Xem nó là busy sẽ khiến form bị chuyển thành chỉ đọc ngay
+  /// sau khi khởi tạo hoặc thay đổi một trường.
+  bool get isBusy => status == ProjectRegistrationSubmitStatus.submitting;
 
   String? get message => errorMessage;
 

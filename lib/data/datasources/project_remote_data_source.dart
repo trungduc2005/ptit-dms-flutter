@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:ptit_dms_flutter/core/network/bearer_auth_interceptor.dart';
 import 'package:ptit_dms_flutter/core/utils/json_helpers.dart';
 import 'package:ptit_dms_flutter/domain/entities/project.dart';
+import 'package:ptit_dms_flutter/domain/entities/project_registration_option.dart';
 import 'package:ptit_dms_flutter/domain/entities/project_registration_request.dart';
 
 class ProjectRemoteDataSource {
@@ -9,20 +10,85 @@ class ProjectRemoteDataSource {
 
   final Dio _dio;
 
-  /// GET /api/projects/check-project?academicYearId=...
-  /// Kiểm tra sinh viên hiện tại có đồ án trong năm học không.
-  /// Trả về null nếu chưa có.
-  Future<Project?> checkProject({required String academicYearId}) async {
-    final response = await _dio.get(
+  /// Kiểm tra và lấy hồ sơ đồ án của sinh viên trong năm học.
+  ///
+  /// Backend tách việc này thành hai endpoint:
+  /// - GET /api/projects/check-project chỉ trả `{ register: bool }`.
+  /// - GET /api/projects/:studentId mới trả đầy đủ thông tin đồ án.
+  Future<Project?> checkProject({
+    required String academicYearId,
+    required String studentId,
+  }) async {
+    final checkResponse = await _dio.get(
       '/projects/check-project',
       queryParameters: {'academicYearId': academicYearId},
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    final json = asNullableJsonMap(response.data, unwrapData: true);
-    if (json == null) return null;
+    final checkJson = asNullableJsonMap(checkResponse.data, unwrapData: true);
+    if (checkJson == null || checkJson['register'] != true) return null;
 
-    return Project.fromJson(json);
+    final projectResponse = await _dio.get(
+      '/projects/${Uri.encodeComponent(studentId)}',
+      queryParameters: {'academicYearId': academicYearId},
+      options: Options(extra: const {requiresBearerAuthKey: true}),
+    );
+
+    final projectJson = asNullableJsonMap(
+      projectResponse.data,
+      unwrapData: true,
+    );
+    if (projectJson == null) {
+      throw const FormatException(
+        'Backend xác nhận đã đăng ký nhưng không trả thông tin đồ án.',
+      );
+    }
+
+    final nestedProject = projectJson['project'];
+    final data = nestedProject is Map
+        ? Map<String, dynamic>.from(nestedProject)
+        : projectJson;
+
+    final hasProjectIdentity = [
+      data['_id'],
+      data['projectId'],
+      data['projectName'],
+    ].any((value) => value != null && value.toString().trim().isNotEmpty);
+    if (!hasProjectIdentity) {
+      throw const FormatException('Thông tin đồ án không có định danh.');
+    }
+
+    return Project.fromJson(data);
+  }
+
+  /// GET /api/periods?type=project
+  Future<List<ProjectPeriodOption>> getProjectPeriods() async {
+    final response = await _dio.get(
+      '/periods',
+      queryParameters: const {'type': 'project'},
+      options: Options(extra: const {requiresBearerAuthKey: true}),
+    );
+
+    return asJsonList(response.data)
+        .map(ProjectPeriodOption.fromJson)
+        .where((item) => item.name.trim().isNotEmpty)
+        .toList(growable: false);
+  }
+
+  /// GET /api/lecturers/guiders?academicYearId=...
+  Future<List<ProjectGuiderOption>> getProjectGuiders({
+    required String academicYearId,
+  }) async {
+    final response = await _dio.get(
+      '/lecturers/guiders',
+      queryParameters: {'academicYearId': academicYearId},
+      options: Options(extra: const {requiresBearerAuthKey: true}),
+    );
+
+    return asJsonList(response.data)
+        .map(ProjectGuiderOption.fromJson)
+        .where((item) => item.lecturerId.trim().isNotEmpty)
+        .toList(growable: false);
   }
 
   /// POST /api/projects
@@ -36,7 +102,7 @@ class ProjectRemoteDataSource {
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    return Project.fromJson(asJsonMap(response.data, unwrapData: true));
+    return Project.fromJson(_extractProject(response.data));
   }
 
   /// PUT /api/projects
@@ -50,7 +116,16 @@ class ProjectRemoteDataSource {
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
 
-    return Project.fromJson(asJsonMap(response.data, unwrapData: true));
+    return Project.fromJson(_extractProject(response.data));
+  }
+
+  Map<String, dynamic> _extractProject(Object? data) {
+    final json = asJsonMap(data, unwrapData: true);
+    final project = json['project'];
+    if (project is Map) {
+      return Map<String, dynamic>.from(project);
+    }
+    return json;
   }
 
   /// POST /api/projects/:projectId/members/:studentRef/approve
@@ -59,8 +134,11 @@ class ProjectRemoteDataSource {
     required String projectId,
     required String studentRef,
   }) async {
+    final encodedProjectId = Uri.encodeComponent(projectId);
+    final encodedStudentRef = Uri.encodeComponent(studentRef);
+
     await _dio.post(
-      '/projects/$projectId/members/$studentRef/approve',
+      '/projects/$encodedProjectId/members/$encodedStudentRef/approve',
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );
   }
@@ -72,8 +150,11 @@ class ProjectRemoteDataSource {
     required String studentRef,
     String? reason,
   }) async {
+    final encodedProjectId = Uri.encodeComponent(projectId);
+    final encodedStudentRef = Uri.encodeComponent(studentRef);
+
     await _dio.post(
-      '/projects/$projectId/members/$studentRef/reject',
+      '/projects/$encodedProjectId/members/$encodedStudentRef/reject',
       data: reason != null ? {'reason': reason} : null,
       options: Options(extra: const {requiresBearerAuthKey: true}),
     );

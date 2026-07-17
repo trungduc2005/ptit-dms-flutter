@@ -81,6 +81,8 @@ class Timeline extends Equatable {
     this.startTime,
     this.endTime,
     this.preferredCompanyCount,
+    this.minMember,
+    this.maxMember,
     this.autoFilterProcessedAt,
     this.createdAt,
     this.updatedAt,
@@ -98,6 +100,8 @@ class Timeline extends Equatable {
   final DateTime? startTime;
   final DateTime? endTime;
   final int? preferredCompanyCount;
+  final int? minMember;
+  final int? maxMember;
   final DateTime? autoFilterProcessedAt;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -118,6 +122,8 @@ class Timeline extends Equatable {
       startTime: asDateTime(json['startTime']),
       endTime: asDateTime(json['endTime']),
       preferredCompanyCount: asInt(json['preferredCompanyCount']),
+      minMember: asInt(json['minMember']),
+      maxMember: asInt(json['maxMember']),
       autoFilterProcessedAt: asDateTime(json['autoFilterProcessedAt']),
       createdAt: asDateTime(json['createdAt']),
       updatedAt: asDateTime(json['updatedAt']),
@@ -142,6 +148,8 @@ class Timeline extends Equatable {
       'startTime': startTime?.toIso8601String(),
       'endTime': endTime?.toIso8601String(),
       'preferredCompanyCount': preferredCompanyCount,
+      'minMember': minMember,
+      'maxMember': maxMember,
       'autoFilterProcessedAt': autoFilterProcessedAt?.toIso8601String(),
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
@@ -162,6 +170,8 @@ class Timeline extends Equatable {
     startTime,
     endTime,
     preferredCompanyCount,
+    minMember,
+    maxMember,
     autoFilterProcessedAt,
     createdAt,
     updatedAt,
