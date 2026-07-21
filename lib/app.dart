@@ -9,6 +9,7 @@ import 'package:ptit_dms_flutter/domain/repositories/eligibility_repository.dart
 import 'package:ptit_dms_flutter/domain/repositories/intern_cv_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_registration_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_repository.dart';
+import 'package:ptit_dms_flutter/domain/repositories/project_progress_report_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_search_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/timeline_repository.dart';
@@ -25,6 +26,7 @@ class App extends StatelessWidget {
     required this.internCvRepository,
     required this.internRegistrationRepository,
     required this.projectRepository,
+    required this.projectProgressReportRepository,
     required this.studentSearchRepository,
     super.key,
   });
@@ -38,6 +40,7 @@ class App extends StatelessWidget {
   final InternCvRepository internCvRepository;
   final InternRegistrationRepository internRegistrationRepository;
   final ProjectRepository projectRepository;
+  final ProjectProgressReportRepository projectProgressReportRepository;
   final StudentSearchRepository studentSearchRepository;
 
   @override
@@ -61,6 +64,9 @@ class App extends StatelessWidget {
           value: internRegistrationRepository,
         ),
         RepositoryProvider<ProjectRepository>.value(value: projectRepository),
+        RepositoryProvider<ProjectProgressReportRepository>.value(
+          value: projectProgressReportRepository,
+        ),
         RepositoryProvider<StudentSearchRepository>.value(
           value: studentSearchRepository,
         ),

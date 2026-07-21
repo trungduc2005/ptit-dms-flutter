@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_dropdown_field.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_read_only_field.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_section_card.dart';
+import 'package:ptit_dms_flutter/core/widgets/form/form_segmented_tabs.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_text_field.dart';
 import 'package:ptit_dms_flutter/domain/entities/academic_year_option.dart';
 import 'package:ptit_dms_flutter/domain/entities/project.dart';
@@ -24,85 +25,19 @@ class ProjectRegistrationTabSwitcher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEEEEEE),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _RegistrationTabItem(
-              label: 'Thông tin đăng ký',
-              isSelected: selectedTab == ProjectRegistrationTab.information,
-              onTap: () => onChanged(ProjectRegistrationTab.information),
-            ),
-          ),
-          Expanded(
-            child: _RegistrationTabItem(
-              label: 'Trạng thái',
-              isSelected: selectedTab == ProjectRegistrationTab.status,
-              onTap: () => onChanged(ProjectRegistrationTab.status),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _RegistrationTabItem extends StatelessWidget {
-  const _RegistrationTabItem({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: isSelected,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          curve: Curves.easeOut,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: isSelected
-                ? const [
-                    BoxShadow(
-                      color: Color(0x0C000000),
-                      blurRadius: 2,
-                      offset: Offset(0, 1),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isSelected
-                  ? const Color(0xFF8E0012)
-                  : const Color(0xFF5D5F5F),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              height: 1.43,
-            ),
-          ),
+    return FormSegmentedTabs<ProjectRegistrationTab>(
+      selectedValue: selectedTab,
+      onChanged: onChanged,
+      items: const [
+        FormSegmentedTabItem(
+          value: ProjectRegistrationTab.information,
+          label: 'Thông tin đăng ký',
         ),
-      ),
+        FormSegmentedTabItem(
+          value: ProjectRegistrationTab.status,
+          label: 'Trạng thái',
+        ),
+      ],
     );
   }
 }
