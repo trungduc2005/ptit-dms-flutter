@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ptit_dms_flutter/features/home/pages/home_page.dart';
 import 'package:ptit_dms_flutter/features/main/models/main_tab.dart';
 import 'package:ptit_dms_flutter/features/main/pages/main_tab_child_page.dart';
-import 'package:ptit_dms_flutter/features/notifications/notifications_page.dart';
+import 'package:ptit_dms_flutter/features/notifications/pages/notifications_page.dart';
 import 'package:ptit_dms_flutter/domain/entities/student_profile.dart';
 import 'package:ptit_dms_flutter/features/profile/navigation/profile_routes.dart';
 import 'package:ptit_dms_flutter/features/profile/pages/account_information_page.dart';

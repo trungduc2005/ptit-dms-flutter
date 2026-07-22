@@ -7,6 +7,7 @@ import 'package:ptit_dms_flutter/data/datasources/company_remote_data_source.dar
 import 'package:ptit_dms_flutter/data/datasources/eligibility_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/intern_cv_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/intern_registration_remote_data_source.dart';
+import 'package:ptit_dms_flutter/data/datasources/notification_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/student_profile_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/project_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/project_post_defense_submission_remote_data_source.dart';
@@ -20,6 +21,7 @@ import 'package:ptit_dms_flutter/data/repositories/company_repository_impl.dart'
 import 'package:ptit_dms_flutter/data/repositories/eligibility_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/intern_cv_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/intern_registration_repository_impl.dart';
+import 'package:ptit_dms_flutter/data/repositories/notification_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/project_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/project_post_defense_submission_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/project_pre_defense_submission_repository_impl.dart';
@@ -33,6 +35,7 @@ import 'package:ptit_dms_flutter/domain/repositories/company_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/eligibility_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_cv_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_registration_repository.dart';
+import 'package:ptit_dms_flutter/domain/repositories/notification_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_post_defense_submission_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_pre_defense_submission_repository.dart';
@@ -52,6 +55,7 @@ class AppDependencies {
     required this.companyRepository,
     required this.internCvRepository,
     required this.internRegistrationRepository,
+    required this.notificationRepository,
     required this.projectRepository,
     required this.projectPreDefenseSubmissionRepository,
     required this.projectPostDefenseSubmissionRepository,
@@ -67,6 +71,7 @@ class AppDependencies {
   final CompanyRepository companyRepository;
   final InternCvRepository internCvRepository;
   final InternRegistrationRepository internRegistrationRepository;
+  final NotificationRepository notificationRepository;
   final ProjectRepository projectRepository;
   final ProjectPreDefenseSubmissionRepository
   projectPreDefenseSubmissionRepository;
@@ -119,6 +124,10 @@ class AppDependencies {
       ),
       internRegistrationRepository: InternRegistrationRepositoryImpl(
         InternRegistrationRemoteDataSource(dio),
+        mapper,
+      ),
+      notificationRepository: NotificationRepositoryImpl(
+        NotificationRemoteDataSource(dio),
         mapper,
       ),
       projectRepository: ProjectRepositoryImpl(

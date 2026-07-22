@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ptit_dms_flutter/core/theme/theme.dart';
+import 'package:ptit_dms_flutter/core/widgets/app_header.dart';
 import 'package:ptit_dms_flutter/domain/entities/project_progress_report.dart';
 import 'package:ptit_dms_flutter/domain/entities/project_progress_report_request.dart';
 import 'package:ptit_dms_flutter/domain/entities/timeline.dart';
@@ -260,9 +261,9 @@ class _ProjectProgressReportViewState
         listener: _handleReportAction,
         child: Scaffold(
           backgroundColor: const Color(0xFFF6F7F9),
-          appBar: AppBar(
-            title: const Text('Báo cáo tiến độ'),
-            centerTitle: true,
+          appBar: const AppHeader(
+            title: 'Báo cáo tiến độ',
+            showBackButton: true,
           ),
           body:
               BlocBuilder<
