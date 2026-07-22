@@ -9,6 +9,8 @@ import 'package:ptit_dms_flutter/data/datasources/intern_cv_remote_data_source.d
 import 'package:ptit_dms_flutter/data/datasources/intern_registration_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/student_profile_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/project_remote_data_source.dart';
+import 'package:ptit_dms_flutter/data/datasources/project_post_defense_submission_remote_data_source.dart';
+import 'package:ptit_dms_flutter/data/datasources/project_pre_defense_submission_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/project_progress_report_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/student_search_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/timeline_remote_data_source.dart';
@@ -19,6 +21,8 @@ import 'package:ptit_dms_flutter/data/repositories/eligibility_repository_impl.d
 import 'package:ptit_dms_flutter/data/repositories/intern_cv_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/intern_registration_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/project_repository_impl.dart';
+import 'package:ptit_dms_flutter/data/repositories/project_post_defense_submission_repository_impl.dart';
+import 'package:ptit_dms_flutter/data/repositories/project_pre_defense_submission_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/project_progress_report_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/student_profile_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/student_search_repository_impl.dart';
@@ -30,6 +34,8 @@ import 'package:ptit_dms_flutter/domain/repositories/eligibility_repository.dart
 import 'package:ptit_dms_flutter/domain/repositories/intern_cv_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_registration_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_repository.dart';
+import 'package:ptit_dms_flutter/domain/repositories/project_post_defense_submission_repository.dart';
+import 'package:ptit_dms_flutter/domain/repositories/project_pre_defense_submission_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_progress_report_repository.dart';
 import 'package:ptit_dms_flutter/core/error/dio_exception_mapper.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
@@ -47,6 +53,8 @@ class AppDependencies {
     required this.internCvRepository,
     required this.internRegistrationRepository,
     required this.projectRepository,
+    required this.projectPreDefenseSubmissionRepository,
+    required this.projectPostDefenseSubmissionRepository,
     required this.projectProgressReportRepository,
     required this.studentSearchRepository,
   });
@@ -60,6 +68,10 @@ class AppDependencies {
   final InternCvRepository internCvRepository;
   final InternRegistrationRepository internRegistrationRepository;
   final ProjectRepository projectRepository;
+  final ProjectPreDefenseSubmissionRepository
+  projectPreDefenseSubmissionRepository;
+  final ProjectPostDefenseSubmissionRepository
+  projectPostDefenseSubmissionRepository;
   final ProjectProgressReportRepository projectProgressReportRepository;
   final StudentSearchRepository studentSearchRepository;
 
@@ -113,6 +125,16 @@ class AppDependencies {
         ProjectRemoteDataSource(dio),
         mapper,
       ),
+      projectPreDefenseSubmissionRepository:
+          ProjectPreDefenseSubmissionRepositoryImpl(
+            ProjectPreDefenseSubmissionRemoteDataSource(dio),
+            mapper,
+          ),
+      projectPostDefenseSubmissionRepository:
+          ProjectPostDefenseSubmissionRepositoryImpl(
+            ProjectPostDefenseSubmissionRemoteDataSource(dio),
+            mapper,
+          ),
       projectProgressReportRepository: ProjectProgressReportRepositoryImpl(
         ProjectProgressReportRemoteDataSource(dio),
         mapper,
