@@ -1,6 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ptit_dms_flutter/core/utils/error_helpers.dart';
+import 'package:ptit_dms_flutter/core/error/app_exception.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 
 import 'profile_context_event.dart';
@@ -50,16 +49,13 @@ class ProfileContextBloc
           errorMessage: null,
         ),
       );
-    } on DioException catch (e) {
+    } on AppException catch (e) {
       if (emit.isDone || isClosed) return;
 
       emit(
         state.copyWith(
           status: ProfileContextStatus.failure,
-          errorMessage: readDioErrorMessage(
-            e,
-            fallback: 'Không thể tải thông tin cá nhân.',
-          ),
+          errorMessage: e.message,
         ),
       );
     } catch (_) {

@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ptit_dms_flutter/core/widgets/app_popup_dialog.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 import 'package:ptit_dms_flutter/features/auth/bloc/auth_bloc.dart';
-import 'package:ptit_dms_flutter/features/main/pages/main_tab_child_page.dart';
 import 'package:ptit_dms_flutter/features/profile/bloc/profile_context_bloc.dart';
+import 'package:ptit_dms_flutter/features/profile/navigation/profile_routes.dart';
 import 'package:ptit_dms_flutter/features/profile/widgets/profile_view_body.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -35,12 +35,19 @@ class _ProfilePageViewState extends State<_ProfilePageView> {
     context.read<ProfileContextBloc>().add(const ProfileContextRefreshed());
   }
 
-  void _openAccountInfo() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const MainTabChildPage(title: 'Thông tin tài khoản'),
-      ),
-    );
+  Future<void> _openAccountInfo() async {
+    final profile = context.read<ProfileContextBloc>().state.profile;
+    if (profile == null) {
+      return;
+    }
+
+    final updated = await Navigator.of(
+      context,
+    ).pushNamed<bool>(ProfileRoutes.accountInformation, arguments: profile);
+
+    if (updated == true && mounted) {
+      _refresh();
+    }
   }
 
   Future<T?> _showPopup<T>({

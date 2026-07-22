@@ -1,6 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ptit_dms_flutter/core/utils/error_helpers.dart';
+import 'package:ptit_dms_flutter/core/error/app_exception.dart';
 import 'package:ptit_dms_flutter/domain/entities/student_profile_update_request.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 
@@ -58,17 +57,14 @@ class ProfileSubmitBloc extends Bloc<ProfileSubmitEvent, ProfileSubmitState> {
           message: 'Cập nhật thông tin thành công.',
         ),
       );
-    } on DioException catch (e) {
+    } on AppException catch (e) {
       if (emit.isDone || isClosed) return;
 
       emit(
         state.copyWith(
           submitStatus: ProfileSubmitStatus.failure,
           updatedProfile: null,
-          message: readDioErrorMessage(
-            e,
-            fallback: 'Cập nhật thông tin thất bại.',
-          ),
+          message: e.message,
         ),
       );
     } catch (_) {
@@ -133,14 +129,14 @@ class ProfileSubmitBloc extends Bloc<ProfileSubmitEvent, ProfileSubmitState> {
           message: 'Upload avatar thành công.',
         ),
       );
-    } on DioException catch (e) {
+    } on AppException catch (e) {
       if (emit.isDone || isClosed) return;
 
       emit(
         state.copyWith(
           uploadStatus: ProfileAvatarUploadStatus.failure,
           uploadedAvatar: null,
-          message: readDioErrorMessage(e, fallback: 'Upload avatar thất bại.'),
+          message: e.message,
         ),
       );
     } catch (_) {
