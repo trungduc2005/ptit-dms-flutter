@@ -75,6 +75,15 @@ class DioExceptionMapper {
       );
     }
 
+    if (statusCode == 404) {
+      return ServerException(
+        message ?? 'Không tìm thấy dữ liệu yêu cầu.',
+        statusCode: statusCode,
+        cause: error,
+        stackTrace: stackTrace,
+      );
+    }
+
     if (statusCode != null && statusCode >= 500) {
       return ServerException(
         message ?? 'Máy chủ đang gặp sự cố. Vui lòng thử lại sau.',
@@ -100,6 +109,6 @@ class DioExceptionMapper {
       final msg = data['message'];
       if (msg != null) return msg.toString();
     }
-    return error.message;
+    return null;
   }
 }

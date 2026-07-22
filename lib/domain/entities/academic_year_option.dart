@@ -13,11 +13,24 @@ class AcademicYearOption extends Equatable {
   final String name;
 
   factory AcademicYearOption.fromJson(Map<String, dynamic> json) {
+    final name = asString(json['name']) ?? '';
+    final providedCode = asString(json['code'])?.trim() ?? '';
+
     return AcademicYearOption(
       id: asString(json['_id']) ?? '',
-      code: asString(json['code']) ?? '',
-      name: asString(json['name']) ?? '',
+      code: providedCode.isNotEmpty ? providedCode : _extractCodeFromName(name),
+      name: name,
     );
+  }
+
+  static String _extractCodeFromName(String name) {
+    final years = RegExp(
+      r'\d{4}',
+    ).allMatches(name).map((match) => match.group(0));
+
+    if (years.length < 2) return '';
+
+    return '${years.elementAt(0)}-${years.elementAt(1)}';
   }
 
   Map<String, dynamic> toJson() {

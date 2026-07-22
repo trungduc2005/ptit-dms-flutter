@@ -19,6 +19,12 @@ const _tYear = AcademicYearOption(
   name: 'Năm học 2024-2025',
 );
 
+const _tOtherYear = AcademicYearOption(
+  id: 'y2',
+  code: '2023-2024',
+  name: 'Năm học 2023-2024',
+);
+
 const _tCompany = Company(
   id: 'c1',
   companyId: 'C001',
@@ -34,14 +40,14 @@ void main() {
     academicYearRepo = _MockAcademicYearRepository();
   });
 
-  CompanyListBloc buildBloc() =>
-      CompanyListBloc(companyRepo, academicYearRepo);
+  CompanyListBloc buildBloc() => CompanyListBloc(companyRepo, academicYearRepo);
 
   // ── Stub helpers ──────────────────────────────────────────────────────
 
   void stubYears(List<AcademicYearOption> years) {
-    when(() => academicYearRepo.getInternAcademicYears())
-        .thenAnswer((_) async => years);
+    when(
+      () => academicYearRepo.getInternAcademicYears(),
+    ).thenAnswer((_) async => years);
   }
 
   void stubCompanies(String code, List<Company> companies) {
@@ -90,6 +96,8 @@ void main() {
           const CompanyListState(
             status: CompanyListStatus.success,
             companies: [_tCompany],
+            academicYears: [_tYear],
+            selectedAcademicYear: _tYear,
           ),
         ],
       );
@@ -181,6 +189,8 @@ void main() {
           const CompanyListState(
             status: CompanyListStatus.success,
             companies: [_tCompany],
+            academicYears: [_tYear],
+            selectedAcademicYear: _tYear,
           ),
         ],
       );
@@ -194,8 +204,11 @@ void main() {
         act: (b) => b.add(const CompanyListRefreshed()),
         expect: () => [
           loadingState,
-          isA<CompanyListState>()
-              .having((s) => s.status, 'status', CompanyListStatus.failure),
+          isA<CompanyListState>().having(
+            (s) => s.status,
+            'status',
+            CompanyListStatus.failure,
+          ),
         ],
       );
 
@@ -207,8 +220,9 @@ void main() {
           companies: [_tCompany],
         ),
         act: (b) {
-          when(() => academicYearRepo.getInternAcademicYears())
-              .thenThrow(NetworkException('No internet connection'));
+          when(
+            () => academicYearRepo.getInternAcademicYears(),
+          ).thenThrow(NetworkException('No internet connection'));
           b.add(const CompanyListRefreshed());
         },
         expect: () => [
@@ -217,9 +231,67 @@ void main() {
             status: CompanyListStatus.loading,
             companies: [_tCompany],
           ),
-          isA<CompanyListState>()
-              .having((s) => s.status, 'status', CompanyListStatus.failure),
+          isA<CompanyListState>().having(
+            (s) => s.status,
+            'status',
+            CompanyListStatus.failure,
+          ),
         ],
+      );
+    });
+
+    group('on CompanyListAcademicYearChanged –', () {
+      blocTest<CompanyListBloc, CompanyListState>(
+        'loads companies using the newly selected academic year code',
+        setUp: () {
+          stubCompanies(_tOtherYear.code, [_tCompany]);
+        },
+        build: buildBloc,
+        seed: () => const CompanyListState(
+          status: CompanyListStatus.success,
+          academicYears: [_tYear, _tOtherYear],
+          selectedAcademicYear: _tYear,
+        ),
+        act: (b) => b.add(const CompanyListAcademicYearChanged(_tOtherYear)),
+        expect: () => [
+          const CompanyListState(
+            status: CompanyListStatus.loading,
+            academicYears: [_tYear, _tOtherYear],
+            selectedAcademicYear: _tOtherYear,
+          ),
+          const CompanyListState(
+            status: CompanyListStatus.success,
+            companies: [_tCompany],
+            academicYears: [_tYear, _tOtherYear],
+            selectedAcademicYear: _tOtherYear,
+          ),
+        ],
+        verify: (_) {
+          verify(
+            () => companyRepo.getCompanies(academicYearCode: _tOtherYear.code),
+          ).called(1);
+          verifyNever(() => academicYearRepo.getInternAcademicYears());
+        },
+      );
+
+      blocTest<CompanyListBloc, CompanyListState>(
+        'does not reload when the selected academic year is unchanged',
+        build: buildBloc,
+        seed: () => const CompanyListState(
+          status: CompanyListStatus.success,
+          academicYears: [_tYear],
+          selectedAcademicYear: _tYear,
+        ),
+        act: (b) => b.add(const CompanyListAcademicYearChanged(_tYear)),
+        expect: () => <CompanyListState>[],
+        verify: (_) {
+          verifyNever(
+            () => companyRepo.getCompanies(
+              academicYearCode: any(named: 'academicYearCode'),
+              search: any(named: 'search'),
+            ),
+          );
+        },
       );
     });
 
@@ -241,15 +313,17 @@ void main() {
         expect(s.hasCompanies, isTrue);
       });
 
-      test('copyWith preserves existing errorMessage when not explicitly set',
-          () {
-        const s = CompanyListState(
-          status: CompanyListStatus.failure,
-          errorMessage: 'old error',
-        );
-        final updated = s.copyWith(status: CompanyListStatus.loading);
-        expect(updated.errorMessage, 'old error');
-      });
+      test(
+        'copyWith preserves existing errorMessage when not explicitly set',
+        () {
+          const s = CompanyListState(
+            status: CompanyListStatus.failure,
+            errorMessage: 'old error',
+          );
+          final updated = s.copyWith(status: CompanyListStatus.loading);
+          expect(updated.errorMessage, 'old error');
+        },
+      );
 
       test('copyWith can explicitly clear errorMessage to null', () {
         const s = CompanyListState(

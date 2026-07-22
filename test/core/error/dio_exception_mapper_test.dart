@@ -9,14 +9,13 @@ DioException _makeDio({
   dynamic data,
   String? message,
 }) {
-  final response =
-      statusCode != null
-          ? Response(
-            requestOptions: RequestOptions(),
-            statusCode: statusCode,
-            data: data,
-          )
-          : null;
+  final response = statusCode != null
+      ? Response(
+          requestOptions: RequestOptions(),
+          statusCode: statusCode,
+          data: data,
+        )
+      : null;
   return DioException(
     requestOptions: RequestOptions(),
     type: type,
@@ -106,6 +105,37 @@ void main() {
         );
         final result = mapper.map(ex, StackTrace.current);
         expect(result, isA<ValidationException>());
+      });
+
+      test('404 → ServerException with a safe default message', () {
+        const dioTechnicalMessage =
+            'This exception was thrown because the response has a status code of 404';
+        final ex = _makeDio(
+          type: DioExceptionType.badResponse,
+          statusCode: 404,
+          data: {'error': 'not found'},
+          message: dioTechnicalMessage,
+        );
+
+        final result = mapper.map(ex, StackTrace.current);
+
+        expect(result, isA<ServerException>());
+        expect((result as ServerException).statusCode, 404);
+        expect(result.message, 'Không tìm thấy dữ liệu yêu cầu.');
+        expect(result.message, isNot(contains(dioTechnicalMessage)));
+      });
+
+      test('404 preserves a message returned by the backend', () {
+        final ex = _makeDio(
+          type: DioExceptionType.badResponse,
+          statusCode: 404,
+          data: {'message': 'Không tìm thấy danh sách doanh nghiệp'},
+        );
+
+        final result = mapper.map(ex, StackTrace.current);
+
+        expect(result, isA<ServerException>());
+        expect(result.message, 'Không tìm thấy danh sách doanh nghiệp');
       });
 
       test('500 → ServerException with statusCode', () {
