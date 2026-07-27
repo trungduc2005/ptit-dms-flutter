@@ -32,6 +32,11 @@ class UtilitiesPage extends StatelessWidget {
       routeName: UtilitiesRoutes.projectRegistration,
     ),
     UtilityShortcutData(
+      title: 'Phân\nhội đồng',
+      iconAsset: 'assets/icons/committee.svg',
+      routeName: UtilitiesRoutes.projectCommittee,
+    ),
+    UtilityShortcutData(
       title: 'Báo cáo\ntiến độ',
       iconAsset: 'assets/icons/progression.svg',
       routeName: UtilitiesRoutes.projectProgressReport,

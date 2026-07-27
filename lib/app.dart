@@ -10,6 +10,7 @@ import 'package:ptit_dms_flutter/domain/repositories/intern_cv_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/intern_registration_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/notification_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_repository.dart';
+import 'package:ptit_dms_flutter/domain/repositories/project_committee_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_post_defense_submission_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_pre_defense_submission_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_progress_report_repository.dart';
@@ -30,6 +31,7 @@ class App extends StatelessWidget {
     required this.internRegistrationRepository,
     required this.notificationRepository,
     required this.projectRepository,
+    required this.projectCommitteeRepository,
     required this.projectPreDefenseSubmissionRepository,
     required this.projectPostDefenseSubmissionRepository,
     required this.projectProgressReportRepository,
@@ -47,6 +49,7 @@ class App extends StatelessWidget {
   final InternRegistrationRepository internRegistrationRepository;
   final NotificationRepository notificationRepository;
   final ProjectRepository projectRepository;
+  final ProjectCommitteeRepository projectCommitteeRepository;
   final ProjectPreDefenseSubmissionRepository
   projectPreDefenseSubmissionRepository;
   final ProjectPostDefenseSubmissionRepository
@@ -78,6 +81,9 @@ class App extends StatelessWidget {
           value: notificationRepository,
         ),
         RepositoryProvider<ProjectRepository>.value(value: projectRepository),
+        RepositoryProvider<ProjectCommitteeRepository>.value(
+          value: projectCommitteeRepository,
+        ),
         RepositoryProvider<ProjectPreDefenseSubmissionRepository>.value(
           value: projectPreDefenseSubmissionRepository,
         ),

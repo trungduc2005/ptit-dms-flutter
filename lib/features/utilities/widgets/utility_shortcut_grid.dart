@@ -27,16 +27,32 @@ class UtilityShortcutGrid extends StatelessWidget {
       builder: (context, constraints) {
         final slotWidth = constraints.maxWidth / _slotCount;
 
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: List.generate(_slotCount, (index) {
-            if (index >= shortcuts.length) {
-              return SizedBox(width: slotWidth);
-            }
+        final rowCount = (shortcuts.length / _slotCount).ceil();
 
-            return SizedBox(
-              width: slotWidth,
-              child: UtilityShortcutTile(shortcut: shortcuts[index]),
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(rowCount, (rowIndex) {
+            final firstShortcutIndex = rowIndex * _slotCount;
+
+            return Padding(
+              padding: EdgeInsets.only(top: rowIndex == 0 ? 0 : 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: List.generate(_slotCount, (columnIndex) {
+                  final shortcutIndex = firstShortcutIndex + columnIndex;
+
+                  if (shortcutIndex >= shortcuts.length) {
+                    return SizedBox(width: slotWidth);
+                  }
+
+                  return SizedBox(
+                    width: slotWidth,
+                    child: UtilityShortcutTile(
+                      shortcut: shortcuts[shortcutIndex],
+                    ),
+                  );
+                }),
+              ),
             );
           }),
         );

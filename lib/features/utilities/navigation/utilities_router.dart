@@ -4,6 +4,7 @@ import 'package:ptit_dms_flutter/features/utilities/company_list/pages/companies
 import 'package:ptit_dms_flutter/features/utilities/company_list/pages/company_detail_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/navigation/utilities_routes.dart';
 import 'package:ptit_dms_flutter/features/utilities/internship_registration/pages/internship_registration_page.dart';
+import 'package:ptit_dms_flutter/features/utilities/project_committee/pages/project_committee_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/project_post_defense_submission/pages/project_post_defense_submission_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/project_pre_defense_submission/pages/project_pre_defense_submission_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/project_progress_report/pages/project_progress_report_page.dart';
@@ -48,6 +49,11 @@ class UtilitiesRouter {
       case UtilitiesRoutes.projectRegistration:
         return MaterialPageRoute(
           builder: (_) => const ProjectRegistrationPage(),
+          settings: settings,
+        );
+      case UtilitiesRoutes.projectCommittee:
+        return MaterialPageRoute(
+          builder: (_) => const ProjectCommitteePage(),
           settings: settings,
         );
       case UtilitiesRoutes.projectProgressReport:
