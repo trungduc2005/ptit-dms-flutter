@@ -12,9 +12,15 @@ class ProjectResultRepositoryImpl implements ProjectResultRepository {
   final DioExceptionMapper _mapper;
 
   @override
-  Future<ProjectResult> getProjectResult({required String projectId}) async {
+  Future<ProjectResult> getProjectResult({
+    required String projectId,
+    required String academicYearId,
+  }) async {
     try {
-      return await _remoteDataSource.getProjectResult(projectId: projectId);
+      return await _remoteDataSource.getProjectResult(
+        projectId: projectId,
+        academicYearId: academicYearId,
+      );
     } on DioException catch (error, stackTrace) {
       Error.throwWithStackTrace(_mapper.map(error, stackTrace), stackTrace);
     } on FormatException catch (error, stackTrace) {

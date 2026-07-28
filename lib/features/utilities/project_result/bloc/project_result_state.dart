@@ -9,12 +9,14 @@ final class ProjectResultState extends Equatable {
   const ProjectResultState({
     this.status = ProjectResultStatus.initial,
     this.projectId = '',
+    this.academicYearId = '',
     this.result,
     this.errorMessage,
   });
 
   final ProjectResultStatus status;
   final String projectId;
+  final String academicYearId;
   final ProjectResult? result;
   final String? errorMessage;
 
@@ -24,12 +26,14 @@ final class ProjectResultState extends Equatable {
   ProjectResultState copyWith({
     ProjectResultStatus? status,
     String? projectId,
+    String? academicYearId,
     Object? result = _unset,
     Object? errorMessage = _unset,
   }) {
     return ProjectResultState(
       status: status ?? this.status,
       projectId: projectId ?? this.projectId,
+      academicYearId: academicYearId ?? this.academicYearId,
       result: identical(result, _unset)
           ? this.result
           : result as ProjectResult?,
@@ -40,5 +44,11 @@ final class ProjectResultState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [status, projectId, result, errorMessage];
+  List<Object?> get props => [
+    status,
+    projectId,
+    academicYearId,
+    result,
+    errorMessage,
+  ];
 }

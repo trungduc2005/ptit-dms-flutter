@@ -11,5 +11,6 @@ class UtilitiesRoutes {
       '/utilities/project-pre-defense-submission';
   static const projectPostDefenseSubmission =
       '/utilities/project-post-defense-submission';
+  static const projectResult = '/utilities/project-result';
   static const registrationResult = '/utilities/registration-result';
 }

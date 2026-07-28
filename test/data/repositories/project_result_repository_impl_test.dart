@@ -7,7 +7,10 @@ import 'package:ptit_dms_flutter/data/repositories/project_result_repository_imp
 import 'package:ptit_dms_flutter/domain/entities/project_result.dart';
 
 typedef _GetProjectResultCallback =
-    Future<ProjectResult> Function({required String projectId});
+    Future<ProjectResult> Function({
+      required String projectId,
+      required String academicYearId,
+    });
 
 class _FakeProjectResultDataSource extends Fake
     implements ProjectResultRemoteDataSource {
@@ -16,8 +19,11 @@ class _FakeProjectResultDataSource extends Fake
   final _GetProjectResultCallback _callback;
 
   @override
-  Future<ProjectResult> getProjectResult({required String projectId}) {
-    return _callback(projectId: projectId);
+  Future<ProjectResult> getProjectResult({
+    required String projectId,
+    required String academicYearId,
+  }) {
+    return _callback(projectId: projectId, academicYearId: academicYearId);
   }
 }
 
@@ -68,48 +74,75 @@ void main() {
   }
 
   group('ProjectResultRepositoryImpl.getProjectResult', () {
-    test('returns result and forwards project id', () async {
+    test('returns result and forwards project and academic year ids', () async {
       String? capturedProjectId;
-      final repository = createRepository(({required projectId}) async {
+      String? capturedAcademicYearId;
+      final repository = createRepository(({
+        required projectId,
+        required academicYearId,
+      }) async {
         capturedProjectId = projectId;
+        capturedAcademicYearId = academicYearId;
         return _projectResult;
       });
 
-      final result = await repository.getProjectResult(projectId: 'project-01');
+      final result = await repository.getProjectResult(
+        projectId: 'project-01',
+        academicYearId: 'academic-year-01',
+      );
 
       expect(result, same(_projectResult));
       expect(capturedProjectId, 'project-01');
+      expect(capturedAcademicYearId, 'academic-year-01');
     });
 
     test('maps connection DioException to NetworkException', () {
-      final repository = createRepository(({required projectId}) {
+      final repository = createRepository(({
+        required projectId,
+        required academicYearId,
+      }) {
         throw _dioError(DioExceptionType.connectionTimeout);
       });
 
       expect(
-        () => repository.getProjectResult(projectId: 'project-01'),
+        () => repository.getProjectResult(
+          projectId: 'project-01',
+          academicYearId: 'academic-year-01',
+        ),
         throwsA(isA<NetworkException>()),
       );
     });
 
     test('maps unauthorized DioException to UnauthorizedException', () {
-      final repository = createRepository(({required projectId}) {
+      final repository = createRepository(({
+        required projectId,
+        required academicYearId,
+      }) {
         throw _dioError(DioExceptionType.badResponse, statusCode: 401);
       });
 
       expect(
-        () => repository.getProjectResult(projectId: 'project-01'),
+        () => repository.getProjectResult(
+          projectId: 'project-01',
+          academicYearId: 'academic-year-01',
+        ),
         throwsA(isA<UnauthorizedException>()),
       );
     });
 
     test('maps malformed response to UnexpectedException', () {
-      final repository = createRepository(({required projectId}) {
+      final repository = createRepository(({
+        required projectId,
+        required academicYearId,
+      }) {
         throw const FormatException('bad json');
       });
 
       expect(
-        () => repository.getProjectResult(projectId: 'project-01'),
+        () => repository.getProjectResult(
+          projectId: 'project-01',
+          academicYearId: 'academic-year-01',
+        ),
         throwsA(
           isA<UnexpectedException>().having(
             (error) => error.message,

@@ -22,6 +22,7 @@ class ProjectResultBloc extends Bloc<ProjectResultEvent, ProjectResultState> {
   ) async {
     await _loadResult(
       projectId: event.projectId,
+      academicYearId: event.academicYearId,
       emit: emit,
       clearResult: true,
     );
@@ -31,10 +32,11 @@ class ProjectResultBloc extends Bloc<ProjectResultEvent, ProjectResultState> {
     ProjectResultRefreshed event,
     Emitter<ProjectResultState> emit,
   ) async {
-    if (state.projectId.isEmpty) return;
+    if (state.projectId.isEmpty || state.academicYearId.isEmpty) return;
 
     await _loadResult(
       projectId: state.projectId,
+      academicYearId: state.academicYearId,
       emit: emit,
       clearResult: false,
     );
@@ -42,6 +44,7 @@ class ProjectResultBloc extends Bloc<ProjectResultEvent, ProjectResultState> {
 
   Future<void> _loadResult({
     required String projectId,
+    required String academicYearId,
     required Emitter<ProjectResultState> emit,
     required bool clearResult,
   }) async {
@@ -49,13 +52,17 @@ class ProjectResultBloc extends Bloc<ProjectResultEvent, ProjectResultState> {
       state.copyWith(
         status: ProjectResultStatus.loading,
         projectId: projectId,
+        academicYearId: academicYearId,
         result: clearResult ? null : state.result,
         errorMessage: null,
       ),
     );
 
     try {
-      final result = await _repository.getProjectResult(projectId: projectId);
+      final result = await _repository.getProjectResult(
+        projectId: projectId,
+        academicYearId: academicYearId,
+      );
 
       if (emit.isDone || isClosed) return;
 
@@ -63,6 +70,7 @@ class ProjectResultBloc extends Bloc<ProjectResultEvent, ProjectResultState> {
         state.copyWith(
           status: ProjectResultStatus.success,
           projectId: projectId,
+          academicYearId: academicYearId,
           result: result,
           errorMessage: null,
         ),

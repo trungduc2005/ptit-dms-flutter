@@ -10,6 +10,7 @@ class _MockProjectResultRepository extends Mock
     implements ProjectResultRepository {}
 
 const _projectId = 'project-1';
+const _academicYearId = 'academic-year-1';
 
 const _publishedResult = ProjectResult(
   projectId: _projectId,
@@ -57,26 +58,38 @@ void main() {
         'emits loading then success with the returned result',
         setUp: () {
           when(
-            () => repository.getProjectResult(projectId: _projectId),
+            () => repository.getProjectResult(
+              projectId: _projectId,
+              academicYearId: _academicYearId,
+            ),
           ).thenAnswer((_) async => _publishedResult);
         },
         build: buildBloc,
-        act: (bloc) =>
-            bloc.add(const ProjectResultStarted(projectId: _projectId)),
+        act: (bloc) => bloc.add(
+          const ProjectResultStarted(
+            projectId: _projectId,
+            academicYearId: _academicYearId,
+          ),
+        ),
         expect: () => const [
           ProjectResultState(
             status: ProjectResultStatus.loading,
             projectId: _projectId,
+            academicYearId: _academicYearId,
           ),
           ProjectResultState(
             status: ProjectResultStatus.success,
             projectId: _projectId,
+            academicYearId: _academicYearId,
             result: _publishedResult,
           ),
         ],
         verify: (_) {
           verify(
-            () => repository.getProjectResult(projectId: _projectId),
+            () => repository.getProjectResult(
+              projectId: _projectId,
+              academicYearId: _academicYearId,
+            ),
           ).called(1);
         },
       );
@@ -85,20 +98,29 @@ void main() {
         'treats an unpublished result as success',
         setUp: () {
           when(
-            () => repository.getProjectResult(projectId: _projectId),
+            () => repository.getProjectResult(
+              projectId: _projectId,
+              academicYearId: _academicYearId,
+            ),
           ).thenAnswer((_) async => _unpublishedResult);
         },
         build: buildBloc,
-        act: (bloc) =>
-            bloc.add(const ProjectResultStarted(projectId: _projectId)),
+        act: (bloc) => bloc.add(
+          const ProjectResultStarted(
+            projectId: _projectId,
+            academicYearId: _academicYearId,
+          ),
+        ),
         expect: () => const [
           ProjectResultState(
             status: ProjectResultStatus.loading,
             projectId: _projectId,
+            academicYearId: _academicYearId,
           ),
           ProjectResultState(
             status: ProjectResultStatus.success,
             projectId: _projectId,
+            academicYearId: _academicYearId,
             result: _unpublishedResult,
           ),
         ],
@@ -108,20 +130,29 @@ void main() {
         'emits loading then failure with AppException message',
         setUp: () {
           when(
-            () => repository.getProjectResult(projectId: _projectId),
+            () => repository.getProjectResult(
+              projectId: _projectId,
+              academicYearId: _academicYearId,
+            ),
           ).thenThrow(NetworkException('Không có kết nối mạng'));
         },
         build: buildBloc,
-        act: (bloc) =>
-            bloc.add(const ProjectResultStarted(projectId: _projectId)),
+        act: (bloc) => bloc.add(
+          const ProjectResultStarted(
+            projectId: _projectId,
+            academicYearId: _academicYearId,
+          ),
+        ),
         expect: () => const [
           ProjectResultState(
             status: ProjectResultStatus.loading,
             projectId: _projectId,
+            academicYearId: _academicYearId,
           ),
           ProjectResultState(
             status: ProjectResultStatus.failure,
             projectId: _projectId,
+            academicYearId: _academicYearId,
             errorMessage: 'Không có kết nối mạng',
           ),
         ],
@@ -131,25 +162,35 @@ void main() {
         'clears stale result when loading a different project',
         setUp: () {
           when(
-            () => repository.getProjectResult(projectId: _projectId),
+            () => repository.getProjectResult(
+              projectId: _projectId,
+              academicYearId: _academicYearId,
+            ),
           ).thenAnswer((_) async => _publishedResult);
         },
         build: buildBloc,
         seed: () => const ProjectResultState(
           status: ProjectResultStatus.success,
           projectId: 'old-project',
+          academicYearId: 'old-academic-year',
           result: _publishedResult,
         ),
-        act: (bloc) =>
-            bloc.add(const ProjectResultStarted(projectId: _projectId)),
+        act: (bloc) => bloc.add(
+          const ProjectResultStarted(
+            projectId: _projectId,
+            academicYearId: _academicYearId,
+          ),
+        ),
         expect: () => const [
           ProjectResultState(
             status: ProjectResultStatus.loading,
             projectId: _projectId,
+            academicYearId: _academicYearId,
           ),
           ProjectResultState(
             status: ProjectResultStatus.success,
             projectId: _projectId,
+            academicYearId: _academicYearId,
             result: _publishedResult,
           ),
         ],
@@ -158,14 +199,16 @@ void main() {
 
     group('ProjectResultRefreshed', () {
       blocTest<ProjectResultBloc, ProjectResultState>(
-        'does nothing when no project has been loaded',
+        'does nothing when no project and academic year have been loaded',
         build: buildBloc,
         act: (bloc) => bloc.add(const ProjectResultRefreshed()),
         expect: () => <ProjectResultState>[],
         verify: (_) {
           verifyNever(
-            () =>
-                repository.getProjectResult(projectId: any(named: 'projectId')),
+            () => repository.getProjectResult(
+              projectId: any(named: 'projectId'),
+              academicYearId: any(named: 'academicYearId'),
+            ),
           );
         },
       );
@@ -174,13 +217,17 @@ void main() {
         'keeps current result while refreshing then emits success',
         setUp: () {
           when(
-            () => repository.getProjectResult(projectId: _projectId),
+            () => repository.getProjectResult(
+              projectId: _projectId,
+              academicYearId: _academicYearId,
+            ),
           ).thenAnswer((_) async => _publishedResult);
         },
         build: buildBloc,
         seed: () => const ProjectResultState(
           status: ProjectResultStatus.success,
           projectId: _projectId,
+          academicYearId: _academicYearId,
           result: _publishedResult,
         ),
         act: (bloc) => bloc.add(const ProjectResultRefreshed()),
@@ -188,11 +235,13 @@ void main() {
           ProjectResultState(
             status: ProjectResultStatus.loading,
             projectId: _projectId,
+            academicYearId: _academicYearId,
             result: _publishedResult,
           ),
           ProjectResultState(
             status: ProjectResultStatus.success,
             projectId: _projectId,
+            academicYearId: _academicYearId,
             result: _publishedResult,
           ),
         ],
@@ -202,13 +251,17 @@ void main() {
         'keeps current result when refresh fails',
         setUp: () {
           when(
-            () => repository.getProjectResult(projectId: _projectId),
+            () => repository.getProjectResult(
+              projectId: _projectId,
+              academicYearId: _academicYearId,
+            ),
           ).thenThrow(ServerException('Không thể tải kết quả đồ án'));
         },
         build: buildBloc,
         seed: () => const ProjectResultState(
           status: ProjectResultStatus.success,
           projectId: _projectId,
+          academicYearId: _academicYearId,
           result: _publishedResult,
         ),
         act: (bloc) => bloc.add(const ProjectResultRefreshed()),
@@ -216,11 +269,13 @@ void main() {
           ProjectResultState(
             status: ProjectResultStatus.loading,
             projectId: _projectId,
+            academicYearId: _academicYearId,
             result: _publishedResult,
           ),
           ProjectResultState(
             status: ProjectResultStatus.failure,
             projectId: _projectId,
+            academicYearId: _academicYearId,
             result: _publishedResult,
             errorMessage: 'Không thể tải kết quả đồ án',
           ),

@@ -27,6 +27,7 @@ Future<void> main() async {
           dependencies.projectPostDefenseSubmissionRepository,
       projectProgressReportRepository:
           dependencies.projectProgressReportRepository,
+      projectResultRepository: dependencies.projectResultRepository,
       studentSearchRepository: dependencies.studentSearchRepository,
     ),
   );

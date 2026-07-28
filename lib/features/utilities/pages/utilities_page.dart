@@ -51,6 +51,11 @@ class UtilitiesPage extends StatelessWidget {
       iconAsset: 'assets/icons/project_post_defense_submission.svg',
       routeName: UtilitiesRoutes.projectPostDefenseSubmission,
     ),
+    UtilityShortcutData(
+      title: 'Kết quả\nđồ án',
+      iconAsset: 'assets/icons/project_result.svg',
+      routeName: UtilitiesRoutes.projectResult,
+    ),
   ];
 
   @override

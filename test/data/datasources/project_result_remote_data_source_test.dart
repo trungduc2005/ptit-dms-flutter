@@ -56,19 +56,23 @@ void main() {
     test('requests and parses project CLO results', () async {
       RequestOptions? captured;
       final dataSource = ProjectResultRemoteDataSource(
-        createStubDio(
-          validResponse(),
-          capture: (options) => captured = options,
-        ),
+        createStubDio({
+          'success': true,
+          'data': validResponse(),
+        }, capture: (options) => captured = options),
       );
 
-      final result = await dataSource.getProjectResult(projectId: 'project-01');
+      final result = await dataSource.getProjectResult(
+        projectId: 'project-01',
+        academicYearId: 'academic-year-01',
+      );
 
       expect(captured!.method, 'GET');
       expect(
         captured!.path,
         '/projects/evaluations-result/project-01/clo-results',
       );
+      expect(captured!.queryParameters, {'academicYearId': 'academic-year-01'});
       expect(result.projectId, 'project-01');
       expect(result.projectName, 'Hệ thống quản lý đồ án');
       expect(result.isPublished, isTrue);
@@ -84,7 +88,10 @@ void main() {
       final response = validResponse()..['members'] = <Object?>[];
       final dataSource = ProjectResultRemoteDataSource(createStubDio(response));
 
-      final result = await dataSource.getProjectResult(projectId: 'project-01');
+      final result = await dataSource.getProjectResult(
+        projectId: 'project-01',
+        academicYearId: 'academic-year-01',
+      );
 
       expect(result.members, isEmpty);
       expect(result.isPublished, isFalse);
@@ -96,7 +103,10 @@ void main() {
       );
 
       expect(
-        () => dataSource.getProjectResult(projectId: 'project-01'),
+        () => dataSource.getProjectResult(
+          projectId: 'project-01',
+          academicYearId: 'academic-year-01',
+        ),
         throwsA(isA<FormatException>()),
       );
     });
@@ -106,7 +116,10 @@ void main() {
       final dataSource = ProjectResultRemoteDataSource(createStubDio(response));
 
       expect(
-        () => dataSource.getProjectResult(projectId: 'project-01'),
+        () => dataSource.getProjectResult(
+          projectId: 'project-01',
+          academicYearId: 'academic-year-01',
+        ),
         throwsA(isA<FormatException>()),
       );
     });

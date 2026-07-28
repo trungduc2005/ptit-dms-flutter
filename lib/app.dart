@@ -14,6 +14,7 @@ import 'package:ptit_dms_flutter/domain/repositories/project_committee_repositor
 import 'package:ptit_dms_flutter/domain/repositories/project_post_defense_submission_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_pre_defense_submission_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_progress_report_repository.dart';
+import 'package:ptit_dms_flutter/domain/repositories/project_result_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_search_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/timeline_repository.dart';
@@ -35,6 +36,7 @@ class App extends StatelessWidget {
     required this.projectPreDefenseSubmissionRepository,
     required this.projectPostDefenseSubmissionRepository,
     required this.projectProgressReportRepository,
+    required this.projectResultRepository,
     required this.studentSearchRepository,
     super.key,
   });
@@ -55,6 +57,7 @@ class App extends StatelessWidget {
   final ProjectPostDefenseSubmissionRepository
   projectPostDefenseSubmissionRepository;
   final ProjectProgressReportRepository projectProgressReportRepository;
+  final ProjectResultRepository projectResultRepository;
   final StudentSearchRepository studentSearchRepository;
 
   @override
@@ -92,6 +95,9 @@ class App extends StatelessWidget {
         ),
         RepositoryProvider<ProjectProgressReportRepository>.value(
           value: projectProgressReportRepository,
+        ),
+        RepositoryProvider<ProjectResultRepository>.value(
+          value: projectResultRepository,
         ),
         RepositoryProvider<StudentSearchRepository>.value(
           value: studentSearchRepository,

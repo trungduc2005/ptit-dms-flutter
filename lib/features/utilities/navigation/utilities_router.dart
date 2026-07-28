@@ -9,6 +9,7 @@ import 'package:ptit_dms_flutter/features/utilities/project_post_defense_submiss
 import 'package:ptit_dms_flutter/features/utilities/project_pre_defense_submission/pages/project_pre_defense_submission_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/project_progress_report/pages/project_progress_report_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/project_registration/pages/project_registration_page.dart';
+import 'package:ptit_dms_flutter/features/utilities/project_result/pages/project_result_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/pages/utilities_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/pages/utility_placeholder_page.dart';
 
@@ -69,6 +70,11 @@ class UtilitiesRouter {
       case UtilitiesRoutes.projectPostDefenseSubmission:
         return MaterialPageRoute(
           builder: (_) => const ProjectPostDefenseSubmissionPage(),
+          settings: settings,
+        );
+      case UtilitiesRoutes.projectResult:
+        return MaterialPageRoute(
+          builder: (_) => const ProjectResultPage(),
           settings: settings,
         );
       case UtilitiesRoutes.registrationResult:
