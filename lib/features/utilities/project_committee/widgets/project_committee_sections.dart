@@ -281,7 +281,7 @@ class _CommitteeSummaryCard extends StatelessWidget {
                     icon: Icons.format_list_numbered_rounded,
                     label: 'Thứ tự báo cáo',
                     value: committee.project.presentationOrder < 0
-                        ? 'Chưa cập nhật'
+                        ? 'N/A'
                         : committee.project.presentationOrder.toString(),
                   ),
                 ),
