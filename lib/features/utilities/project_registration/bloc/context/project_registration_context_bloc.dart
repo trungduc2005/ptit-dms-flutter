@@ -24,6 +24,7 @@ class ProjectRegistrationContextBloc
     required AcademicYearRepository academicYearRepository,
     required ProjectRepository projectRepository,
     required TimelineRepository timelineRepository,
+    this.timelineType = 'projectRegistration',
   }) : _studentProfileRepository = studentProfileRepository,
        _academicYearRepository = academicYearRepository,
        _projectRepository = projectRepository,
@@ -38,6 +39,7 @@ class ProjectRegistrationContextBloc
   final AcademicYearRepository _academicYearRepository;
   final ProjectRepository _projectRepository;
   final TimelineRepository _timelineRepository;
+  final String timelineType;
 
   Future<void> _onStarted(
     ProjectRegistrationContextStarted event,
@@ -280,7 +282,7 @@ class ProjectRegistrationContextBloc
 
   Timeline? _findRegistrationTimeline(List<Timeline> timelines) {
     for (final timeline in timelines) {
-      if (timeline.type == 'projectRegistration') return timeline;
+      if (timeline.type == timelineType) return timeline;
     }
     return null;
   }

@@ -26,6 +26,7 @@ class ProjectPreDefenseSubmissionPage extends StatelessWidget {
             academicYearRepository: context.read<AcademicYearRepository>(),
             projectRepository: context.read<ProjectRepository>(),
             timelineRepository: context.read<TimelineRepository>(),
+            timelineType: 'projectSubmissionPre',
           )..add(const ProjectRegistrationContextStarted()),
         ),
         BlocProvider(
@@ -269,6 +270,7 @@ class _ProjectPreDefenseSubmissionViewState
                         academicYears: contextState.academicYears,
                         selectedAcademicYearId:
                             contextState.selectedAcademicYearId,
+                        timeline: contextState.registrationTimeline,
                         isBusy:
                             contextState.status ==
                             ProjectRegistrationContextStatus.loading,
@@ -367,13 +369,6 @@ class _ProjectPreDefenseSubmissionViewState
             onRemoveTurnitin: () => setState(() => _turnitinFile = null),
             onSubmit: () => _submit(contextState, state),
             isResubmission: submission.hasSubmitted,
-          )
-        else
-          const ProjectPreDefenseEmptyState(
-            icon: Icons.lock_outline,
-            title: 'Hồ sơ đã được duyệt',
-            message:
-                'Bạn không cần nộp lại khi hồ sơ đã được giảng viên hướng dẫn phê duyệt.',
           ),
         if (submission.submissions.isNotEmpty) ...[
           const SizedBox(height: 16),

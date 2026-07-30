@@ -4,10 +4,12 @@ import 'package:ptit_dms_flutter/core/widgets/form/form_read_only_field.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_section_card.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_segmented_tabs.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_text_field.dart';
+import 'package:ptit_dms_flutter/core/widgets/form/form_time_range_caption.dart';
 import 'package:ptit_dms_flutter/domain/entities/academic_year_option.dart';
 import 'package:ptit_dms_flutter/domain/entities/project.dart';
 import 'package:ptit_dms_flutter/domain/entities/project_registration_option.dart';
 import 'package:ptit_dms_flutter/domain/entities/student_search_result.dart';
+import 'package:ptit_dms_flutter/domain/entities/timeline.dart';
 
 // ─── Registration tabs ───────────────────────────────────────────────────────
 
@@ -472,6 +474,7 @@ class ProjectRegistrationInfoSection extends StatelessWidget {
     required this.selectedAcademicYearId,
     required this.periods,
     required this.selectedPeriod,
+    required this.registrationTimeline,
     required this.fieldController,
     required this.isBusy,
     required this.canEdit,
@@ -485,6 +488,7 @@ class ProjectRegistrationInfoSection extends StatelessWidget {
   final String? selectedAcademicYearId;
   final List<ProjectPeriodOption> periods;
   final String? selectedPeriod;
+  final Timeline? registrationTimeline;
   final TextEditingController fieldController;
   final bool isBusy;
   final bool canEdit;
@@ -523,6 +527,14 @@ class ProjectRegistrationInfoSection extends StatelessWidget {
                 .toList(growable: false),
             onChanged: onAcademicYearChanged,
           ),
+        if (registrationTimeline?.startTime != null ||
+            registrationTimeline?.endTime != null) ...[
+          const SizedBox(height: 10),
+          FormTimeRangeCaption(
+            startTime: registrationTimeline?.startTime,
+            endTime: registrationTimeline?.endTime,
+          ),
+        ],
         const SizedBox(height: 12),
         if (displayOnly)
           FormReadOnlyField(
@@ -958,6 +970,11 @@ class _MemberSearchField extends StatelessWidget {
                             fontSize: 15,
                           ),
                           border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          focusedErrorBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
                           isCollapsed: true,
                           contentPadding: EdgeInsets.zero,
                         ),

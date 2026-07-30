@@ -3,6 +3,7 @@ import 'package:ptit_dms_flutter/core/theme/theme.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_dropdown_field.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_segmented_tabs.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_text_field.dart';
+import 'package:ptit_dms_flutter/core/widgets/form/form_time_range_caption.dart';
 import 'package:ptit_dms_flutter/domain/entities/academic_year_option.dart';
 import 'package:ptit_dms_flutter/domain/entities/project_progress_report.dart';
 import 'package:ptit_dms_flutter/domain/entities/timeline.dart';
@@ -174,47 +175,21 @@ class ProjectProgressReportContextSection extends StatelessWidget {
             ),
           ] else if (hasSelectedReportPeriod) ...[
             const SizedBox(height: 10),
-            _ReportPeriodTime(
-              timeline: reportPeriodItems.firstWhere(
-                (item) => item.key?.trim() == selectedReportPeriodKey,
-              ),
+            FormTimeRangeCaption(
+              startTime: reportPeriodItems
+                  .firstWhere(
+                    (item) => item.key?.trim() == selectedReportPeriodKey,
+                  )
+                  .startTime,
+              endTime: reportPeriodItems
+                  .firstWhere(
+                    (item) => item.key?.trim() == selectedReportPeriodKey,
+                  )
+                  .endTime,
             ),
           ],
         ],
       ),
-    );
-  }
-}
-
-class _ReportPeriodTime extends StatelessWidget {
-  const _ReportPeriodTime({required this.timeline});
-
-  final Timeline timeline;
-
-  @override
-  Widget build(BuildContext context) {
-    final start = timeline.startTime;
-    final end = timeline.endTime;
-    if (start == null && end == null) return const SizedBox.shrink();
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Icon(Icons.schedule_outlined, size: 17, color: Color(0xFF6B7280)),
-        const SizedBox(width: 7),
-        Expanded(
-          child: Text(
-            start != null && end != null
-                ? 'Thời gian: ${_formatDateTime(start)} - ${_formatDateTime(end)}'
-                : 'Thời gian: ${_formatDateTime(start ?? end!)}',
-            style: const TextStyle(
-              color: Color(0xFF6B7280),
-              fontSize: 12,
-              height: 1.4,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

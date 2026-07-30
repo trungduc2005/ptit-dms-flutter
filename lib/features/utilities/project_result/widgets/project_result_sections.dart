@@ -295,14 +295,33 @@ class _CloResultRow extends StatelessWidget {
   }
 }
 
+String formatProjectCloWeightPercentage(double weight) {
+  final text = weight.toString();
+  final isNegative = text.startsWith('-');
+  final unsignedText = isNegative ? text.substring(1) : text;
+  final parts = unsignedText.split('.');
+  final integerDigits = parts.first;
+  final fractionDigits = parts.length > 1 ? parts[1] : '';
+  final digits = '$integerDigits$fractionDigits';
+  final decimalIndex = integerDigits.length + 2;
+
+  final percentage = decimalIndex >= digits.length
+      ? digits.padRight(decimalIndex, '0')
+      : '${digits.substring(0, decimalIndex)}.${digits.substring(decimalIndex)}';
+  final withoutLeadingZeros = percentage.replaceFirst(RegExp(r'^0+(?=\d)'), '');
+  final normalized = withoutLeadingZeros.contains('.')
+      ? withoutLeadingZeros
+            .replaceFirst(RegExp(r'0+$'), '')
+            .replaceFirst(RegExp(r'\.$'), '')
+      : withoutLeadingZeros;
+
+  return '${isNegative ? '-' : ''}${normalized.isEmpty ? '0' : normalized}';
+}
+
 class _CloNotes extends StatelessWidget {
   const _CloNotes({required this.clos});
 
   final List<ProjectCloResult> clos;
-
-  String _formatWeight(double weight) {
-    return weight.toStringAsFixed(weight == weight.roundToDouble() ? 0 : 1);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -340,7 +359,7 @@ class _CloNotes extends StatelessWidget {
           ...clos.indexed.map((entry) {
             final clo = entry.$2;
             final description = clo.cloDescription.trim();
-            final weight = _formatWeight(clo.cloWeight);
+            final weight = formatProjectCloWeightPercentage(clo.cloWeight);
 
             return Padding(
               padding: EdgeInsets.only(

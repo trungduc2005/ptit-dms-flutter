@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:ptit_dms_flutter/core/theme/theme.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_dropdown_field.dart';
+import 'package:ptit_dms_flutter/core/widgets/form/form_time_range_caption.dart';
 import 'package:ptit_dms_flutter/domain/entities/academic_year_option.dart';
 import 'package:ptit_dms_flutter/domain/entities/project_pre_defense_submission.dart';
+import 'package:ptit_dms_flutter/domain/entities/timeline.dart';
 import 'package:ptit_dms_flutter/domain/entities/project_pre_defense_submission_request.dart';
 
 class ProjectPreDefenseContextSection extends StatelessWidget {
   const ProjectPreDefenseContextSection({
     required this.academicYears,
     required this.selectedAcademicYearId,
+    required this.timeline,
     required this.isBusy,
     required this.onChanged,
     super.key,
@@ -16,6 +19,7 @@ class ProjectPreDefenseContextSection extends StatelessWidget {
 
   final List<AcademicYearOption> academicYears;
   final String? selectedAcademicYearId;
+  final Timeline? timeline;
   final bool isBusy;
   final ValueChanged<String?> onChanged;
 
@@ -51,6 +55,13 @@ class ProjectPreDefenseContextSection extends StatelessWidget {
                 .toList(growable: false),
             onChanged: onChanged,
           ),
+          if (timeline != null) ...[
+            const SizedBox(height: 10),
+            FormTimeRangeCaption(
+              startTime: timeline!.startTime,
+              endTime: timeline!.endTime,
+            ),
+          ],
         ],
       ),
     );

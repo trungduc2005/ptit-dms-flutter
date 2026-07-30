@@ -48,7 +48,8 @@ class _FormDropdownFieldState<T> extends State<FormDropdownField<T>> {
 
   @override
   void dispose() {
-    _closeDropdown();
+    _overlayEntry?.remove();
+    _overlayEntry = null;
     super.dispose();
   }
 

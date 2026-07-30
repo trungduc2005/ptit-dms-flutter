@@ -726,6 +726,8 @@ class _ProjectRegistrationViewState extends State<_ProjectRegistrationView> {
                               contextState.selectedAcademicYearId,
                           periods: contextState.periods,
                           selectedPeriod: _selectedPeriod,
+                          registrationTimeline:
+                              contextState.registrationTimeline,
                           fieldController: _fieldController,
                           isBusy: submitState.isBusy,
                           canEdit: canEdit,
