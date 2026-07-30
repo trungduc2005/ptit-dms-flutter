@@ -233,6 +233,7 @@ class _ProjectRegistrationViewState extends State<_ProjectRegistrationView> {
     final syncKey = [
       state.selectedAcademicYearId ?? '',
       registration?.id ?? '',
+      registration?.updatedAt?.toIso8601String() ?? '',
       state.status.name,
     ].join('|');
 

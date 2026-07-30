@@ -23,6 +23,7 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
   late final TextEditingController _addressController;
+  late StudentProfile _profile;
 
   String? _gender;
   DateTime? _dateOfBirth;
@@ -32,11 +33,12 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
   bool _submissionRequested = false;
   bool _isEditing = false;
 
-  StudentProfileUser? get _user => widget.profile.user;
+  StudentProfileUser? get _user => _profile.user;
 
   @override
   void initState() {
     super.initState();
+    _profile = widget.profile;
     _emailController = TextEditingController(text: _user?.email ?? '');
     _phoneController = TextEditingController(text: _user?.phone ?? '');
     _addressController = TextEditingController(text: _user?.address ?? '');
@@ -172,7 +174,10 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
     }
 
     if (state.uploadStatus == ProfileAvatarUploadStatus.success) {
-      _finishSuccessfully('Cập nhật thông tin và avatar thành công.');
+      _finishSuccessfully(
+        state: state,
+        message: 'Cập nhật thông tin và avatar thành công.',
+      );
       return;
     }
 
@@ -185,7 +190,7 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
         );
         return;
       }
-      _finishSuccessfully(state.message);
+      _finishSuccessfully(state: state, message: state.message);
     }
   }
 
@@ -195,9 +200,34 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
       ..showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void _finishSuccessfully(String? message) {
+  void _finishSuccessfully({
+    required ProfileSubmitState state,
+    String? message,
+  }) {
+    final updatedProfile = state.updatedProfile;
+    if (updatedProfile == null) {
+      _submissionRequested = false;
+      _waitingForAvatarUpload = false;
+      _showMessage('Không thể hiển thị thông tin vừa cập nhật.');
+      return;
+    }
+
+    setState(() {
+      _profile = updatedProfile;
+      _emailController.text = _user?.email ?? '';
+      _phoneController.text = _user?.phone ?? '';
+      _addressController.text = _user?.address ?? '';
+      _gender = _normalizeGender(_user?.gender);
+      _dateOfBirth = _dateOnly(_user?.dateOfBirth);
+      _selectedAvatarPath = null;
+      _validationMessage = null;
+      _waitingForAvatarUpload = false;
+      _submissionRequested = false;
+      _isEditing = false;
+    });
+
+    context.read<ProfileSubmitBloc>().add(const ProfileSubmitStateCleared());
     _showMessage(message ?? 'Cập nhật thông tin thành công.');
-    Navigator.of(context).pop(true);
   }
 
   @override
@@ -236,41 +266,8 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            if (!_isEditing) ...[
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: FilledButton.tonalIcon(
-                                  onPressed: _startEditing,
-                                  style: FilledButton.styleFrom(
-                                    foregroundColor: AppTheme.brandColor,
-                                    backgroundColor: const Color(0xFFFCEEEE),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 11,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  icon: const Icon(
-                                    Icons.edit_outlined,
-                                    size: 18,
-                                  ),
-                                  label: const Text(
-                                    'Chỉnh sửa',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 14),
-                            ],
                             _ProfileSectionCard(
-                              icon: Icons.school_outlined,
                               title: 'Thông tin học tập',
-                              subtitle:
-                                  'Thông tin được đồng bộ từ hệ thống đào tạo',
                               child: _isEditing
                                   ? Column(
                                       children: [
@@ -281,26 +278,22 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
                                         const SizedBox(height: 14),
                                         FormReadOnlyField(
                                           label: 'Mã sinh viên',
-                                          value: widget.profile.studentId,
+                                          value: _profile.studentId,
                                         ),
                                         const SizedBox(height: 14),
                                         FormReadOnlyField(
                                           label: 'Lớp',
-                                          value:
-                                              widget.profile.classInfo?.name ??
-                                              '',
+                                          value: _profile.classInfo?.name ?? '',
                                         ),
                                         const SizedBox(height: 14),
                                         FormReadOnlyField(
                                           label: 'Khóa',
-                                          value: widget.profile.cohort,
+                                          value: _profile.cohort,
                                         ),
                                         const SizedBox(height: 14),
                                         FormReadOnlyField(
                                           label: 'Ngành',
-                                          value: widget.profile.major.join(
-                                            ', ',
-                                          ),
+                                          value: _profile.major.join(', '),
                                         ),
                                       ],
                                     )
@@ -313,25 +306,23 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
                                         _InformationRow(
                                           label: 'Mã sinh viên',
                                           value: _displayValue(
-                                            widget.profile.studentId,
+                                            _profile.studentId,
                                           ),
                                         ),
                                         _InformationRow(
                                           label: 'Lớp',
                                           value: _displayValue(
-                                            widget.profile.classInfo?.name,
+                                            _profile.classInfo?.name,
                                           ),
                                         ),
                                         _InformationRow(
                                           label: 'Khóa',
-                                          value: _displayValue(
-                                            widget.profile.cohort,
-                                          ),
+                                          value: _displayValue(_profile.cohort),
                                         ),
                                         _InformationRow(
                                           label: 'Ngành',
                                           value: _displayValue(
-                                            widget.profile.major.join(', '),
+                                            _profile.major.join(', '),
                                           ),
                                           showDivider: false,
                                         ),
@@ -340,11 +331,23 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
                             ),
                             const SizedBox(height: 18),
                             _ProfileSectionCard(
-                              icon: Icons.person_outline_rounded,
                               title: 'Thông tin cá nhân',
-                              subtitle: _isEditing
-                                  ? 'Chỉnh sửa thông tin có thể cập nhật'
-                                  : 'Thông tin liên hệ của bạn',
+                              action: _isEditing
+                                  ? null
+                                  : IconButton(
+                                      onPressed: _startEditing,
+                                      tooltip: 'Chỉnh sửa',
+                                      color: AppTheme.brandColor,
+                                      iconSize: 18,
+                                      padding: EdgeInsets.zero,
+                                      visualDensity: VisualDensity.compact,
+                                      constraints:
+                                          const BoxConstraints.tightFor(
+                                            width: 28,
+                                            height: 28,
+                                          ),
+                                      icon: const Icon(Icons.edit_outlined),
+                                    ),
                               child: _isEditing
                                   ? Column(
                                       children: [
@@ -600,16 +603,14 @@ class _InformationRow extends StatelessWidget {
 
 class _ProfileSectionCard extends StatelessWidget {
   const _ProfileSectionCard({
-    required this.icon,
     required this.title,
-    required this.subtitle,
     required this.child,
+    this.action,
   });
 
-  final IconData icon;
   final String title;
-  final String subtitle;
   final Widget child;
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -633,43 +634,20 @@ class _ProfileSectionCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFCEEEE),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: AppTheme.brandColor, size: 22),
-              ),
-              const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: Color(0xFF1D2939),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        color: Color(0xFF667085),
-                        fontSize: 12,
-                        height: 1.35,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Color(0xFF1D2939),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
+              if (action != null) ...[const SizedBox(width: 8), action!],
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: action == null ? 20 : 12),
           const Divider(height: 1, color: Color(0xFFEAECF0)),
           const SizedBox(height: 20),
           child,
