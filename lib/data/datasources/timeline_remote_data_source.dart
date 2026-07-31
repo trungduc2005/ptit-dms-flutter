@@ -22,6 +22,20 @@ class TimelineRemoteDataSource {
     return items.map(Timeline.fromJson).toList(growable: false);
   }
 
+  Future<List<Timeline>> getResearchTimelines({
+    required String academicYearId,
+  }) async {
+    final response = await _dio.get(
+      '/researches/timelines',
+      queryParameters: {'yearId': academicYearId, 'target': 'student'},
+      options: Options(extra: const {requiresBearerAuthKey: true}),
+    );
+
+    return asJsonList(
+      response.data,
+    ).map(Timeline.fromJson).toList(growable: false);
+  }
+
   Future<List<Timeline>> getProjectTimelines({
     required String academicYearId,
   }) async {

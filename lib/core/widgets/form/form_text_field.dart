@@ -17,6 +17,8 @@ class FormTextField extends StatelessWidget {
     this.minLines,
     this.maxLines = 1,
     this.textCapitalization = TextCapitalization.none,
+    this.onChanged,
+    this.focusNode,
   });
 
   final String label;
@@ -28,6 +30,8 @@ class FormTextField extends StatelessWidget {
   final int? minLines;
   final int? maxLines;
   final TextCapitalization textCapitalization;
+  final ValueChanged<String>? onChanged;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +45,9 @@ class FormTextField extends StatelessWidget {
           ? SizedBox.expand(
               child: TextField(
                 controller: controller,
+                focusNode: focusNode,
                 enabled: enabled,
+                onChanged: onChanged,
                 keyboardType: keyboardType ?? TextInputType.multiline,
                 expands: true,
                 minLines: null,
@@ -75,7 +81,9 @@ class FormTextField extends StatelessWidget {
           : SizedBox.expand(
               child: TextField(
                 controller: controller,
+                focusNode: focusNode,
                 enabled: enabled,
+                onChanged: onChanged,
                 keyboardType: keyboardType,
                 expands: true,
                 minLines: null,

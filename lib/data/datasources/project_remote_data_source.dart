@@ -120,12 +120,33 @@ class ProjectRemoteDataSource {
   }
 
   Map<String, dynamic> _extractProject(Object? data) {
-    final json = asJsonMap(data, unwrapData: true);
-    final project = json['project'];
-    if (project is Map) {
-      return Map<String, dynamic>.from(project);
+    final json = asNullableJsonMap(data, unwrapData: true);
+    if (json == null) {
+      throw const FormatException(
+        'Kết quả đăng ký đồ án không đúng định dạng.',
+      );
     }
-    return json;
+
+    final project = json['project'];
+    if (project is! Map) {
+      throw const FormatException(
+        'Kết quả đăng ký đồ án không chứa thông tin đồ án.',
+      );
+    }
+
+    final projectJson = Map<String, dynamic>.from(project);
+    final hasProjectIdentity = [
+      projectJson['_id'],
+      projectJson['projectId'],
+    ].any((value) => value != null && value.toString().trim().isNotEmpty);
+
+    if (!hasProjectIdentity) {
+      throw const FormatException(
+        'Thông tin đồ án vừa đăng ký không có định danh.',
+      );
+    }
+
+    return projectJson;
   }
 
   /// POST /api/projects/:projectId/members/:studentRef/approve

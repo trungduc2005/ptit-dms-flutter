@@ -24,6 +24,19 @@ class TimelineRepositoryImpl implements TimelineRepository {
   }
 
   @override
+  Future<List<Timeline>> getResearchTimelines({
+    required String academicYearId,
+  }) async {
+    try {
+      return await _remoteDataSource.getResearchTimelines(
+        academicYearId: academicYearId,
+      );
+    } on DioException catch (error, stackTrace) {
+      Error.throwWithStackTrace(_mapper.map(error, stackTrace), stackTrace);
+    }
+  }
+
+  @override
   Future<List<Timeline>> getProjectTimelines({
     required String academicYearId,
   }) async {

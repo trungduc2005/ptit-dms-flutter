@@ -8,6 +8,17 @@ class AcademicYearRemoteDataSource {
 
   final Dio _dio;
 
+  Future<List<AcademicYearOption>> getAcademicYears() async {
+    final response = await _dio.get(
+      '/years/options',
+      options: Options(extra: const {requiresBearerAuthKey: true}),
+    );
+
+    final items = asJsonList(response.data);
+
+    return items.map(AcademicYearOption.fromJson).toList();
+  }
+
   Future<List<AcademicYearOption>> getInternAcademicYears() async {
     final response = await _dio.get(
       '/academic-years/options/interns',

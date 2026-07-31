@@ -25,6 +25,14 @@ class UtilitiesPage extends StatelessWidget {
     // ),
   ];
 
+  static const List<UtilityShortcutData> _researchShortcuts = [
+    UtilityShortcutData(
+      title: 'Đăng ký\nnghiên cứu',
+      iconAsset: 'assets/icons/research.svg',
+      routeName: UtilitiesRoutes.researchRegistration,
+    ),
+  ];
+
   static const List<UtilityShortcutData> _projectShortcuts = [
     UtilityShortcutData(
       title: 'Đăng ký\nđồ án',
@@ -75,6 +83,11 @@ class UtilitiesPage extends StatelessWidget {
             const UtilitiesSectionCard(
               title: 'Đồ án',
               child: UtilityShortcutGrid(shortcuts: _projectShortcuts),
+            ),
+            const SizedBox(height: 16),
+            const UtilitiesSectionCard(
+              title: 'Nghiên cứu khoa học',
+              child: UtilityShortcutGrid(shortcuts: _researchShortcuts),
             ),
           ],
         ),

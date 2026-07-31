@@ -11,6 +11,15 @@ class AcademicYearRepositoryImpl implements AcademicYearRepository {
   final DioExceptionMapper _mapper;
 
   @override
+  Future<List<AcademicYearOption>> getAcademicYears() async {
+    try {
+      return await _remoteDataSource.getAcademicYears();
+    } on DioException catch (error, stackTrace) {
+      Error.throwWithStackTrace(_mapper.map(error, stackTrace), stackTrace);
+    }
+  }
+
+  @override
   Future<List<AcademicYearOption>> getInternAcademicYears() async {
     try {
       return await _remoteDataSource.getInternAcademicYears();
