@@ -11,12 +11,10 @@ import 'package:ptit_dms_flutter/core/widgets/form/form_section_card.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_text_field.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_time_range_caption.dart';
 import 'package:ptit_dms_flutter/domain/entities/academic_year_option.dart';
-import 'package:ptit_dms_flutter/domain/entities/project_registration_option.dart';
 import 'package:ptit_dms_flutter/domain/entities/research.dart';
 import 'package:ptit_dms_flutter/domain/entities/research_member_option.dart';
 import 'package:ptit_dms_flutter/domain/entities/research_registration_request.dart';
 import 'package:ptit_dms_flutter/domain/repositories/academic_year_repository.dart';
-import 'package:ptit_dms_flutter/domain/repositories/project_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/research_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/timeline_repository.dart';
@@ -59,12 +57,10 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
   List<AcademicYearOption> _academicYears = const [];
   String? _selectedYearId;
   ResearchMemberOption? _selectedLecturer;
-  List<ProjectGuiderOption> _lecturers = const [];
   List<ResearchMemberOption> _selectedMembers = const [];
   String _leaderName = 'Bạn';
   bool _isLoadingYears = true;
   String? _yearError;
-  String? _lecturerError;
   bool _isPopupOpen = false;
   bool _isAddingMember = false;
 
@@ -110,7 +106,6 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
 
       await _loadLeaderProfile();
       if (_selectedYearId != null) {
-        await _loadLecturers();
         _loadResearches();
       }
     } catch (_) {
@@ -139,37 +134,6 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
       });
     } catch (_) {
       // Giữ nhãn mặc định nếu hồ sơ cá nhân tạm thời không tải được.
-    }
-  }
-
-  Future<void> _loadLecturers() async {
-    final yearId = _selectedYearId?.trim() ?? '';
-    if (yearId.isEmpty) return;
-
-    setState(() {
-      _lecturers = const [];
-      _lecturerError = null;
-    });
-    try {
-      final lecturers = await context
-          .read<ProjectRepository>()
-          .getProjectGuiders(academicYearId: yearId);
-      if (!mounted || _selectedYearId != yearId) return;
-      setState(() {
-        _lecturers = lecturers
-            .where(
-              (lecturer) =>
-                  lecturer.lecturerId.trim().isNotEmpty &&
-                  lecturer.fullName.trim().isNotEmpty,
-            )
-            .toList(growable: false);
-      });
-    } catch (_) {
-      if (!mounted || _selectedYearId != yearId) return;
-      setState(() {
-        _lecturers = const [];
-        _lecturerError = 'Không thể tải danh sách giảng viên.';
-      });
     }
   }
 
@@ -386,7 +350,6 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
                 _selectedYearId = value;
               });
               _clearForm();
-              _loadLecturers();
               _loadResearches();
             },
           ),
@@ -480,40 +443,14 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
               enabled: enabled,
             ),
             const SizedBox(height: 14),
-            FormDropdownField<String>(
+            _ResearchLecturerSearchField(
               key: const ValueKey('research-lecturer-dropdown'),
               label: 'Giảng viên hướng dẫn *',
-              value: _selectedLecturer?.id,
-              hintText:
-                  _lecturerError ??
-                  (_lecturers.isEmpty
-                      ? 'Chưa có giảng viên phù hợp'
-                      : 'Chọn giảng viên hướng dẫn'),
-              enabled: enabled && _lecturers.isNotEmpty,
-              items: _lecturers
-                  .map(
-                    (lecturer) => DropdownMenuItem<String>(
-                      value: lecturer.lecturerId,
-                      child: Text(
-                        lecturer.departmentName.trim().isEmpty
-                            ? lecturer.fullName
-                            : '${lecturer.fullName} • ${lecturer.departmentName}',
-                      ),
-                    ),
-                  )
-                  .toList(growable: false),
-              onChanged: (lecturerId) {
-                if (lecturerId == null) return;
-                final lecturer = _lecturers.firstWhere(
-                  (item) => item.lecturerId == lecturerId,
-                );
-                setState(() {
-                  _selectedLecturer = ResearchMemberOption(
-                    id: lecturer.lecturerId,
-                    name: lecturer.fullName,
-                    label: lecturer.fullName,
-                  );
-                });
+              enabled: enabled,
+              selected: _selectedLecturer,
+              repository: context.read<ResearchRepository>(),
+              onSelected: (lecturer) {
+                setState(() => _selectedLecturer = lecturer);
               },
             ),
             const SizedBox(height: 14),
@@ -613,6 +550,237 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
       minLines: null,
       maxLines: null,
       textCapitalization: TextCapitalization.sentences,
+    );
+  }
+}
+
+class _ResearchLecturerSearchField extends StatefulWidget {
+  const _ResearchLecturerSearchField({
+    required this.label,
+    required this.enabled,
+    required this.selected,
+    required this.repository,
+    required this.onSelected,
+    super.key,
+  });
+
+  final String label;
+  final bool enabled;
+  final ResearchMemberOption? selected;
+  final ResearchRepository repository;
+  final ValueChanged<ResearchMemberOption> onSelected;
+
+  @override
+  State<_ResearchLecturerSearchField> createState() =>
+      _ResearchLecturerSearchFieldState();
+}
+
+class _ResearchLecturerSearchFieldState
+    extends State<_ResearchLecturerSearchField> {
+  final _controller = TextEditingController();
+  final _focusNode = FocusNode();
+  Timer? _debounce;
+  List<ResearchMemberOption> _options = const [];
+  bool _isLoading = false;
+  bool _showOptions = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.text = widget.selected?.label ?? '';
+  }
+
+  @override
+  void didUpdateWidget(covariant _ResearchLecturerSearchField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selected?.id != widget.selected?.id) {
+      _controller.text = widget.selected?.label ?? '';
+    }
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _onQueryChanged(String value) {
+    _debounce?.cancel();
+    final query = value.trim();
+
+    setState(() {
+      _showOptions = true;
+      _options = const [];
+      _error = null;
+      _isLoading = false;
+    });
+
+    if (query.length < 3) return;
+
+    _debounce = Timer(const Duration(milliseconds: 350), () {
+      _search(query);
+    });
+  }
+
+  Future<void> _search(String query) async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+      _showOptions = true;
+    });
+
+    try {
+      final results = await widget.repository.searchLecturers(query: query);
+      if (!mounted || _controller.text.trim() != query) return;
+
+      setState(() {
+        _options = results
+            .where((option) => option.id.trim().isNotEmpty)
+            .toList(growable: false);
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (!mounted || _controller.text.trim() != query) return;
+
+      setState(() {
+        _options = const [];
+        _isLoading = false;
+        _error = 'Không thể tìm giảng viên.';
+      });
+    }
+  }
+
+  void _select(ResearchMemberOption option) {
+    _controller.text = option.label;
+    _focusNode.unfocus();
+    setState(() {
+      _options = const [];
+      _showOptions = false;
+    });
+    widget.onSelected(option);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final queryLength = _controller.text.trim().length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.label,
+          style: const TextStyle(
+            color: Color(0xFF1F1F1F),
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            height: 1.2,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 52,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFADACB2)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.search, size: 18, color: Color(0xFF757575)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  key: const ValueKey('research-lecturer-search-input'),
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  enabled: widget.enabled,
+                  onTap: () => setState(() => _showOptions = true),
+                  onChanged: _onQueryChanged,
+                  decoration: const InputDecoration(
+                    hintText: 'Tìm giảng viên theo mã hoặc tên',
+                    hintStyle: TextStyle(
+                      color: Color(0xFF757575),
+                      fontSize: 16,
+                    ),
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    isCollapsed: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  style: const TextStyle(
+                    color: Color(0xFF1F1F1F),
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              if (_isLoading)
+                const SizedBox.square(
+                  dimension: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+            ],
+          ),
+        ),
+        if (_error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              _error!,
+              style: const TextStyle(color: Colors.red, fontSize: 13),
+            ),
+          )
+        else if (_showOptions && !_isLoading && _options.isNotEmpty)
+          Container(
+            margin: const EdgeInsets.only(top: 6),
+            constraints: const BoxConstraints(maxHeight: 220),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x33000000),
+                  blurRadius: 12,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: ListView.separated(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                itemCount: _options.length,
+                separatorBuilder: (_, _) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final option = _options[index];
+                  return ListTile(
+                    dense: true,
+                    title: Text(option.label),
+                    onTap: () => _select(option),
+                  );
+                },
+              ),
+            ),
+          )
+        else if (_showOptions && !_isLoading && queryLength > 0)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              queryLength < 3
+                  ? 'Nhập tối thiểu 3 ký tự'
+                  : 'Không tìm thấy giảng viên',
+              style: const TextStyle(color: Color(0xFF757575), fontSize: 13),
+            ),
+          ),
+      ],
     );
   }
 }

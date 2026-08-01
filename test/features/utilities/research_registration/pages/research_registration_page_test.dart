@@ -3,13 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:ptit_dms_flutter/domain/entities/academic_year_option.dart';
-import 'package:ptit_dms_flutter/domain/entities/project_registration_option.dart';
 import 'package:ptit_dms_flutter/domain/entities/research.dart';
 import 'package:ptit_dms_flutter/domain/entities/research_registration_request.dart';
+import 'package:ptit_dms_flutter/domain/entities/research_member_option.dart';
 import 'package:ptit_dms_flutter/domain/entities/student_profile.dart';
 import 'package:ptit_dms_flutter/domain/entities/timeline.dart';
 import 'package:ptit_dms_flutter/domain/repositories/academic_year_repository.dart';
-import 'package:ptit_dms_flutter/domain/repositories/project_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/research_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/timeline_repository.dart';
@@ -19,8 +18,6 @@ class _MockAcademicYearRepository extends Mock
     implements AcademicYearRepository {}
 
 class _MockResearchRepository extends Mock implements ResearchRepository {}
-
-class _MockProjectRepository extends Mock implements ProjectRepository {}
 
 class _MockStudentProfileRepository extends Mock
     implements StudentProfileRepository {}
@@ -51,30 +48,24 @@ void main() {
 
   late _MockAcademicYearRepository academicYearRepository;
   late _MockResearchRepository researchRepository;
-  late _MockProjectRepository projectRepository;
   late _MockStudentProfileRepository studentProfileRepository;
   late _MockTimelineRepository timelineRepository;
 
   setUp(() {
     academicYearRepository = _MockAcademicYearRepository();
     researchRepository = _MockResearchRepository();
-    projectRepository = _MockProjectRepository();
     studentProfileRepository = _MockStudentProfileRepository();
     timelineRepository = _MockTimelineRepository();
 
     when(
       () => academicYearRepository.getAcademicYears(),
     ).thenAnswer((_) async => const [academicYear]);
-    when(
-      () =>
-          projectRepository.getProjectGuiders(academicYearId: academicYear.id),
-    ).thenAnswer(
+    when(() => researchRepository.searchLecturers(query: 'Nguyễn')).thenAnswer(
       (_) async => const [
-        ProjectGuiderOption(
-          lecturerId: 'lecturer-1',
-          fullName: 'Nguyễn Văn Hướng',
-          departmentName: 'Công nghệ phần mềm',
-          limit: 5,
+        ResearchMemberOption(
+          id: 'lecturer-1',
+          name: 'Nguyễn Văn Hướng',
+          label: 'Nguyễn Văn Hướng - lecturer-1',
         ),
       ],
     );
@@ -105,7 +96,6 @@ void main() {
           value: academicYearRepository,
         ),
         RepositoryProvider<ResearchRepository>.value(value: researchRepository),
-        RepositoryProvider<ProjectRepository>.value(value: projectRepository),
         RepositoryProvider<StudentProfileRepository>.value(
           value: studentProfileRepository,
         ),
@@ -226,67 +216,80 @@ void main() {
     },
   );
 
-  testWidgets(
-    'dùng dropdown chọn giảng viên và nút thêm thành viên như đăng ký đồ án',
-    (tester) async {
-      when(
-        () => researchRepository.getUserResearches(
-          yearId: academicYear.id,
-          type: 'student',
-        ),
-      ).thenAnswer((_) async => const []);
+  testWidgets('tìm và chọn giảng viên bằng danh sách gợi ý', (tester) async {
+    when(
+      () => researchRepository.getUserResearches(
+        yearId: academicYear.id,
+        type: 'student',
+      ),
+    ).thenAnswer((_) async => const []);
 
-      await tester.pumpWidget(buildSubject());
-      await tester.pumpAndSettle();
+    await tester.pumpWidget(buildSubject());
+    await tester.pumpAndSettle();
 
-      final lecturerDropdown = find.byKey(
-        const ValueKey('research-lecturer-dropdown'),
-      );
-      await tester.dragUntilVisible(
-        lecturerDropdown,
-        find.byType(ListView).first,
-        const Offset(0, -500),
-      );
-      await tester.pumpAndSettle();
+    final lecturerDropdown = find.byKey(
+      const ValueKey('research-lecturer-dropdown'),
+    );
+    final lecturerInput = find.byKey(
+      const ValueKey('research-lecturer-search-input'),
+    );
+    await tester.dragUntilVisible(
+      lecturerDropdown,
+      find.byType(ListView).first,
+      const Offset(0, -500),
+    );
+    await tester.pumpAndSettle();
 
-      expect(lecturerDropdown, findsOneWidget);
-      expect(find.text('Chọn giảng viên hướng dẫn'), findsOneWidget);
-      expect(find.text('Nhập mã hoặc tên giảng viên...'), findsNothing);
+    expect(lecturerDropdown, findsOneWidget);
+    expect(find.text('Tìm giảng viên theo mã hoặc tên'), findsOneWidget);
 
-      await tester.tap(lecturerDropdown);
-      await tester.pumpAndSettle();
+    await tester.tap(lecturerInput);
+    await tester.enterText(lecturerInput, 'Nguyễn');
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
 
-      expect(
-        find.text('Nguyễn Văn Hướng • Công nghệ phần mềm'),
-        findsOneWidget,
-      );
-      expect(find.text('Nhập mã hoặc tên giảng viên...'), findsNothing);
+    final lecturerOption = find.text('Nguyễn Văn Hướng - lecturer-1');
+    expect(lecturerOption, findsOneWidget);
+    expect(
+      tester.getRect(lecturerOption).bottom,
+      lessThanOrEqualTo(
+        tester.view.physicalSize.height / tester.view.devicePixelRatio,
+      ),
+    );
+    expect(
+      tester.hitTestOnBinding(tester.getCenter(lecturerOption)).path,
+      isNotEmpty,
+    );
 
-      await tester.tap(find.text('Nguyễn Văn Hướng • Công nghệ phần mềm').last);
-      await tester.pumpAndSettle();
+    await tester.tap(lecturerOption);
+    await tester.pumpAndSettle();
 
-      expect(
-        find.text('Nguyễn Văn Hướng • Công nghệ phần mềm'),
-        findsOneWidget,
-      );
+    expect(
+      find.descendant(
+        of: lecturerDropdown,
+        matching: find.text('Nguyễn Văn Hướng - lecturer-1'),
+      ),
+      findsOneWidget,
+    );
 
-      final addMemberButton = find.text('Thêm thành viên');
-      await tester.dragUntilVisible(
-        addMemberButton,
-        find.byType(ListView).first,
-        const Offset(0, -300),
-      );
-      await tester.pumpAndSettle();
+    verify(() => researchRepository.searchLecturers(query: 'Nguyễn')).called(1);
 
-      expect(find.text('Nguyễn Văn Sinh - B21DCCN001'), findsOneWidget);
-      expect(addMemberButton, findsOneWidget);
+    final addMemberButton = find.text('Thêm thành viên');
+    await tester.dragUntilVisible(
+      addMemberButton,
+      find.byType(ListView).first,
+      const Offset(0, -300),
+    );
+    await tester.pumpAndSettle();
 
-      await tester.tap(addMemberButton);
-      await tester.pump();
+    expect(find.text('Nguyễn Văn Sinh - B21DCCN001'), findsOneWidget);
+    expect(addMemberButton, findsOneWidget);
 
-      expect(find.text('Nhập mã hoặc tên sinh viên...'), findsOneWidget);
-    },
-  );
+    await tester.tap(addMemberButton);
+    await tester.pump();
+
+    expect(find.text('Nhập mã hoặc tên sinh viên...'), findsOneWidget);
+  });
 
   testWidgets('kiểm tra trường bắt buộc trước khi gửi đăng ký', (tester) async {
     when(

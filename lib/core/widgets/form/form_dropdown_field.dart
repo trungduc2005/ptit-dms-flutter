@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 /// A generic custom dropdown form field with overlay menu.
@@ -78,11 +80,36 @@ class _FormDropdownFieldState<T> extends State<FormDropdownField<T>> {
   void _openDropdown() {
     final renderBox =
         _fieldKey.currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox == null) {
+    final overlay = Overlay.of(context);
+    final overlayBox = overlay.context.findRenderObject() as RenderBox?;
+    if (renderBox == null || overlayBox == null) {
       return;
     }
 
+    const menuGap = 8.0;
+    const estimatedItemHeight = 49.0;
     final fieldSize = renderBox.size;
+    final fieldOffset = renderBox.localToGlobal(
+      Offset.zero,
+      ancestor: overlayBox,
+    );
+    final mediaQuery = MediaQuery.of(context);
+    final usableTop = mediaQuery.padding.top;
+    final usableBottom =
+        overlayBox.size.height -
+        math.max(mediaQuery.padding.bottom, mediaQuery.viewInsets.bottom);
+    final spaceAbove = math.max(0.0, fieldOffset.dy - usableTop - menuGap);
+    final spaceBelow = math.max(
+      0.0,
+      usableBottom - fieldOffset.dy - fieldSize.height - menuGap,
+    );
+    final desiredMenuHeight = math.min(
+      widget.maxMenuHeight,
+      widget.items.length * estimatedItemHeight,
+    );
+    final opensBelow =
+        desiredMenuHeight <= spaceBelow || spaceBelow >= spaceAbove;
+    final availableMenuHeight = opensBelow ? spaceBelow : spaceAbove;
 
     _overlayEntry = OverlayEntry(
       builder: (context) {
@@ -98,14 +125,23 @@ class _FormDropdownFieldState<T> extends State<FormDropdownField<T>> {
             CompositedTransformFollower(
               link: _layerLink,
               showWhenUnlinked: false,
-              offset: Offset(0, fieldSize.height + 8),
+              targetAnchor: opensBelow
+                  ? Alignment.bottomLeft
+                  : Alignment.topLeft,
+              followerAnchor: opensBelow
+                  ? Alignment.topLeft
+                  : Alignment.bottomLeft,
+              offset: Offset(0, opensBelow ? menuGap : -menuGap),
               child: Material(
                 color: Colors.transparent,
                 child: SizedBox(
                   width: fieldSize.width,
                   child: Container(
                     constraints: BoxConstraints(
-                      maxHeight: widget.maxMenuHeight,
+                      maxHeight: math.min(
+                        widget.maxMenuHeight,
+                        availableMenuHeight,
+                      ),
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
