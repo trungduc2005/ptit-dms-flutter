@@ -46,6 +46,42 @@ void main() {
     endTime: DateTime(2026, 8, 31, 17),
   );
 
+  const editableResearch = Research(
+    id: 'research-ref-1',
+    userId: 'user-1',
+    researchId: 'RESEARCH-1',
+    type: 'student',
+    level: 'department',
+    researchTopic: 'Ứng dụng AI trong giáo dục',
+    keyword: 'AI, giáo dục',
+    outcome: 'Mô hình thử nghiệm',
+    description: 'Nội dung nghiên cứu',
+    researchNecessity: 'Tính cấp thiết',
+    nationalOverview: 'Tổng quan trong nước',
+    internationalOverview: 'Tổng quan quốc tế',
+    yearId: 'year-1',
+    approvalStatus: 'pending',
+    guider: ResearchGuider(
+      lecturerId: 'lecturer-1',
+      lecturerName: 'Nguyễn Văn Hướng',
+    ),
+    members: [
+      ResearchMember(
+        userId: 'user-1',
+        memberId: 'B21DCCN001',
+        memberName: 'Nguyễn Văn Sinh',
+        role: 'Leader',
+      ),
+      ResearchMember(
+        userId: 'user-2',
+        memberId: 'B21DCCN002',
+        memberName: 'Nguyễn Văn Thành Viên',
+        role: 'Member',
+      ),
+    ],
+    comments: [],
+  );
+
   late _MockAcademicYearRepository academicYearRepository;
   late _MockResearchRepository researchRepository;
   late _MockStudentProfileRepository studentProfileRepository;
@@ -165,56 +201,219 @@ void main() {
     );
   });
 
-  testWidgets(
-    'hiển thị đề tài đã đăng ký thay cho form tạo mới khi API trả dữ liệu',
-    (tester) async {
-      const research = Research(
-        id: 'research-ref-1',
-        userId: 'user-1',
-        researchId: 'RESEARCH-1',
+  testWidgets('hiển thị danh sách và chỉ hiện chi tiết sau khi chọn đề tài', (
+    tester,
+  ) async {
+    when(
+      () => researchRepository.getUserResearches(
+        yearId: academicYear.id,
         type: 'student',
-        researchTopic: 'Ứng dụng AI trong giáo dục',
-        keyword: 'AI, giáo dục',
-        outcome: 'Mô hình thử nghiệm',
-        description: 'Nội dung nghiên cứu',
-        researchNecessity: 'Tính cấp thiết',
-        nationalOverview: 'Tổng quan trong nước',
-        internationalOverview: 'Tổng quan quốc tế',
-        yearId: 'year-1',
-        approvalStatus: 'pending',
-        guider: ResearchGuider(
-          lecturerId: 'lecturer-1',
-          lecturerName: 'Nguyễn Văn Hướng',
-        ),
-        members: [
-          ResearchMember(
-            userId: 'user-1',
-            memberId: 'B21DCCN001',
-            memberName: 'Nguyễn Văn Sinh',
-            role: 'Leader',
-          ),
-        ],
-        comments: [],
-      );
-      when(
-        () => researchRepository.getUserResearches(
-          yearId: academicYear.id,
-          type: 'student',
-        ),
-      ).thenAnswer((_) async => const [research]);
+      ),
+    ).thenAnswer((_) async => const [editableResearch]);
 
-      await tester.pumpWidget(buildSubject());
-      await tester.pumpAndSettle();
+    await tester.pumpWidget(buildSubject());
+    await tester.pumpAndSettle();
 
-      expect(find.text('Đề tài đã đăng ký'), findsOneWidget);
-      expect(find.text(research.researchTopic), findsOneWidget);
-      expect(find.text('Nguyễn Văn Hướng'), findsOneWidget);
-      expect(find.text('Nguyễn Văn Sinh - B21DCCN001'), findsOneWidget);
-      expect(find.text('Đang chờ duyệt'), findsOneWidget);
-      expect(find.text('Thông tin đăng ký'), findsNothing);
-      expect(find.text('Gửi đăng ký'), findsNothing);
-    },
-  );
+    expect(find.text('Đề tài đã đăng ký'), findsOneWidget);
+    expect(find.text(editableResearch.researchTopic), findsOneWidget);
+    expect(find.text('Nguyễn Văn Hướng • Đang chờ duyệt'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('research-item-RESEARCH-1')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('add-research-button')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('edit-research-RESEARCH-1')),
+      findsNothing,
+    );
+    expect(find.text('Chi tiết đề tài'), findsNothing);
+    expect(find.text('Nguyễn Văn Sinh - B21DCCN001'), findsNothing);
+
+    await tester.tap(find.byKey(const ValueKey('research-item-RESEARCH-1')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Đề tài đã đăng ký'), findsNothing);
+    expect(find.text('Chi tiết đề tài'), findsOneWidget);
+    expect(find.text('Nguyễn Văn Hướng'), findsOneWidget);
+    expect(find.text('Nguyễn Văn Sinh - B21DCCN001'), findsOneWidget);
+    expect(find.text('Đang chờ duyệt'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('edit-research-RESEARCH-1')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Đề tài đã đăng ký'), findsOneWidget);
+    expect(find.text('Chi tiết đề tài'), findsNothing);
+    expect(
+      find.byKey(const ValueKey('research-item-RESEARCH-1')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('mở form thêm nghiên cứu mới và hủy về danh sách', (
+    tester,
+  ) async {
+    when(
+      () => researchRepository.getUserResearches(
+        yearId: academicYear.id,
+        type: 'student',
+      ),
+    ).thenAnswer((_) async => const [editableResearch]);
+
+    await tester.pumpWidget(buildSubject());
+    await tester.pumpAndSettle();
+
+    final addButton = find.byKey(const ValueKey('add-research-button'));
+    expect(addButton, findsOneWidget);
+
+    await tester.tap(addButton);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Thêm nghiên cứu khoa học'), findsOneWidget);
+    expect(find.text('Đề tài đã đăng ký'), findsNothing);
+    expect(find.text(editableResearch.researchTopic), findsNothing);
+    expect(find.text('Hủy'), findsOneWidget);
+    expect(find.text('Gửi đăng ký'), findsOneWidget);
+
+    final topicField = tester.widget<TextField>(find.byType(TextField).first);
+    expect(topicField.controller?.text, isEmpty);
+
+    final cancelButton = find.text('Hủy');
+    await tester.dragUntilVisible(
+      cancelButton,
+      find.byType(ListView).first,
+      const Offset(0, -500),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(cancelButton);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('add-research-button')), findsOneWidget);
+    expect(find.text('Đề tài đã đăng ký'), findsOneWidget);
+    expect(find.text(editableResearch.researchTopic), findsOneWidget);
+    verifyNever(
+      () => researchRepository.createResearch(request: any(named: 'request')),
+    );
+    verifyNever(
+      () => researchRepository.updateResearch(
+        researchId: any(named: 'researchId'),
+        request: any(named: 'request'),
+      ),
+    );
+  });
+
+  testWidgets('chỉnh sửa đề tài đã đăng ký và gửi đúng dữ liệu cập nhật', (
+    tester,
+  ) async {
+    when(
+      () => researchRepository.getUserResearches(
+        yearId: academicYear.id,
+        type: 'student',
+      ),
+    ).thenAnswer((_) async => const [editableResearch]);
+    when(
+      () => researchRepository.updateResearch(
+        researchId: editableResearch.researchId,
+        request: any(named: 'request'),
+      ),
+    ).thenAnswer((_) async => editableResearch);
+
+    await tester.pumpWidget(buildSubject());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('research-item-RESEARCH-1')));
+    await tester.pumpAndSettle();
+
+    final editButton = find.byKey(const ValueKey('edit-research-RESEARCH-1'));
+    await tester.ensureVisible(editButton);
+    await tester.tap(editButton);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Chỉnh sửa thông tin đăng ký'), findsOneWidget);
+    expect(find.text(editableResearch.researchTopic), findsOneWidget);
+    expect(find.text('Nguyễn Văn Hướng - lecturer-1'), findsOneWidget);
+    expect(find.text('Nguyễn Văn Thành Viên - B21DCCN002'), findsOneWidget);
+    expect(find.text('Hủy'), findsOneWidget);
+    expect(find.text('Lưu thay đổi'), findsOneWidget);
+
+    final saveButton = find.text('Lưu thay đổi');
+    await tester.dragUntilVisible(
+      saveButton,
+      find.byType(ListView).first,
+      const Offset(0, -500),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(saveButton);
+    await tester.pumpAndSettle();
+
+    final captured =
+        verify(
+              () => researchRepository.updateResearch(
+                researchId: editableResearch.researchId,
+                request: captureAny(named: 'request'),
+              ),
+            ).captured.single
+            as ResearchRegistrationRequest;
+    expect(captured.yearId, academicYear.id);
+    expect(captured.type, 'student');
+    expect(captured.level, editableResearch.level);
+    expect(captured.researchTopic, editableResearch.researchTopic);
+    expect(captured.guiderId, 'lecturer-1');
+    expect(captured.members.map((member) => member.memberId), ['B21DCCN002']);
+    verifyNever(
+      () => researchRepository.createResearch(request: any(named: 'request')),
+    );
+  });
+
+  testWidgets('không cho chỉnh sửa đề tài đã được phê duyệt', (tester) async {
+    const approvedResearch = Research(
+      id: 'research-ref-approved',
+      userId: 'user-1',
+      researchId: 'RESEARCH-APPROVED',
+      type: 'student',
+      researchTopic: 'Đề tài đã duyệt',
+      keyword: 'Từ khóa',
+      outcome: 'Mục tiêu',
+      description: 'Nội dung',
+      researchNecessity: 'Tính cấp thiết',
+      nationalOverview: 'Tổng quan trong nước',
+      internationalOverview: 'Tổng quan quốc tế',
+      yearId: 'year-1',
+      approvalStatus: 'approved',
+      members: [],
+      comments: [],
+    );
+    when(
+      () => researchRepository.getUserResearches(
+        yearId: academicYear.id,
+        type: 'student',
+      ),
+    ).thenAnswer((_) async => const [approvedResearch]);
+
+    await tester.pumpWidget(buildSubject());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Đã phê duyệt'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('research-item-RESEARCH-APPROVED')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('research-item-RESEARCH-APPROVED')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Chi tiết đề tài'), findsOneWidget);
+    expect(find.text('Đã phê duyệt'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('edit-research-RESEARCH-APPROVED')),
+      findsNothing,
+    );
+  });
 
   testWidgets('tìm và chọn giảng viên bằng danh sách gợi ý', (tester) async {
     when(

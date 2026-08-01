@@ -19,6 +19,7 @@ import 'package:ptit_dms_flutter/domain/repositories/research_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/timeline_repository.dart';
 import 'package:ptit_dms_flutter/features/utilities/research_registration/bloc/research_registration_bloc.dart';
+import 'package:ptit_dms_flutter/features/utilities/research_registration/pages/research_registration_detail_page.dart';
 
 class ResearchRegistrationPage extends StatelessWidget {
   const ResearchRegistrationPage({super.key});
@@ -63,6 +64,8 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
   String? _yearError;
   bool _isPopupOpen = false;
   bool _isAddingMember = false;
+  bool _isCreatingResearch = false;
+  Research? _editingResearch;
 
   @override
   void initState() {
@@ -148,6 +151,8 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
 
   void _clearForm() {
     setState(() {
+      _isCreatingResearch = false;
+      _editingResearch = null;
       _selectedLecturer = null;
       _selectedMembers = const [];
       _isAddingMember = false;
@@ -158,6 +163,88 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
       _necessityController.clear();
       _nationalOverviewController.clear();
       _internationalOverviewController.clear();
+    });
+  }
+
+  void _startCreating() {
+    setState(() {
+      _isCreatingResearch = true;
+      _editingResearch = null;
+      _selectedLecturer = null;
+      _selectedMembers = const [];
+      _isAddingMember = false;
+      _topicController.clear();
+      _keywordController.clear();
+      _outcomeController.clear();
+      _descriptionController.clear();
+      _necessityController.clear();
+      _nationalOverviewController.clear();
+      _internationalOverviewController.clear();
+    });
+  }
+
+  Future<void> _openResearchDetails(Research research) async {
+    final result = await Navigator.of(context)
+        .push<ResearchRegistrationDetailResult>(
+          MaterialPageRoute(
+            builder: (_) => ResearchRegistrationDetailPage(research: research),
+          ),
+        );
+
+    if (!mounted || result != ResearchRegistrationDetailResult.edit) return;
+    _startEditing(research);
+  }
+
+  void _cancelForm() {
+    setState(() {
+      _isCreatingResearch = false;
+      _editingResearch = null;
+      _selectedLecturer = null;
+      _selectedMembers = const [];
+      _isAddingMember = false;
+    });
+  }
+
+  void _startEditing(Research research) {
+    if (!research.isEditable) return;
+
+    final lecturerId = research.guider?.lecturerId?.trim() ?? '';
+    final lecturerName = research.guider?.lecturerName?.trim() ?? '';
+
+    setState(() {
+      _isCreatingResearch = false;
+      _editingResearch = research;
+      _isAddingMember = false;
+      _topicController.text = research.researchTopic;
+      _keywordController.text = research.keyword;
+      _outcomeController.text = research.outcome;
+      _descriptionController.text = research.description;
+      _necessityController.text = research.researchNecessity;
+      _nationalOverviewController.text = research.nationalOverview;
+      _internationalOverviewController.text = research.internationalOverview;
+      _selectedLecturer = lecturerId.isEmpty
+          ? null
+          : ResearchMemberOption(
+              id: lecturerId,
+              name: lecturerName,
+              label: lecturerName.isEmpty
+                  ? lecturerId
+                  : '$lecturerName - $lecturerId',
+            );
+      _selectedMembers = research.members
+          .where(
+            (member) => !member.isLeader && member.memberId.trim().isNotEmpty,
+          )
+          .map((member) {
+            final id = member.memberId.trim();
+            final name = member.memberName.trim();
+            return ResearchMemberOption(
+              id: id,
+              name: name,
+              label: name.isEmpty ? id : '$name - $id',
+            );
+          })
+          .toList(growable: false);
     });
   }
 
@@ -197,6 +284,7 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
     final request = ResearchRegistrationRequest(
       yearId: yearId,
       type: _researchType,
+      level: _editingResearch?.level,
       researchTopic: _topicController.text.trim(),
       keyword: _keywordController.text.trim(),
       outcome: _outcomeController.text.trim(),
@@ -212,8 +300,19 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
           .toList(growable: false),
     );
 
+    final editingResearch = _editingResearch;
+    if (editingResearch == null) {
+      context.read<ResearchRegistrationBloc>().add(
+        ResearchRegistrationCreated(request: request),
+      );
+      return;
+    }
+
     context.read<ResearchRegistrationBloc>().add(
-      ResearchRegistrationCreated(request: request),
+      ResearchRegistrationUpdated(
+        researchId: editingResearch.researchId,
+        request: request,
+      ),
     );
   }
 
@@ -310,6 +409,8 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
                           'Không thể tải danh sách nghiên cứu khoa học.',
                       onRetry: _loadResearches,
                     )
+                  else if (_isCreatingResearch || _editingResearch != null)
+                    _buildForm(state)
                   else if (state.researches.isNotEmpty)
                     _buildRegisteredResearches(state.researches)
                   else
@@ -367,18 +468,35 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
 
   Widget _buildRegisteredResearches(List<Research> researches) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (var index = 0; index < researches.length; index++) ...[
-          _Card(
-            child: FormSectionCard(
-              title: researches.length == 1
-                  ? 'Đề tài đã đăng ký'
-                  : 'Đề tài đã đăng ký ${index + 1}',
-              bottomPadding: 0,
-              child: _RegisteredResearchDetails(research: researches[index]),
+        Row(
+          children: [
+            const Expanded(
+              child: Text(
+                'Đề tài đã đăng ký',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1F1F1F),
+                ),
+              ),
             ),
+            IconButton(
+              key: const ValueKey('add-research-button'),
+              onPressed: _startCreating,
+              tooltip: 'Thêm nghiên cứu khoa học',
+              icon: const Icon(Icons.add, color: AppTheme.brandColor),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        for (var index = 0; index < researches.length; index++) ...[
+          _RegisteredResearchListItem(
+            research: researches[index],
+            onTap: () => _openResearchDetails(researches[index]),
           ),
-          if (index < researches.length - 1) const SizedBox(height: 16),
+          if (index < researches.length - 1) const SizedBox(height: 12),
         ],
       ],
     );
@@ -386,10 +504,16 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
 
   Widget _buildForm(ResearchRegistrationState state) {
     final enabled = !state.isSubmitting;
+    final isEditing = _editingResearch != null;
+    final canCancel = isEditing || _isCreatingResearch;
 
     return _Card(
       child: FormSectionCard(
-        title: 'Thông tin đăng ký',
+        title: isEditing
+            ? 'Chỉnh sửa thông tin đăng ký'
+            : _isCreatingResearch
+            ? 'Thêm nghiên cứu khoa học'
+            : 'Thông tin đăng ký',
         bottomPadding: 0,
         child: Column(
           children: [
@@ -515,6 +639,15 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
             const SizedBox(height: 20),
             Row(
               children: [
+                if (canCancel) ...[
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: enabled ? _cancelForm : null,
+                      child: const Text('Hủy'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                ],
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: enabled ? () => _submit(state) : null,
@@ -523,8 +656,12 @@ class _ResearchRegistrationViewState extends State<_ResearchRegistrationView> {
                             dimension: 18,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Icon(Icons.send_outlined),
-                    label: const Text('Gửi đăng ký'),
+                        : Icon(
+                            isEditing
+                                ? Icons.save_outlined
+                                : Icons.send_outlined,
+                          ),
+                    label: Text(isEditing ? 'Lưu thay đổi' : 'Gửi đăng ký'),
                   ),
                 ),
               ],
@@ -983,109 +1120,84 @@ class _ResearchMemberSearchFieldState
   }
 }
 
-class _RegisteredResearchDetails extends StatelessWidget {
-  const _RegisteredResearchDetails({required this.research});
+class _RegisteredResearchListItem extends StatelessWidget {
+  const _RegisteredResearchListItem({
+    required this.research,
+    required this.onTap,
+  });
 
   final Research research;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final guiderName = research.guider?.lecturerName?.trim() ?? '';
-    final members = research.members;
-    final status = _statusLabel(research.approvalStatus);
+    final topic = research.researchTopic.trim();
+    final status = researchStatusLabel(research.approvalStatus);
 
-    return Column(
-      children: [
-        FormReadOnlyField(
-          label: 'Tên chủ đề',
-          value: _displayValue(research.researchTopic),
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        key: ValueKey('research-item-${research.researchId}'),
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE1E4E9)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppTheme.brandColor.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.science_outlined,
+                  color: AppTheme.brandColor,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      topic.isEmpty ? 'Chưa có tên đề tài' : topic,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF1F1F1F),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      guiderName.isEmpty ? status : '$guiderName • $status',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF667085),
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right_rounded, color: Color(0xFF98A0B2)),
+            ],
+          ),
         ),
-        const SizedBox(height: 12),
-        FormReadOnlyField(
-          label: 'Loại hình',
-          value: research.type == 'student'
-              ? 'Sinh viên'
-              : _displayValue(research.type),
-        ),
-        const SizedBox(height: 12),
-        FormReadOnlyField(
-          label: 'Từ khóa',
-          value: _displayValue(research.keyword),
-        ),
-        const SizedBox(height: 12),
-        FormReadOnlyField(
-          label: 'Mục tiêu',
-          value: _displayValue(research.outcome),
-        ),
-        const SizedBox(height: 12),
-        FormReadOnlyField(
-          label: 'Nội dung',
-          value: _displayValue(research.description),
-        ),
-        const SizedBox(height: 12),
-        FormReadOnlyField(
-          label: 'Tình hình nghiên cứu trong nước',
-          value: _displayValue(research.nationalOverview),
-        ),
-        const SizedBox(height: 12),
-        FormReadOnlyField(
-          label: 'Tình hình nghiên cứu quốc tế',
-          value: _displayValue(research.internationalOverview),
-        ),
-        const SizedBox(height: 12),
-        FormReadOnlyField(
-          label: 'Tính cấp thiết của đề tài',
-          value: _displayValue(research.researchNecessity),
-        ),
-        const SizedBox(height: 12),
-        FormReadOnlyField(
-          label: 'Giảng viên hướng dẫn',
-          value: guiderName.isEmpty ? 'Chưa có thông tin' : guiderName,
-        ),
-        const SizedBox(height: 12),
-        FormReadOnlyField(label: 'Trạng thái', value: status),
-        if (members.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          for (var index = 0; index < members.length; index++) ...[
-            FormReadOnlyField(
-              label: members[index].isLeader
-                  ? 'Chủ nhiệm đề tài'
-                  : 'Thành viên ${index + 1}',
-              value: _memberLabel(members[index]),
-            ),
-            if (index < members.length - 1) const SizedBox(height: 12),
-          ],
-        ],
-      ],
+      ),
     );
-  }
-
-  String _displayValue(String value) {
-    final trimmed = value.trim();
-    return trimmed.isEmpty ? 'Chưa có thông tin' : trimmed;
-  }
-
-  String _memberLabel(ResearchMember member) {
-    final name = member.memberName.trim();
-    final id = member.memberId.trim();
-    if (name.isNotEmpty && id.isNotEmpty) return '$name - $id';
-    if (name.isNotEmpty) return name;
-    return id.isNotEmpty ? id : 'Chưa có thông tin';
-  }
-
-  String _statusLabel(String status) {
-    switch (status.trim().toLowerCase()) {
-      case 'approved':
-        return 'Đã phê duyệt';
-      case 'rejected':
-        return 'Đã từ chối';
-      case 'hasissue':
-      case 'needs_revision':
-        return 'Cần chỉnh sửa';
-      case 'pending':
-      default:
-        return 'Đang chờ duyệt';
-    }
   }
 }
 
