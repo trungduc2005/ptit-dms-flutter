@@ -31,6 +31,11 @@ class UtilitiesPage extends StatelessWidget {
       iconAsset: 'assets/icons/research.svg',
       routeName: UtilitiesRoutes.researchRegistration,
     ),
+    UtilityShortcutData(
+      title: 'Báo cáo trước\nnghiệm thu',
+      iconAsset: 'assets/icons/research_pre_acceptance_report.svg',
+      routeName: UtilitiesRoutes.researchPreAcceptanceReport,
+    ),
   ];
 
   static const List<UtilityShortcutData> _projectShortcuts = [

@@ -6,6 +6,8 @@ class UtilitiesRoutes {
   static const internshipRegistration = '/utilities/internship-registration';
   static const projectRegistration = '/utilities/project-registration';
   static const researchRegistration = '/utilities/research-registration';
+  static const researchPreAcceptanceReport =
+      '/utilities/research-pre-acceptance-report';
   static const projectCommittee = '/utilities/project-committee';
   static const projectProgressReport = '/utilities/project-progress-report';
   static const projectPreDefenseSubmission =
