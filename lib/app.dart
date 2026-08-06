@@ -18,6 +18,7 @@ import 'package:ptit_dms_flutter/domain/repositories/project_result_repository.d
 import 'package:ptit_dms_flutter/domain/repositories/research_post_acceptance_report_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/research_pre_acceptance_report_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/research_repository.dart';
+import 'package:ptit_dms_flutter/domain/repositories/research_seminar_committee_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_search_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/timeline_repository.dart';
@@ -43,6 +44,7 @@ class App extends StatelessWidget {
     required this.researchRepository,
     required this.researchPreAcceptanceReportRepository,
     required this.researchPostAcceptanceReportRepository,
+    required this.researchSeminarCommitteeRepository,
     required this.studentSearchRepository,
     super.key,
   });
@@ -69,6 +71,7 @@ class App extends StatelessWidget {
   researchPreAcceptanceReportRepository;
   final ResearchPostAcceptanceReportRepository
   researchPostAcceptanceReportRepository;
+  final ResearchSeminarCommitteeRepository researchSeminarCommitteeRepository;
   final StudentSearchRepository studentSearchRepository;
 
   @override
@@ -116,6 +119,9 @@ class App extends StatelessWidget {
         ),
         RepositoryProvider<ResearchPostAcceptanceReportRepository>.value(
           value: researchPostAcceptanceReportRepository,
+        ),
+        RepositoryProvider<ResearchSeminarCommitteeRepository>.value(
+          value: researchSeminarCommitteeRepository,
         ),
         RepositoryProvider<StudentSearchRepository>.value(
           value: studentSearchRepository,

@@ -18,6 +18,7 @@ import 'package:ptit_dms_flutter/data/datasources/project_result_remote_data_sou
 import 'package:ptit_dms_flutter/data/datasources/research_post_acceptance_report_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/research_pre_acceptance_report_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/research_remote_data_source.dart';
+import 'package:ptit_dms_flutter/data/datasources/research_seminar_committee_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/student_search_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/timeline_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/repositories/academic_year_repository_impl.dart';
@@ -36,6 +37,7 @@ import 'package:ptit_dms_flutter/data/repositories/project_result_repository_imp
 import 'package:ptit_dms_flutter/data/repositories/research_post_acceptance_report_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/research_pre_acceptance_report_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/research_repository_impl.dart';
+import 'package:ptit_dms_flutter/data/repositories/research_seminar_committee_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/student_profile_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/student_search_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/timeline_repository_impl.dart';
@@ -55,6 +57,7 @@ import 'package:ptit_dms_flutter/domain/repositories/project_result_repository.d
 import 'package:ptit_dms_flutter/domain/repositories/research_post_acceptance_report_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/research_pre_acceptance_report_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/research_repository.dart';
+import 'package:ptit_dms_flutter/domain/repositories/research_seminar_committee_repository.dart';
 import 'package:ptit_dms_flutter/core/error/dio_exception_mapper.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_profile_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/student_search_repository.dart';
@@ -80,6 +83,7 @@ class AppDependencies {
     required this.researchRepository,
     required this.researchPreAcceptanceReportRepository,
     required this.researchPostAcceptanceReportRepository,
+    required this.researchSeminarCommitteeRepository,
     required this.studentSearchRepository,
   });
 
@@ -105,6 +109,7 @@ class AppDependencies {
   researchPreAcceptanceReportRepository;
   final ResearchPostAcceptanceReportRepository
   researchPostAcceptanceReportRepository;
+  final ResearchSeminarCommitteeRepository researchSeminarCommitteeRepository;
   final StudentSearchRepository studentSearchRepository;
 
   static Future<AppDependencies> create() async {
@@ -195,6 +200,11 @@ class AppDependencies {
       researchPostAcceptanceReportRepository:
           ResearchPostAcceptanceReportRepositoryImpl(
             ResearchPostAcceptanceReportRemoteDataSource(dio),
+            mapper,
+          ),
+      researchSeminarCommitteeRepository:
+          ResearchSeminarCommitteeRepositoryImpl(
+            ResearchSeminarCommitteeRemoteDataSource(dio),
             mapper,
           ),
       studentSearchRepository: StudentSearchRepositoryImpl(

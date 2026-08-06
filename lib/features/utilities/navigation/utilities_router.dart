@@ -13,6 +13,7 @@ import 'package:ptit_dms_flutter/features/utilities/project_result/pages/project
 import 'package:ptit_dms_flutter/features/utilities/research_post_acceptance_report/pages/research_post_acceptance_report_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/research_pre_acceptance_report/pages/research_pre_acceptance_report_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/research_registration/pages/research_registration_page.dart';
+import 'package:ptit_dms_flutter/features/utilities/research_seminar_committee/pages/research_seminar_committee_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/pages/utilities_page.dart';
 import 'package:ptit_dms_flutter/features/utilities/pages/utility_placeholder_page.dart';
 
@@ -68,6 +69,11 @@ class UtilitiesRouter {
       case UtilitiesRoutes.researchPostAcceptanceReport:
         return MaterialPageRoute(
           builder: (_) => const ResearchPostAcceptanceReportPage(),
+          settings: settings,
+        );
+      case UtilitiesRoutes.researchSeminarCommittee:
+        return MaterialPageRoute(
+          builder: (_) => const ResearchSeminarCommitteePage(),
           settings: settings,
         );
       case UtilitiesRoutes.projectCommittee:

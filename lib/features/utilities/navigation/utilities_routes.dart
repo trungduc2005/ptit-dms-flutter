@@ -10,6 +10,8 @@ class UtilitiesRoutes {
       '/utilities/research-pre-acceptance-report';
   static const researchPostAcceptanceReport =
       '/utilities/research-post-acceptance-report';
+  static const researchSeminarCommittee =
+      '/utilities/research-seminar-committee';
   static const projectCommittee = '/utilities/project-committee';
   static const projectProgressReport = '/utilities/project-progress-report';
   static const projectPreDefenseSubmission =
