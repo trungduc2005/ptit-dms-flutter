@@ -15,6 +15,7 @@ import 'package:ptit_dms_flutter/data/datasources/project_post_defense_submissio
 import 'package:ptit_dms_flutter/data/datasources/project_pre_defense_submission_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/project_progress_report_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/project_result_remote_data_source.dart';
+import 'package:ptit_dms_flutter/data/datasources/research_post_acceptance_report_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/research_pre_acceptance_report_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/research_remote_data_source.dart';
 import 'package:ptit_dms_flutter/data/datasources/student_search_remote_data_source.dart';
@@ -32,6 +33,7 @@ import 'package:ptit_dms_flutter/data/repositories/project_post_defense_submissi
 import 'package:ptit_dms_flutter/data/repositories/project_pre_defense_submission_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/project_progress_report_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/project_result_repository_impl.dart';
+import 'package:ptit_dms_flutter/data/repositories/research_post_acceptance_report_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/research_pre_acceptance_report_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/research_repository_impl.dart';
 import 'package:ptit_dms_flutter/data/repositories/student_profile_repository_impl.dart';
@@ -50,6 +52,7 @@ import 'package:ptit_dms_flutter/domain/repositories/project_post_defense_submis
 import 'package:ptit_dms_flutter/domain/repositories/project_pre_defense_submission_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_progress_report_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/project_result_repository.dart';
+import 'package:ptit_dms_flutter/domain/repositories/research_post_acceptance_report_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/research_pre_acceptance_report_repository.dart';
 import 'package:ptit_dms_flutter/domain/repositories/research_repository.dart';
 import 'package:ptit_dms_flutter/core/error/dio_exception_mapper.dart';
@@ -76,6 +79,7 @@ class AppDependencies {
     required this.projectResultRepository,
     required this.researchRepository,
     required this.researchPreAcceptanceReportRepository,
+    required this.researchPostAcceptanceReportRepository,
     required this.studentSearchRepository,
   });
 
@@ -99,6 +103,8 @@ class AppDependencies {
   final ResearchRepository researchRepository;
   final ResearchPreAcceptanceReportRepository
   researchPreAcceptanceReportRepository;
+  final ResearchPostAcceptanceReportRepository
+  researchPostAcceptanceReportRepository;
   final StudentSearchRepository studentSearchRepository;
 
   static Future<AppDependencies> create() async {
@@ -184,6 +190,11 @@ class AppDependencies {
       researchPreAcceptanceReportRepository:
           ResearchPreAcceptanceReportRepositoryImpl(
             ResearchPreAcceptanceReportRemoteDataSource(dio),
+            mapper,
+          ),
+      researchPostAcceptanceReportRepository:
+          ResearchPostAcceptanceReportRepositoryImpl(
+            ResearchPostAcceptanceReportRemoteDataSource(dio),
             mapper,
           ),
       studentSearchRepository: StudentSearchRepositoryImpl(

@@ -31,6 +31,8 @@ Future<void> main() async {
       researchRepository: dependencies.researchRepository,
       researchPreAcceptanceReportRepository:
           dependencies.researchPreAcceptanceReportRepository,
+      researchPostAcceptanceReportRepository:
+          dependencies.researchPostAcceptanceReportRepository,
       studentSearchRepository: dependencies.studentSearchRepository,
     ),
   );

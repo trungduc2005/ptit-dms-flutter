@@ -8,6 +8,8 @@ class UtilitiesRoutes {
   static const researchRegistration = '/utilities/research-registration';
   static const researchPreAcceptanceReport =
       '/utilities/research-pre-acceptance-report';
+  static const researchPostAcceptanceReport =
+      '/utilities/research-post-acceptance-report';
   static const projectCommittee = '/utilities/project-committee';
   static const projectProgressReport = '/utilities/project-progress-report';
   static const projectPreDefenseSubmission =

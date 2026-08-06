@@ -32,9 +32,14 @@ class UtilitiesPage extends StatelessWidget {
       routeName: UtilitiesRoutes.researchRegistration,
     ),
     UtilityShortcutData(
-      title: 'Báo cáo trước\nnghiệm thu',
+      title: 'BC trước\nnghiệm thu',
       iconAsset: 'assets/icons/research_pre_acceptance_report.svg',
       routeName: UtilitiesRoutes.researchPreAcceptanceReport,
+    ),
+    UtilityShortcutData(
+      title: 'BC sau\nnghiệm thu',
+      iconAsset: 'assets/icons/research_post_acceptance_report.svg',
+      routeName: UtilitiesRoutes.researchPostAcceptanceReport,
     ),
   ];
 
