@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ptit_dms_flutter/domain/entities/academic_year_option.dart';
-import 'package:ptit_dms_flutter/domain/entities/research_seminar_committee.dart';
-import 'package:ptit_dms_flutter/features/utilities/research_seminar_committee/widgets/research_seminar_committee_sections.dart';
+import 'package:ptit_dms_flutter/domain/entities/research_final_committee.dart';
+import 'package:ptit_dms_flutter/features/utilities/research_final_committee/widgets/research_final_committee_sections.dart';
 
 void main() {
   const academicYear = AcademicYearOption(
@@ -10,31 +10,31 @@ void main() {
     code: '2026-2027',
     name: 'Năm học 2026-2027',
   );
-  const research = ResearchSeminarOption(
+  const research = ResearchFinalOption(
     researchId: 'research-1',
     researchTopic: 'Ứng dụng trí tuệ nhân tạo trong giáo dục',
   );
-  final committee = ResearchSeminarCommittee(
+  final committee = ResearchFinalCommittee(
     committeeId: 'committee-1',
-    name: 'Hội đồng nghiên cứu khoa học số 1',
+    name: 'Hội đồng nghiệm thu nghiên cứu khoa học số 1',
     time: '08:30',
     date: DateTime(2026, 8, 12),
     location: 'Phòng 101 - A2',
     members: const [
-      ResearchSeminarCommitteeMember(
+      ResearchFinalCommitteeMember(
         memberId: 'member-1',
         memberName: 'Nguyễn Văn An',
         department: 'Khoa Công nghệ thông tin',
         role: 'Chủ tịch',
       ),
-      ResearchSeminarCommitteeMember(
+      ResearchFinalCommitteeMember(
         memberId: 'member-2',
         memberName: 'Trần Thị Bình',
         department: 'Khoa Đa phương tiện',
         role: 'Thư ký',
       ),
     ],
-    research: const ResearchSeminarCommitteeResearch(
+    research: const ResearchFinalCommitteeResearch(
       researchId: 'research-1',
       researchTopic: 'Ứng dụng trí tuệ nhân tạo trong giáo dục',
       presentationOrder: 2,
@@ -48,10 +48,12 @@ void main() {
     );
   }
 
-  testWidgets('hiển thị bộ lọc năm học và đề tài đã chọn', (tester) async {
+  testWidgets('hiển thị bộ lọc năm học và đề tài nghiệm thu đã chọn', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       wrap(
-        ResearchSeminarCommitteeFilterSection(
+        ResearchFinalCommitteeFilterSection(
           academicYears: const [academicYear],
           researches: const [research],
           selectedAcademicYearId: academicYear.id,
@@ -64,15 +66,15 @@ void main() {
       ),
     );
 
-    expect(find.text('Thông tin hội thảo'), findsOneWidget);
+    expect(find.text('Thông tin nghiệm thu'), findsOneWidget);
     expect(find.text(academicYear.name), findsOneWidget);
     expect(find.text(research.researchTopic), findsOneWidget);
   });
 
-  testWidgets('hiển thị tiến độ khi đang tải dữ liệu bộ lọc', (tester) async {
+  testWidgets('hiển thị tiến độ khi đang tải danh sách đề tài', (tester) async {
     await tester.pumpWidget(
       wrap(
-        ResearchSeminarCommitteeFilterSection(
+        ResearchFinalCommitteeFilterSection(
           academicYears: const [academicYear],
           researches: const [],
           selectedAcademicYearId: academicYear.id,
@@ -89,11 +91,11 @@ void main() {
     expect(find.text('Đang tải danh sách đề tài...'), findsOneWidget);
   });
 
-  testWidgets('hiển thị đầy đủ thông tin hội đồng và thành viên', (
+  testWidgets('hiển thị đầy đủ thông tin hội đồng nghiệm thu và thành viên', (
     tester,
   ) async {
     await tester.pumpWidget(
-      wrap(ResearchSeminarCommitteeOverviewSection(committee: committee)),
+      wrap(ResearchFinalCommitteeOverviewSection(committee: committee)),
     );
 
     expect(find.text(committee.name), findsOneWidget);
@@ -112,11 +114,11 @@ void main() {
   testWidgets('hiển thị giá trị dự phòng khi lịch chưa được cập nhật', (
     tester,
   ) async {
-    const incompleteCommittee = ResearchSeminarCommittee(
+    const incompleteCommittee = ResearchFinalCommittee(
       committeeId: 'committee-2',
-      name: 'Hội đồng số 2',
+      name: 'Hội đồng nghiệm thu số 2',
       members: [],
-      research: ResearchSeminarCommitteeResearch(
+      research: ResearchFinalCommitteeResearch(
         researchId: 'research-2',
         researchTopic: 'Đề tài chưa xếp lịch',
         presentationOrder: -1,
@@ -125,7 +127,7 @@ void main() {
 
     await tester.pumpWidget(
       wrap(
-        const ResearchSeminarCommitteeOverviewSection(
+        const ResearchFinalCommitteeOverviewSection(
           committee: incompleteCommittee,
         ),
       ),
@@ -141,18 +143,59 @@ void main() {
     }
   });
 
+  testWidgets(
+    'xếp giá trị xuống dưới nhãn dài trên màn hình điện thoại để không bị cắt',
+    (tester) async {
+      const incompleteCommittee = ResearchFinalCommittee(
+        committeeId: 'committee-compact',
+        name: 'Hội đồng nghiệm thu',
+        members: [],
+        research: ResearchFinalCommitteeResearch(
+          researchId: 'research-compact',
+          researchTopic: 'Đề tài kiểm thử responsive',
+          presentationOrder: -1,
+        ),
+      );
+      await tester.binding.setSurfaceSize(const Size(390, 844));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        wrap(
+          const ResearchFinalCommitteeOverviewSection(
+            committee: incompleteCommittee,
+          ),
+        ),
+      );
+
+      final presentationLabel = find.text('Thứ tự trình bày:');
+      expect(presentationLabel, findsOneWidget);
+
+      final labelTop = tester.getTopLeft(presentationLabel).dy;
+      final fallbackValues = find.text('N/A');
+      final hasFallbackBelowLabel = fallbackValues
+          .evaluate()
+          .map((element) => find.byWidget(element.widget))
+          .any((finder) => tester.getTopLeft(finder).dy > labelTop);
+
+      expect(hasFallbackBelowLabel, isTrue);
+    },
+  );
+
   testWidgets('hiển thị empty state', (tester) async {
     await tester.pumpWidget(
       wrap(
-        const ResearchSeminarCommitteeEmptyState(
+        const ResearchFinalCommitteeEmptyState(
           title: 'Chưa được phân hội đồng',
-          message: 'Thông tin hội đồng chưa được công bố.',
+          message: 'Thông tin hội đồng nghiệm thu chưa được công bố.',
         ),
       ),
     );
 
     expect(find.text('Chưa được phân hội đồng'), findsOneWidget);
-    expect(find.text('Thông tin hội đồng chưa được công bố.'), findsOneWidget);
+    expect(
+      find.text('Thông tin hội đồng nghiệm thu chưa được công bố.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('hiển thị lỗi và gọi callback thử lại', (tester) async {
@@ -160,7 +203,7 @@ void main() {
 
     await tester.pumpWidget(
       wrap(
-        ResearchSeminarCommitteeErrorState(
+        ResearchFinalCommitteeErrorState(
           message: 'Không thể kết nối máy chủ.',
           onRetry: () => retried = true,
         ),
@@ -171,7 +214,7 @@ void main() {
     expect(find.text('Không thể kết nối máy chủ.'), findsOneWidget);
 
     await tester.tap(
-      find.byKey(const ValueKey('research-seminar-committee-retry')),
+      find.byKey(const ValueKey('research-final-committee-retry')),
     );
 
     expect(retried, isTrue);

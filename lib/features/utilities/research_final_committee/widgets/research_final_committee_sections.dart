@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:ptit_dms_flutter/core/theme/theme.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_dropdown_field.dart';
 import 'package:ptit_dms_flutter/domain/entities/academic_year_option.dart';
-import 'package:ptit_dms_flutter/domain/entities/research_seminar_committee.dart';
+import 'package:ptit_dms_flutter/domain/entities/research_final_committee.dart';
 
 const _titleColor = Color(0xFF202124);
 const _mutedColor = Color(0xFF6B7280);
 const _borderColor = Color(0xFFE7E8EC);
 
-class ResearchSeminarCommitteeFilterSection extends StatelessWidget {
-  const ResearchSeminarCommitteeFilterSection({
+class ResearchFinalCommitteeFilterSection extends StatelessWidget {
+  const ResearchFinalCommitteeFilterSection({
     required this.academicYears,
     required this.researches,
     required this.selectedAcademicYearId,
@@ -22,7 +22,7 @@ class ResearchSeminarCommitteeFilterSection extends StatelessWidget {
   });
 
   final List<AcademicYearOption> academicYears;
-  final List<ResearchSeminarOption> researches;
+  final List<ResearchFinalOption> researches;
   final String? selectedAcademicYearId;
   final String? selectedResearchId;
   final bool isYearLoading;
@@ -39,18 +39,18 @@ class ResearchSeminarCommitteeFilterSection extends StatelessWidget {
       (research) => research.researchId == selectedResearchId,
     );
 
-    return ResearchSeminarCommitteeSurfaceCard(
-      key: const ValueKey('research-seminar-committee-filter'),
+    return ResearchFinalCommitteeSurfaceCard(
+      key: const ValueKey('research-final-committee-filter'),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const ResearchSeminarCommitteeSectionHeading(
+          const ResearchFinalCommitteeSectionHeading(
             icon: Icons.tune_outlined,
-            title: 'Thông tin hội thảo',
+            title: 'Thông tin nghiệm thu',
           ),
           const SizedBox(height: 16),
           FormDropdownField<String>(
-            key: const ValueKey('research-seminar-committee-year-dropdown'),
+            key: const ValueKey('research-final-committee-year-dropdown'),
             label: 'Năm học',
             value: hasSelectedYear ? selectedAcademicYearId : null,
             hintText: isYearLoading ? 'Đang tải năm học...' : 'Chọn năm học',
@@ -70,12 +70,12 @@ class ResearchSeminarCommitteeFilterSection extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           FormDropdownField<String>(
-            key: const ValueKey('research-seminar-committee-research-dropdown'),
-            label: 'Đề tài hội thảo',
+            key: const ValueKey('research-final-committee-research-dropdown'),
+            label: 'Đề tài nghiệm thu',
             value: hasSelectedResearch ? selectedResearchId : null,
             hintText: isCommitteeLoading
                 ? 'Đang tải danh sách đề tài...'
-                : 'Chọn đề tài hội thảo',
+                : 'Chọn đề tài nghiệm thu',
             enabled: !isCommitteeLoading && researches.isNotEmpty,
             items: researches
                 .map(
@@ -100,13 +100,13 @@ class ResearchSeminarCommitteeFilterSection extends StatelessWidget {
   }
 }
 
-class ResearchSeminarCommitteeOverviewSection extends StatelessWidget {
-  const ResearchSeminarCommitteeOverviewSection({
+class ResearchFinalCommitteeOverviewSection extends StatelessWidget {
+  const ResearchFinalCommitteeOverviewSection({
     required this.committee,
     super.key,
   });
 
-  final ResearchSeminarCommittee committee;
+  final ResearchFinalCommittee committee;
 
   @override
   Widget build(BuildContext context) {
@@ -114,24 +114,24 @@ class ResearchSeminarCommitteeOverviewSection extends StatelessWidget {
       children: [
         _CommitteeSummaryCard(committee: committee),
         const SizedBox(height: 16),
-        ResearchSeminarCommitteeMembersSection(members: committee.members),
+        ResearchFinalCommitteeMembersSection(members: committee.members),
       ],
     );
   }
 }
 
-class ResearchSeminarCommitteeMembersSection extends StatelessWidget {
-  const ResearchSeminarCommitteeMembersSection({
+class ResearchFinalCommitteeMembersSection extends StatelessWidget {
+  const ResearchFinalCommitteeMembersSection({
     required this.members,
     super.key,
   });
 
-  final List<ResearchSeminarCommitteeMember> members;
+  final List<ResearchFinalCommitteeMember> members;
 
   @override
   Widget build(BuildContext context) {
-    return ResearchSeminarCommitteeSurfaceCard(
-      key: const ValueKey('research-seminar-committee-members'),
+    return ResearchFinalCommitteeSurfaceCard(
+      key: const ValueKey('research-final-committee-members'),
       padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,8 +197,8 @@ class ResearchSeminarCommitteeMembersSection extends StatelessWidget {
   }
 }
 
-class ResearchSeminarCommitteeEmptyState extends StatelessWidget {
-  const ResearchSeminarCommitteeEmptyState({
+class ResearchFinalCommitteeEmptyState extends StatelessWidget {
+  const ResearchFinalCommitteeEmptyState({
     required this.title,
     required this.message,
     this.icon = Icons.groups_2_outlined,
@@ -215,8 +215,8 @@ class ResearchSeminarCommitteeEmptyState extends StatelessWidget {
   }
 }
 
-class ResearchSeminarCommitteeErrorState extends StatelessWidget {
-  const ResearchSeminarCommitteeErrorState({
+class ResearchFinalCommitteeErrorState extends StatelessWidget {
+  const ResearchFinalCommitteeErrorState({
     required this.message,
     required this.onRetry,
     super.key,
@@ -232,7 +232,7 @@ class ResearchSeminarCommitteeErrorState extends StatelessWidget {
       title: 'Không thể tải thông tin',
       message: message,
       action: OutlinedButton.icon(
-        key: const ValueKey('research-seminar-committee-retry'),
+        key: const ValueKey('research-final-committee-retry'),
         onPressed: onRetry,
         icon: const Icon(Icons.refresh_rounded, size: 19),
         label: const Text('Thử lại'),
@@ -248,12 +248,12 @@ class ResearchSeminarCommitteeErrorState extends StatelessWidget {
 class _CommitteeSummaryCard extends StatelessWidget {
   const _CommitteeSummaryCard({required this.committee});
 
-  final ResearchSeminarCommittee committee;
+  final ResearchFinalCommittee committee;
 
   @override
   Widget build(BuildContext context) {
-    return ResearchSeminarCommitteeSurfaceCard(
-      key: const ValueKey('research-seminar-committee-summary'),
+    return ResearchFinalCommitteeSurfaceCard(
+      key: const ValueKey('research-final-committee-summary'),
       padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,7 +275,7 @@ class _CommitteeSummaryCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
-                    Icons.groups_2_outlined,
+                    Icons.fact_check_outlined,
                     color: AppTheme.brandColor,
                     size: 24,
                   ),
@@ -286,7 +286,7 @@ class _CommitteeSummaryCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Hội đồng hội thảo',
+                        'Hội đồng nghiệm thu',
                         style: TextStyle(
                           color: _mutedColor,
                           fontSize: 12,
@@ -465,7 +465,7 @@ class _CommitteeMemberTile extends StatelessWidget {
   const _CommitteeMemberTile({required this.number, required this.member});
 
   final int number;
-  final ResearchSeminarCommitteeMember member;
+  final ResearchFinalCommitteeMember member;
 
   @override
   Widget build(BuildContext context) {
@@ -607,8 +607,8 @@ class _RoleBadge extends StatelessWidget {
   }
 }
 
-class ResearchSeminarCommitteeSectionHeading extends StatelessWidget {
-  const ResearchSeminarCommitteeSectionHeading({
+class ResearchFinalCommitteeSectionHeading extends StatelessWidget {
+  const ResearchFinalCommitteeSectionHeading({
     required this.icon,
     required this.title,
     super.key,
@@ -638,8 +638,8 @@ class ResearchSeminarCommitteeSectionHeading extends StatelessWidget {
   }
 }
 
-class ResearchSeminarCommitteeSurfaceCard extends StatelessWidget {
-  const ResearchSeminarCommitteeSurfaceCard({
+class ResearchFinalCommitteeSurfaceCard extends StatelessWidget {
+  const ResearchFinalCommitteeSurfaceCard({
     required this.child,
     this.padding = const EdgeInsets.all(16),
     super.key,
@@ -685,8 +685,8 @@ class _MessageState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResearchSeminarCommitteeSurfaceCard(
-      key: const ValueKey('research-seminar-committee-message'),
+    return ResearchFinalCommitteeSurfaceCard(
+      key: const ValueKey('research-final-committee-message'),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 22),
         child: Column(

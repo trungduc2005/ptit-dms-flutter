@@ -190,7 +190,7 @@ class _CommitteeSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final committeeName = committee.name.trim().isEmpty
-        ? 'Chưa cập nhật'
+        ? 'N/A'
         : committee.name.trim();
 
     return _SectionCard(
@@ -237,6 +237,8 @@ class _CommitteeSummaryCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           committeeName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: _brandColor,
                             fontSize: 16,
@@ -345,6 +347,7 @@ class _SummaryItem extends StatelessWidget {
             children: [
               Text(
                 '$label:',
+                maxLines: 1,
                 style: const TextStyle(
                   color: _mutedColor,
                   fontSize: 13,
@@ -355,6 +358,8 @@ class _SummaryItem extends StatelessWidget {
               Expanded(
                 child: Text(
                   value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: valueColor,
                     fontSize: 14,
@@ -595,11 +600,11 @@ class _MessageState extends StatelessWidget {
 
 String _displayValue(String? value) {
   final text = value?.trim() ?? '';
-  return text.isEmpty ? 'Chưa cập nhật' : text;
+  return text.isEmpty ? 'N/A' : text;
 }
 
 String _formatDate(DateTime? date) {
-  if (date == null) return 'Chưa cập nhật';
+  if (date == null) return 'N/A';
   final localDate = date.toLocal();
   final day = localDate.day.toString().padLeft(2, '0');
   final month = localDate.month.toString().padLeft(2, '0');
@@ -612,7 +617,7 @@ String _initials(String name) {
       .split(RegExp(r'\s+'))
       .where((word) => word.isNotEmpty)
       .toList(growable: false);
-  if (words.isEmpty || name == 'Chưa cập nhật') return '?';
+  if (words.isEmpty || name == 'N/A') return '?';
   if (words.length == 1) return words.first[0].toUpperCase();
   return '${words.first[0]}${words.last[0]}'.toUpperCase();
 }

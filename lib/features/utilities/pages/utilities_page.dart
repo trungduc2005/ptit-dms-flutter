@@ -46,6 +46,11 @@ class UtilitiesPage extends StatelessWidget {
       iconAsset: 'assets/icons/committee.svg',
       routeName: UtilitiesRoutes.researchSeminarCommittee,
     ),
+    UtilityShortcutData(
+      title: 'Hội đồng\nnghiệm thu',
+      iconAsset: 'assets/icons/committee.svg',
+      routeName: UtilitiesRoutes.researchFinalCommittee,
+    ),
   ];
 
   static const List<UtilityShortcutData> _projectShortcuts = [
