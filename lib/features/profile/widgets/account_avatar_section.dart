@@ -12,6 +12,7 @@ class AccountAvatarSection extends StatelessWidget {
     required this.studentId,
     required this.enabled,
     required this.onAvatarSelected,
+    this.isLecturer = false,
     super.key,
   });
 
@@ -21,6 +22,7 @@ class AccountAvatarSection extends StatelessWidget {
   final String studentId;
   final bool enabled;
   final ValueChanged<String> onAvatarSelected;
+  final bool isLecturer;
 
   Future<void> _pickAvatar() async {
     final result = await FilePicker.platform.pickFiles(
@@ -40,9 +42,11 @@ class AccountAvatarSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final selectedPath = selectedAvatarPath?.trim();
     final networkUrl = avatarUrl?.trim();
-    final displayName = fullName.trim().isEmpty ? 'Sinh viên PTIT' : fullName;
+    final displayName = fullName.trim().isEmpty
+        ? (isLecturer ? 'Giảng viên PTIT' : 'Sinh viên PTIT')
+        : fullName;
     final displayStudentId = studentId.trim().isEmpty
-        ? 'Chưa có mã sinh viên'
+        ? (isLecturer ? 'Chưa có mã giảng viên' : 'Chưa có mã sinh viên')
         : studentId;
 
     return Container(

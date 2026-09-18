@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ptit_dms_flutter/core/theme/theme.dart';
+import 'package:ptit_dms_flutter/core/utils/role_helpers.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_dropdown_field.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_field_shell.dart';
 import 'package:ptit_dms_flutter/core/widgets/form/form_read_only_field.dart';
@@ -239,6 +240,10 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
       listener: _handleState,
       builder: (context, state) {
         final isBusy = state.isBusy;
+        final isLecturer = isLecturerRole(_user?.roleName);
+        final idLabel = isLecturer ? 'Mã giảng viên' : 'Mã sinh viên';
+        final sectionTitle =
+            isLecturer ? 'Thông tin giảng viên' : 'Thông tin sinh viên';
 
         return SafeArea(
           top: false,
@@ -255,8 +260,9 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
                         avatarUrl: _user?.avatarUrl,
                         selectedAvatarPath: _selectedAvatarPath,
                         fullName: _user?.fullName ?? '',
-                        studentId: widget.profile.studentId,
+                        studentId: _profile.displayId,
                         enabled: _isEditing && !isBusy,
+                        isLecturer: isLecturer,
                         onAvatarSelected: (path) {
                           setState(() => _selectedAvatarPath = path);
                         },
@@ -267,7 +273,7 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             _ProfileSectionCard(
-                              title: 'Thông tin học tập',
+                              title: sectionTitle,
                               child: _isEditing
                                   ? Column(
                                       children: [
@@ -277,24 +283,39 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
                                         ),
                                         const SizedBox(height: 14),
                                         FormReadOnlyField(
-                                          label: 'Mã sinh viên',
-                                          value: _profile.studentId,
+                                          label: idLabel,
+                                          value: _profile.displayId,
                                         ),
-                                        const SizedBox(height: 14),
-                                        FormReadOnlyField(
-                                          label: 'Lớp',
-                                          value: _profile.classInfo?.name ?? '',
-                                        ),
-                                        const SizedBox(height: 14),
-                                        FormReadOnlyField(
-                                          label: 'Khóa',
-                                          value: _profile.cohort,
-                                        ),
-                                        const SizedBox(height: 14),
-                                        FormReadOnlyField(
-                                          label: 'Ngành',
-                                          value: _profile.major.join(', '),
-                                        ),
+                                        if (!isLecturer) ...[
+                                          const SizedBox(height: 14),
+                                          FormReadOnlyField(
+                                            label: 'Lớp',
+                                            value:
+                                                _profile.classInfo?.name ?? '',
+                                          ),
+                                          const SizedBox(height: 14),
+                                          FormReadOnlyField(
+                                            label: 'Khóa',
+                                            value: _profile.cohort,
+                                          ),
+                                          const SizedBox(height: 14),
+                                          FormReadOnlyField(
+                                            label: 'Ngành',
+                                            value: _profile.major.join(', '),
+                                          ),
+                                        ],
+                                        if (isLecturer) ...[
+                                          const SizedBox(height: 14),
+                                          FormReadOnlyField(
+                                            label: 'Khoa',
+                                            value: _user?.facultyName ?? '',
+                                          ),
+                                          const SizedBox(height: 14),
+                                          FormReadOnlyField(
+                                            label: 'Bộ môn',
+                                            value: _user?.departmentName ?? '',
+                                          ),
+                                        ],
                                       ],
                                     )
                                   : Column(
@@ -304,28 +325,47 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
                                           value: _displayValue(_user?.fullName),
                                         ),
                                         _InformationRow(
-                                          label: 'Mã sinh viên',
+                                          label: idLabel,
                                           value: _displayValue(
-                                            _profile.studentId,
+                                            _profile.displayId,
                                           ),
                                         ),
-                                        _InformationRow(
-                                          label: 'Lớp',
-                                          value: _displayValue(
-                                            _profile.classInfo?.name,
+                                        if (!isLecturer) ...[
+                                          _InformationRow(
+                                            label: 'Lớp',
+                                            value: _displayValue(
+                                              _profile.classInfo?.name,
+                                            ),
                                           ),
-                                        ),
-                                        _InformationRow(
-                                          label: 'Khóa',
-                                          value: _displayValue(_profile.cohort),
-                                        ),
-                                        _InformationRow(
-                                          label: 'Ngành',
-                                          value: _displayValue(
-                                            _profile.major.join(', '),
+                                          _InformationRow(
+                                            label: 'Khóa',
+                                            value: _displayValue(
+                                              _profile.cohort,
+                                            ),
                                           ),
-                                          showDivider: false,
-                                        ),
+                                          _InformationRow(
+                                            label: 'Ngành',
+                                            value: _displayValue(
+                                              _profile.major.join(', '),
+                                            ),
+                                            showDivider: false,
+                                          ),
+                                        ],
+                                        if (isLecturer) ...[
+                                          _InformationRow(
+                                            label: 'Khoa',
+                                            value: _displayValue(
+                                              _user?.facultyName,
+                                            ),
+                                          ),
+                                          _InformationRow(
+                                            label: 'Bộ môn',
+                                            value: _displayValue(
+                                              _user?.departmentName,
+                                            ),
+                                            showDivider: false,
+                                          ),
+                                        ],
                                       ],
                                     ),
                             ),

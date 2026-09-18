@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:ptit_dms_flutter/core/network/bearer_auth_interceptor.dart';
 import 'package:ptit_dms_flutter/core/utils/json_helpers.dart';
 import 'package:ptit_dms_flutter/domain/entities/auth_login_result.dart';
 import 'package:ptit_dms_flutter/domain/entities/auth_session.dart';
@@ -22,14 +23,22 @@ class AuthRemoteDataSource {
   }
 
   Future<AuthSession> verify() async {
-    final response = await _dio.get('/auth/verify');
+    final response = await _dio.get(
+      '/auth/verify',
+      options: Options(extra: const {requiresBearerAuthKey: true}),
+    );
     return AuthSession.fromJson(asJsonMap(response.data));
   }
 
   Future<void> logout() async {
     await _dio.post(
       '/auth/logout',
-      options: Options(extra: const {'skipAuthRefresh': true}),
+      options: Options(
+        extra: const {
+          'skipAuthRefresh': true,
+          requiresBearerAuthKey: true,
+        },
+      ),
     );
   }
 }

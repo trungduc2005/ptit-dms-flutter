@@ -10,6 +10,9 @@ class StudentProfile extends Equatable {
     this.subSpecialization,
     this.classInfo,
     this.user,
+    this.lecturerId,
+    this.title,
+    this.position,
   });
 
   final String id;
@@ -19,6 +22,11 @@ class StudentProfile extends Equatable {
   final String? subSpecialization;
   final StudentProfileClass? classInfo;
   final StudentProfileUser? user;
+
+  /// Lecturer-specific fields
+  final String? lecturerId;
+  final String? title;
+  final String? position;
 
   factory StudentProfile.fromJson(Map<String, dynamic> json) {
     final classJson = json['classId'];
@@ -39,7 +47,23 @@ class StudentProfile extends Equatable {
       user: userJson is Map
           ? StudentProfileUser.fromJson(Map<String, dynamic>.from(userJson))
           : null,
+      lecturerId: asString(json['lecturerId']),
+      title: asString(json['title']),
+      position: asString(json['position']),
     );
+  }
+
+  /// Returns the appropriate display ID based on role.
+  /// For lecturers: username (MGV). For students: studentId (MSV).
+  String get displayId {
+    final roleName = user?.roleName;
+    final isLecturer =
+        roleName?.trim().toLowerCase() == 'lecturer' ||
+        roleName?.trim().toLowerCase() == 'lecture';
+    if (isLecturer) {
+      return user?.username ?? '';
+    }
+    return studentId;
   }
 
   Map<String, dynamic> toJson() {
@@ -51,6 +75,9 @@ class StudentProfile extends Equatable {
       'subSpecialization': subSpecialization,
       'classId': classInfo?.toJson(),
       'userId': user?.toJson(),
+      'lecturerId': lecturerId,
+      'title': title,
+      'position': position,
     };
   }
 
@@ -63,6 +90,9 @@ class StudentProfile extends Equatable {
     subSpecialization,
     classInfo,
     user,
+    lecturerId,
+    title,
+    position,
   ];
 }
 

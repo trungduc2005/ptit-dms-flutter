@@ -2,7 +2,8 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 
 const requiresBearerAuthKey = 'requiresBearerAuth';
-const accessTokenCookieName = 'token';
+const primaryAccessTokenCookieName = 'accessToken';
+const legacyAccessTokenCookieName = 'token';
 const authorizationHeaderName = 'Authorization';
 
 class BearerAuthInterceptor extends Interceptor {
@@ -15,7 +16,9 @@ class BearerAuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    if (options.extra[requiresBearerAuthKey] != true) {
+    // If bearer auth is explicitly disabled or it's the login endpoint, proceed without adding token
+    if (options.extra[requiresBearerAuthKey] == false ||
+        options.path == '/auth/login') {
       handler.next(options);
       return;
     }
@@ -25,9 +28,12 @@ class BearerAuthInterceptor extends Interceptor {
     String? accessToken;
 
     for (final cookie in cookies) {
-      if (cookie.name == accessTokenCookieName) {
+      if (cookie.name == primaryAccessTokenCookieName) {
         accessToken = cookie.value;
         break;
+      }
+      if (cookie.name == legacyAccessTokenCookieName) {
+        accessToken ??= cookie.value;
       }
     }
 

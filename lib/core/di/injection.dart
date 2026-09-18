@@ -121,7 +121,7 @@ class AppDependencies {
     final directory = await getApplicationDocumentsDirectory();
 
     final cookieJar = PersistCookieJar(
-      ignoreExpires: false,
+      ignoreExpires: true,
       storage: FileStorage('${directory.path}/.cookies/'),
     );
 

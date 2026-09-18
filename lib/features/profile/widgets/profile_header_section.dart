@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ptit_dms_flutter/core/utils/role_helpers.dart';
 import 'package:ptit_dms_flutter/domain/entities/student_profile.dart';
 
 class ProfileHeaderSection extends StatelessWidget {
@@ -10,9 +11,11 @@ class ProfileHeaderSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = profile.user;
     final fullName = _textOrFallback(user?.fullName, fallback: 'Chưa cập nhật');
-    final studentId = _textOrFallback(profile.studentId, fallback: '---');
+    final displayId = _textOrFallback(profile.displayId, fallback: '---');
     final avatarUrl = user?.avatarUrl?.trim();
     final primaryColor = Theme.of(context).colorScheme.primary;
+    final isLecturer = isLecturerRole(user?.roleName);
+    final idLabel = isLecturer ? 'MGV' : 'MSV';
 
     return Container(
       width: double.infinity,
@@ -41,7 +44,7 @@ class ProfileHeaderSection extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'MSV: $studentId',
+                      '$idLabel: $displayId',
                       style: const TextStyle(
                         color: Color(0xFFFDE7E7),
                         fontSize: 13,
