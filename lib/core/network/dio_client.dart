@@ -8,7 +8,7 @@ import 'csrf_interceptor.dart';
 
 const apiBaseUrl = String.fromEnvironment(
   'API_BASE_URL',
-  defaultValue: 'http://192.168.137.1:3001/api',
+  defaultValue: 'http://localhost:3001/api',
 );
 
 Dio createDioClient(CookieJar cookieJar) {

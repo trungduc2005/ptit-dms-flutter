@@ -214,7 +214,7 @@ class _AccountInformationFormState extends State<AccountInformationForm> {
     }
 
     setState(() {
-      _profile = updatedProfile;
+      _profile = _profile.mergeEditableFields(updatedProfile);
       _emailController.text = _user?.email ?? '';
       _phoneController.text = _user?.phone ?? '';
       _addressController.text = _user?.address ?? '';

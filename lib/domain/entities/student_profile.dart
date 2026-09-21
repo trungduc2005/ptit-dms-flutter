@@ -66,6 +66,48 @@ class StudentProfile extends Equatable {
     return studentId;
   }
 
+  /// Merges only the user-editable fields (email, phone, gender, dateOfBirth,
+  /// address, avatarUrl) from [other] into this profile, preserving all
+  /// structural / non-editable fields (role, faculty, department, class, etc.)
+  /// that the update-API response may not populate.
+  StudentProfile mergeEditableFields(StudentProfile other) {
+    final otherUser = other.user;
+    final currentUser = user;
+
+    final mergedUser = currentUser == null
+        ? otherUser
+        : otherUser == null
+            ? currentUser
+            : StudentProfileUser(
+                id: currentUser.id,
+                fullName: currentUser.fullName,
+                username: currentUser.username,
+                avatarUrl: otherUser.avatarUrl ?? currentUser.avatarUrl,
+                gender: otherUser.gender ?? currentUser.gender,
+                dateOfBirth: otherUser.dateOfBirth ?? currentUser.dateOfBirth,
+                phone: otherUser.phone ?? currentUser.phone,
+                email: otherUser.email ?? currentUser.email,
+                address: otherUser.address ?? currentUser.address,
+                citizenId: currentUser.citizenId,
+                roleName: currentUser.roleName,
+                facultyName: currentUser.facultyName,
+                departmentName: currentUser.departmentName,
+              );
+
+    return StudentProfile(
+      id: id,
+      studentId: studentId,
+      cohort: cohort,
+      major: major,
+      subSpecialization: subSpecialization,
+      classInfo: classInfo,
+      user: mergedUser,
+      lecturerId: lecturerId,
+      title: title,
+      position: position,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       '_id': id,

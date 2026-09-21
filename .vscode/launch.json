@@ -7,19 +7,28 @@
         {
             "name": "ptit_dms_flutter",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "args": [
+                "--dart-define=API_BASE_URL=http://10.0.2.2:3001/api"
+            ]
         },
         {
             "name": "ptit_dms_flutter (profile mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "profile",
+            "args": [
+                "--dart-define=API_BASE_URL=http://10.0.2.2:3001/api"
+            ]
         },
         {
             "name": "ptit_dms_flutter (release mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "release",
+            "args": [
+                "--dart-define=API_BASE_URL=http://10.0.2.2:3001/api"
+            ]
         }
     ]
 }
